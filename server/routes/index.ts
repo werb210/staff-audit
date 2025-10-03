@@ -1,7 +1,12 @@
+// Central API router aggregator. Mounted at /api in boot.ts
 import { Router } from "express";
-import o365 from "./integrations/office365"; // already exists
+import o365 from "./integrations/office365";
 
 const router = Router();
-router.use("/o365", o365); // becomes /api/o365
+
+// Integrations
+router.use("/o365", o365);
+
+// Add other grouped routers here in the future.
 
 export default router;
