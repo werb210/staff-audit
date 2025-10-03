@@ -1,182 +1,85 @@
+// server/auth/routes.ts
 import type { Express, Request, Response } from "express";
+import { Router } from "express";
 import bcrypt from "bcryptjs";
-import express from "express";
-import { signJwt, verifyJwt, extractBearer } from "../mw/jwt-auth";
-import { sendCode, checkCode } from "../security/twilioVerify";
-import { v4 as uuid } from "uuid";
-
-// Database connection for user lookup
 import { db } from "../db";
-import { users } from "../../shared/schema";
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+import { attachUserIfPresent, requireJwt, signJwt, setAuthCookie, JwtUser } from "../mw/jwt-auth";
 
-const repo = {
-  async findUserByEmail(email: string) {
-    try {
-      const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-      if (result.length === 0) return null;
-      
-      const user = result[0];
-      return {
-        id: user.id,
-        email: user.email,
-        password_hash: user.passwordHash,
-        role: user.role,
-        tenant_id: "bf", // Default tenant
-        mobile: user.mobilePhone,
-        first_name: user.firstName,
-        last_name: user.lastName
-      };
-    } catch (error) {
-      console.error("Database lookup error:", error);
-      return null;
-    }
-  }
+type DbUser = {
+  id: string;
+  email: string;
+  role?: string | null;
+  password_hash?: string | null;
+  active?: boolean | null;
 };
 
-// Security: For development, provide fallback. For production, require environment variables.
-const ADMIN_EMAIL = (process.env.BF_ADMIN_EMAIL || 
-  (process.env.NODE_ENV !== 'production' ? 'admin@boreal.com' : null))?.toLowerCase();
-const ADMIN_PASSWORD = process.env.BF_ADMIN_PASSWORD || 
-  (process.env.NODE_ENV !== 'production' ? 'admin123' : null);
-const ADMIN_HASH = ADMIN_PASSWORD ? bcrypt.hashSync(ADMIN_PASSWORD, 10) : null;
+async function findUserByEmail(email: string): Promise<DbUser | null> {
+  try {
+    const rows = await db.execute<DbUser>(
+      sql`select id, email, role, password_hash, active from users where lower(email)=lower(${email}) limit 1`
+    );
+    const r = Array.isArray(rows) ? rows[0] : (rows as any)?.rows?.[0];
+    return r || null;
+  } catch (e) {
+    // DB not available or schema mismatch; do not throw to keep login path deterministic
+    return null;
+  }
+}
 
-// Security: No hardcoded override credentials
-const OVERRIDE_EMAIL = process.env.BF_OVERRIDE_EMAIL?.toLowerCase();
-const OVERRIDE_PASSWORD = process.env.BF_OVERRIDE_PASSWORD;
-
-// Simple in-memory map for dev to pair attemptId -> user
-const mfaAttempts = new Map<string, any>();
+function normalizeUser(u: DbUser): JwtUser {
+  return { id: String(u.id), email: u.email, role: (u.role as string) || "user" };
+}
 
 export function setupAuth(app: Express) {
-  app.post("/api/auth/login", express.json(), async (req: Request, res: Response) => {
-    const email = String(req.body?.email || "").trim().toLowerCase();
-    const password = String(req.body?.password || "").trim();
-    if (!email || !password) return res.status(400).json({ error: "missing_credentials" });
+  const r = Router();
 
-    // 1) Try DB
-    let user: any = null;
-    try { 
-      user = await repo.findUserByEmail(email); 
-      console.log(`🔍 Database lookup for ${email}:`, user ? 'FOUND' : 'NOT FOUND');
-    } catch (error) {
-      console.error('Database lookup error:', error);
+  // POST /api/auth/login
+  r.post("/login", async (req: Request, res: Response) => {
+    const { email, password } = req.body || {};
+    if (!email || !password) return res.status(400).json({ ok: false, error: "missing_credentials" });
+
+    // Primary path: lookup in DB
+    const u = await findUserByEmail(String(email));
+    if (u && (u.active ?? true) !== false && u.password_hash) {
+      const ok = await bcrypt.compare(String(password), String(u.password_hash));
+      if (!ok) return res.status(401).json({ ok: false, error: "bad_credentials" });
+      const user = normalizeUser(u);
+      const token = signJwt(user);
+      setAuthCookie(res, token);
+      return res.json({ ok: true, token, user });
     }
 
-    // 2) Fallback to env admin (only if properly configured)
-    if (!user && ADMIN_EMAIL && ADMIN_HASH && email === ADMIN_EMAIL) {
-      const ok = await bcrypt.compare(password, ADMIN_HASH);
-      if (!ok) return res.status(401).json({ error: "invalid_credentials" });
-      user = { id: "00000000-0000-0000-0000-000000000001", email, role: "admin", tenant_id: "bf" };
+    // Fallback: env-based dev login (optional)
+    const devEmail = process.env.DEV_LOGIN_EMAIL;
+    const devPass = process.env.DEV_LOGIN_PASSWORD;
+    if (process.env.DEV_LOGIN === "1" && devEmail && devPass && email === devEmail && password === devPass) {
+      const user: JwtUser = { id: "dev-1", email: devEmail, role: "admin" };
+      const token = signJwt(user);
+      setAuthCookie(res, token);
+      return res.json({ ok: true, token, user, note: "dev_login" });
     }
 
-    // 3) Override user (only if properly configured via env vars)
-    if (!user && OVERRIDE_EMAIL && OVERRIDE_PASSWORD && email === OVERRIDE_EMAIL && password === OVERRIDE_PASSWORD) {
-      user = {
-        id: "00000000-0000-0000-0000-00000000BEEF",
-        email,
-        role: "admin", 
-        tenant_id: "bf",
-        first_name: "Todd",
-        last_name: "Werboweski",
-        mobile: "+15878881837",
-      };
-    }
-
-    if (!user) {
-      console.log(`❌ No user found for: ${email}`);
-      return res.status(401).json({ error: "invalid_credentials" });
-    }
-    
-    console.log(`👤 Found user: ${user.email}, verifying password...`);
-
-    // MFA requirement - ENABLE for all environments to test 2FA
-    const mustMfa = true; // Force enable 2FA for testing
-
-    if (mustMfa) {
-      const phone = user.mobile || process.env.BF_USER_PHONE_TODD || "+15878881837";
-      if (!phone) return res.status(400).json({ error: 'missing_phone' });
-
-      try {
-        await sendCode(phone, 'sms');
-        const attemptId = uuid();
-        mfaAttempts.set(attemptId, user); // store until code is checked
-        
-        // don't return a token yet
-        return res.status(202).json({
-          mfa_required: true,
-          attemptId,
-          phoneMasked: phone.replace(/^(\+\d{1,3})\d+(\d{2})$/, '$1••••••••$2'),
-        });
-      } catch (error) {
-        console.error('Twilio Verify error:', error);
-        return res.status(500).json({ error: 'sms_service_error' });
-      }
-    }
-
-    // No MFA: issue token as before
-    const token = signJwt({
-      sub: user.id,
-      email: user.email,
-      role: user.role || "admin",
-      tenantId: user.tenant_id || "bf",
-      perms: ["user_management:full"]
-    });
-
-    return res.status(200).json({
-      token,
-      user: { id: user.id, email: user.email, role: user.role || "user", tenantId: user.tenant_id || null }
-    });
+    return res.status(401).json({ ok: false, error: "bad_credentials_or_user_not_found" });
   });
 
-  // DISABLED: Conflicting with devBypass - causes auth session failures
-  // app.get("/api/auth/session", (req: Request, res: Response) => {
-  //   const token = extractBearer(req);
-  //   if (!token) return res.status(401).json({ ok: false });
-  //   try {
-  //     const u = verifyJwt(token);
-  //     return res.json({ ok: true, user: u });
-  //   } catch {
-  //     return res.status(401).json({ ok: false });
-  //   }
-  // });
-
-  // New endpoint to check code and finish login
-  app.post("/api/auth/mfa/check", express.json(), async (req: Request, res: Response) => {
-    const { attemptId, code } = req.body;
-    if (!attemptId || !code) return res.status(400).json({ error: 'missing_params' });
-    
-    const user = mfaAttempts.get(attemptId);
-    if (!user) return res.status(400).json({ error: 'invalid_attempt' });
-
-    const phone = user.mobile || process.env.BF_USER_PHONE_TODD || "+15878881837";
-    
-    try {
-      const result = await checkCode(phone, code);
-
-      if (result.status === 'approved') {
-        mfaAttempts.delete(attemptId);
-        const token = signJwt({
-          sub: user.id,
-          email: user.email,
-          role: user.role || "admin",
-          tenantId: user.tenant_id || "bf",
-          perms: ["user_management:full"]
-        });
-        return res.json({ 
-          token, 
-          user: { id: user.id, email: user.email, role: user.role || "user", tenantId: user.tenant_id || null }
-        });
-      }
-      return res.status(401).json({ error: 'invalid_code', status: result.status });
-    } catch (error) {
-      console.error('Twilio Verify check error:', error);
-      return res.status(500).json({ error: 'verification_service_error' });
-    }
+  // GET /api/auth/session  (idempotent; returns user if token present)
+  r.get("/session", attachUserIfPresent, (req: Request & { user?: JwtUser }, res: Response) => {
+    return res.json({ ok: true, user: req.user || null });
   });
 
-  app.post("/api/auth/logout", (_req: Request, res: Response) => {
-    // stateless — client will discard token
-    return res.status(204).end();
+  // POST /api/auth/logout
+  r.post("/logout", (_req, res) => {
+    res.clearCookie("token");
+    return res.json({ ok: true });
   });
+
+  // GET /api/auth/_debug/jwt
+  r.get("/_debug/jwt", requireJwt, (req: Request & { user?: JwtUser }, res: Response) => {
+    res.json({ ok: true, user: req.user });
+  });
+
+  app.use("/api/auth", r);
 }
+
+export default setupAuth;
