@@ -1,0 +1,3447 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model migrations {
+  id         String   @id
+  applied_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("_migrations")
+}
+
+model ad_costs {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  source     String    @default("google_ads")
+  campaign   String?
+  day        DateTime  @db.Date
+  cost_cents Int
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model ai_training_documents {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title          String    @db.VarChar(255)
+  description    String?
+  category       String?   @default("general") @db.VarChar(100)
+  file_name      String    @db.VarChar(255)
+  file_path      String
+  file_size      Int?
+  mime_type      String?   @db.VarChar(100)
+  extracted_text String?
+  status         String?   @default("uploaded") @db.VarChar(50)
+  uploaded_by    String?   @db.VarChar(255)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model analytics_daily {
+  day                   DateTime @id @db.Date
+  leads_new             Int?     @default(0)
+  apps_created          Int?     @default(0)
+  apps_funded           Int?     @default(0)
+  funded_amount         Decimal? @default(0) @db.Decimal
+  avg_hours_to_decision Decimal? @db.Decimal
+  slas_breached         Int?     @default(0)
+  messages_in           Int?     @default(0)
+  messages_out          Int?     @default(0)
+  esign_sent            Int?     @default(0)
+  esign_completed       Int?     @default(0)
+  kyc_approved          Int?     @default(0)
+  updated_at            DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model api_keys {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  prefix       String
+  hash         String
+  scopes       String[]  @default([])
+  revoked_at   DateTime? @db.Timestamptz(6)
+  last_used_at DateTime? @db.Timestamptz(6)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([prefix], map: "idx_api_keys_prefix")
+}
+
+model app_lender_shares {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String    @db.Uuid
+  partner_id     String    @db.Uuid
+  token          String
+  perms          String[]  @default(["view_docs", "upload_docs", "read_messages", "write_messages"])
+  expires_at     DateTime  @db.Timestamptz(6)
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  revoked_at     DateTime? @db.Timestamptz(6)
+  disabled       Boolean   @default(false)
+  last_access_at DateTime? @db.Timestamptz(6)
+
+  @@index([application_id], map: "idx_shares_app")
+  @@index([token], map: "idx_shares_token")
+}
+
+model app_notes {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String   @db.Uuid
+  user_id        String?  @db.Uuid
+  body           String
+  pinned         Boolean  @default(false)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([application_id, created_at(sort: Desc)], map: "idx_app_notes_app")
+}
+
+model app_settings {
+  key        String   @id
+  value      Json?
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model applicant_sessions {
+  id               Int                @id @default(autoincrement())
+  application_id   String?            @db.VarChar(255)
+  business_name    String?            @db.VarChar(255)
+  session_id       String             @db.VarChar(255)
+  page_url         String?            @db.VarChar(500)
+  started_at       DateTime           @default(now()) @db.Timestamp(6)
+  ended_at         DateTime?          @db.Timestamp(6)
+  created_at       DateTime           @default(now()) @db.Timestamp(6)
+  updated_at       DateTime           @default(now()) @db.Timestamp(6)
+  session_messages session_messages[]
+}
+
+model application_stage_history {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String       @db.Uuid
+  previous_stage String?      @db.VarChar(50)
+  new_stage      String       @db.VarChar(50)
+  reason         String?
+  changed_by     String?      @default("system") @db.VarChar(255)
+  changed_at     DateTime?    @default(now()) @db.Timestamp(6)
+  applications   applications @relation(fields: [application_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model applications {
+  id                                                       String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                                                  String                      @db.VarChar
+  business_id                                              String                      @db.Uuid
+  tenant_id                                                String                      @db.Uuid
+  status                                                   application_status?         @default(draft)
+  requested_amount                                         Decimal?                    @db.Decimal(12, 2)
+  use_of_funds                                             String?
+  current_step                                             Int?                        @default(1)
+  form_data                                                Json?                       @default("{}")
+  submitted_at                                             DateTime?                   @db.Timestamp(6)
+  reviewed_at                                              DateTime?                   @db.Timestamp(6)
+  reviewed_by                                              String?                     @db.VarChar
+  created_at                                               DateTime?                   @default(now()) @db.Timestamp(6)
+  updated_at                                               DateTime?                   @default(now()) @db.Timestamp(6)
+  signed                                                   Boolean?                    @default(false)
+  signed_at                                                DateTime?                   @db.Timestamp(6)
+  signnow_document_id                                      String?                     @db.VarChar(255)
+  sign_url                                                 String?                     @db.VarChar(1000)
+  banking_analysis                                         Json?                       @default("{}")
+  financials_ocr                                           Json?                       @default("{}")
+  document_approvals                                       Json?                       @default("{}")
+  product_category                                         String?                     @db.VarChar(100)
+  recommended_lender_id                                    String?                     @db.VarChar(255)
+  lender_id                                                String?                     // Reference to Lender.id
+  missing_docs                                             Boolean?                    @default(false)
+  loan_category                                            String?                     @db.VarChar(50)
+  legal_business_name                                      String?                     @db.VarChar(255)
+  dba_name                                                 String?                     @db.VarChar(255)
+  business_type                                            String?                     @db.VarChar(100)
+  business_email                                           String?                     @db.VarChar(255)
+  business_phone                                           String?                     @db.VarChar(20)
+  business_address                                         String?
+  contact_first_name                                       String?                     @db.VarChar(100)
+  contact_last_name                                        String?                     @db.VarChar(100)
+  contact_email                                            String?                     @db.VarChar(255)
+  contact_phone                                            String?                     @db.VarChar(20)
+  owner_first_name                                         String?                     @db.VarChar(100)
+  owner_last_name                                          String?                     @db.VarChar(100)
+  owner_ssn                                                String?                     @db.VarChar(20)
+  ownership_percentage                                     Decimal?                    @default(100.00) @db.Decimal(5, 2)
+  loan_amount                                              Decimal?                    @db.Decimal(12, 2)
+  repayment_terms                                          String?                     @db.VarChar(100)
+  number_of_employees                                      Int?
+  annual_revenue                                           Decimal?                    @db.Decimal(12, 2)
+  years_in_business                                        Int?
+  signing_status                                           String?                     @default("not_initiated") @db.VarChar(50)
+  legacy_id                                                String?                     @db.VarChar(100)
+  signed_pdf_document_id                                   String?                     @db.Uuid
+  is_ready_for_lenders                                     Boolean?                    @default(false)
+  business_entity_type                                     String?                     @db.VarChar(100)
+  stage                                                    pipeline_stage?             @default(New)
+  contact_id                                               String?                     @db.Uuid
+  utm_source                                               String?
+  utm_medium                                               String?
+  utm_campaign                                             String?
+  gclid                                                    String?
+  ad_platform                                              String?
+  ad_campaign_id                                           String?
+  ad_group_id                                              String?
+  ad_id                                                    String?
+  funded                                                   Boolean?                    @default(false)
+  business_name                                            String?                     @db.VarChar
+  application_stage_history                                application_stage_history[]
+  businesses                                               businesses                  @relation(fields: [business_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "applications_business_id_businesses_id_fk")
+  users                                                    users?                      @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documents_applications_signed_pdf_document_idTodocuments documents?                  @relation("applications_signed_pdf_document_idTodocuments", fields: [signed_pdf_document_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenants                                                  tenants                     @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "applications_tenant_id_tenants_id_fk")
+  chat_escalations                                         chat_escalations[]
+  chat_issue_reports                                       chat_issue_reports[]
+  documents_documents_application_idToapplications         documents[]                 @relation("documents_application_idToapplications")
+  expected_documents                                       expected_documents[]
+  ocr_results                                              ocr_results[]
+  recommendation_logs                                      recommendation_logs[]
+  retry_upload_logs                                        retry_upload_logs[]
+  risk_assessments                                         risk_assessments[]
+  scheduled_notifications                                  scheduled_notifications[]
+  signature_log                                            signature_log[]
+  transmissions                                            transmissions[]
+  upload_retry_queue                                       upload_retry_queue[]
+  banking_analysis_records                                 banking_analysis[] @relation("banking_analysis_records")
+  lender                                                   Lender?             @relation("LenderApplications", fields: [lender_id], references: [id])
+
+  @@index([ad_platform, ad_campaign_id], map: "idx_apps_campaign")
+  @@index([gclid], map: "idx_apps_gclid")
+  @@index([lender_id], map: "idx_apps_lender")
+}
+
+model appointments {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  link_id          String?         @db.Uuid
+  owner_id         String          @db.Uuid
+  client_name      String?
+  client_email     String?
+  starts_at        DateTime        @db.Timestamptz(6)
+  ends_at          DateTime        @db.Timestamptz(6)
+  meeting_join_url String?
+  created_at       DateTime?       @default(now()) @db.Timestamptz(6)
+  schedule_links   schedule_links? @relation(fields: [link_id], references: [id], onUpdate: NoAction)
+}
+
+model audience_sync_logs {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  platform       String
+  audience_id    String?   @db.Uuid
+  audience_name  String?
+  items_uploaded Int?      @default(0)
+  status         String?   @default("ok")
+  meta           Json?     @default("{}")
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model audiences {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  filter     Json      @default("{}")
+  created_by String?   @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model audit_log {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String?   @db.VarChar
+  tenant_id     String?   @db.Uuid
+  endpoint      String    @db.VarChar(255)
+  method        String    @db.VarChar(10)
+  request_data  Json?
+  response_data Json?
+  status_code   Int?
+  user_agent    String?   @db.VarChar(500)
+  ip_address    String?   @db.VarChar(45)
+  timestamp     DateTime? @default(now()) @db.Timestamp(6)
+  tenants       tenants?  @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "audit_log_tenant_id_tenants_id_fk")
+}
+
+model audit_logs {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entity_type String    @db.VarChar(50)
+  entity_id   String    @db.VarChar(255)
+  action      String    @db.VarChar(100)
+  details     String?
+  user_id     String?   @db.VarChar(255)
+  metadata    Json?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model audits {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type       String    @db.VarChar(64)
+  entity     String    @db.VarChar(64)
+  entity_id  String    @db.Uuid
+  user_id    String?   @db.Uuid
+  data       String?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model backup_applications_20250125 {
+  id                     String?             @db.Uuid
+  user_id                String?             @db.VarChar
+  business_id            String?             @db.Uuid
+  tenant_id              String?             @db.Uuid
+  status                 application_status?
+  requested_amount       Decimal?            @db.Decimal(12, 2)
+  use_of_funds           String?
+  current_step           Int?
+  form_data              Json?
+  submitted_at           DateTime?           @db.Timestamp(6)
+  reviewed_at            DateTime?           @db.Timestamp(6)
+  reviewed_by            String?             @db.VarChar
+  created_at             DateTime?           @db.Timestamp(6)
+  updated_at             DateTime?           @db.Timestamp(6)
+  signed                 Boolean?
+  signed_at              DateTime?           @db.Timestamp(6)
+  signnow_document_id    String?             @db.VarChar(255)
+  sign_url               String?             @db.VarChar(1000)
+  banking_analysis       Json?
+  financials_ocr         Json?
+  document_approvals     Json?
+  product_category       String?             @db.VarChar(100)
+  recommended_lender_id  String?             @db.VarChar(255)
+  missing_docs           Boolean?
+  loan_category          String?             @db.VarChar(50)
+  legal_business_name    String?             @db.VarChar(255)
+  dba_name               String?             @db.VarChar(255)
+  business_type          String?             @db.VarChar(100)
+  business_email         String?             @db.VarChar(255)
+  business_phone         String?             @db.VarChar(20)
+  business_address       String?
+  contact_first_name     String?             @db.VarChar(100)
+  contact_last_name      String?             @db.VarChar(100)
+  contact_email          String?             @db.VarChar(255)
+  contact_phone          String?             @db.VarChar(20)
+  owner_first_name       String?             @db.VarChar(100)
+  owner_last_name        String?             @db.VarChar(100)
+  owner_ssn              String?             @db.VarChar(20)
+  ownership_percentage   Decimal?            @db.Decimal(5, 2)
+  loan_amount            Decimal?            @db.Decimal(12, 2)
+  repayment_terms        String?             @db.VarChar(100)
+  number_of_employees    Int?
+  annual_revenue         Decimal?            @db.Decimal(12, 2)
+  years_in_business      Int?
+  signing_status         String?             @db.VarChar(50)
+  legacy_id              String?             @db.VarChar(100)
+  signed_pdf_document_id String?             @db.Uuid
+  is_ready_for_lenders   Boolean?
+  business_entity_type   String?             @db.VarChar(100)
+  stage                  pipeline_stage?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model backup_documents_20250125 {
+  id                 String?          @db.Uuid
+  application_id     String?          @db.Uuid
+  file_name          String?          @db.VarChar(255)
+  file_type          String?          @db.VarChar(50)
+  file_size          Int?
+  document_type      document_type?
+  file_path          String?          @db.VarChar(500)
+  uploaded_by        String?          @db.VarChar
+  is_required        Boolean?
+  is_verified        Boolean?
+  created_at         DateTime?        @db.Timestamp(6)
+  status             document_status?
+  rejection_reason   String?
+  verified_at        DateTime?        @db.Timestamp(6)
+  reviewed_by        String?          @db.Uuid
+  updated_at         DateTime?        @db.Timestamp(6)
+  storage_key        String?          @db.VarChar(500)
+  checksum           String?          @db.VarChar(128)
+  tags               String[]
+  description        String?
+  sha256             String?          @db.VarChar(64)
+  version_number     Int?
+  preview_status     String?          @db.VarChar(20)
+  file_exists        Boolean?
+  mime_type          String?          @db.VarChar(100)
+  sha256_checksum    String?          @db.VarChar(64)
+  backup_status      backup_status?
+  object_storage_key String?          @db.VarChar(500)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model backup_users_20250125 {
+  id         String?    @db.Uuid
+  email      String?    @db.VarChar
+  role       user_role?
+  created_at DateTime?  @db.Timestamp(6)
+
+  @@ignore
+}
+
+model backups_log {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  kind        String
+  s3_key      String?
+  bytes       BigInt?
+  status      String
+  error       String?
+  started_at  DateTime  @default(now()) @db.Timestamptz(6)
+  finished_at DateTime? @db.Timestamptz(6)
+}
+
+model bank_accounts {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  link_id    String     @db.Uuid
+  acct_id    String
+  name       String?
+  mask       String?
+  type       String?
+  subtype    String?
+  currency   String?
+  available  Decimal?   @db.Decimal
+  current    Decimal?   @db.Decimal
+  updated_at DateTime   @default(now()) @db.Timestamptz(6)
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  bank_links bank_links @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([link_id, acct_id], map: "uniq_bank_acct")
+}
+
+model bank_links {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id        String              @db.Uuid
+  provider          String
+  access_token      String?
+  status            String              @default("active")
+  institution       String?
+  last_sync_at      DateTime?           @db.Timestamptz(6)
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  bank_accounts     bank_accounts[]
+  bank_transactions bank_transactions[]
+
+  @@index([contact_id, created_at(sort: Desc)], map: "idx_banklinks_contact")
+}
+
+model bank_statement_analysis {
+  id                String    @id
+  application_id    String?
+  profit_margin     Float?    @db.Real
+  cash_flow_ratio   Float?    @db.Real
+  transaction_count Int?
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model bank_transactions {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  link_id    String     @db.Uuid
+  acct_id    String
+  txn_id     String
+  posted_at  DateTime?  @db.Date
+  amount     Decimal?   @db.Decimal
+  name       String?
+  category   String?
+  raw        Json?
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  bank_links bank_links @relation(fields: [link_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([link_id, txn_id], map: "uniq_bank_txn")
+}
+
+model banking_analysis {
+  id                      String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id          String       @db.Uuid
+  document_id             String?      @db.Uuid
+  bank_name               String?      @db.VarChar(100)
+  account_number          String?      @db.VarChar(50)
+  account_type            String?      @db.VarChar(50)
+  statement_period        Json?
+  opening_balance         Decimal?     @db.Decimal(12, 2)
+  closing_balance         Decimal?     @db.Decimal(12, 2)
+  average_daily_balance   Decimal?     @db.Decimal(12, 2)
+  minimum_balance         Decimal?     @db.Decimal(12, 2)
+  maximum_balance         Decimal?     @db.Decimal(12, 2)
+  total_deposits          Decimal?     @db.Decimal(12, 2)
+  total_withdrawals       Decimal?     @db.Decimal(12, 2)
+  total_checks            Decimal?     @db.Decimal(12, 2)
+  total_fees              Decimal?     @db.Decimal(12, 2)
+  transaction_count       Int?
+  deposit_count           Int?
+  withdrawal_count        Int?
+  net_cash_flow           Decimal?     @db.Decimal(12, 2)
+  average_monthly_inflow  Decimal?     @db.Decimal(12, 2)
+  average_monthly_outflow Decimal?     @db.Decimal(12, 2)
+  cash_flow_trend         String?      @db.VarChar(20)
+  volatility_score        Decimal?     @db.Decimal(5, 2)
+  nsf_count               Int?         @default(0)
+  nsf_fees                Decimal?     @default(0.00) @db.Decimal(10, 2)
+  overdraft_days          Int?         @default(0)
+  insufficient_funds_risk String?      @db.VarChar(20)
+  business_deposits       Decimal?     @db.Decimal(12, 2)
+  personal_withdrawals    Decimal?     @db.Decimal(12, 2)
+  operating_expenses      Decimal?     @db.Decimal(12, 2)
+  merchant_fees           Decimal?     @db.Decimal(12, 2)
+  employee_payments       Decimal?     @db.Decimal(12, 2)
+  recurring_withdrawals   Json?
+  large_deposits          Json?
+  unusual_activity        Json?
+  transaction_patterns    Json?
+  risk_factors            Json?
+  financial_health_score  Int?
+  recommendations         String[]
+  confidence_level        String?      @db.VarChar(20)
+  analysis_version        String?      @db.VarChar(20)
+  processing_time         Int?
+  created_at              DateTime     @default(now()) @db.Timestamp(6)
+  updated_at              DateTime     @default(now()) @db.Timestamp(6)
+  applications            applications @relation("banking_analysis_records", fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documents               documents?   @relation("banking_analysis_records", fields: [document_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([application_id], map: "idx_banking_analysis_application_id")
+  @@index([created_at], map: "idx_banking_analysis_created_at")
+  @@index([document_id], map: "idx_banking_analysis_document_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model benchmark_comparisons {
+  id                              Int       @id @default(autoincrement())
+  application_id                  String    @unique(map: "unique_application_id")
+  industry                        String
+  applicant_monthly_revenue       Float?    @db.Real
+  applicant_monthly_expenses      Float?    @db.Real
+  applicant_profit_margin         Float?    @db.Real
+  applicant_cash_flow_ratio       Float?    @db.Real
+  applicant_debt_to_revenue_ratio Float?    @db.Real
+  applicant_transaction_volume    Int?
+  applicant_business_age          Int?
+  applicant_employee_count        Int?
+  performance_score               Float     @db.Real
+  overall_ranking                 String
+  risk_adjustment                 Float?    @db.Real
+  revenue_percentile              Float?    @db.Real
+  expense_percentile              Float?    @db.Real
+  profit_margin_percentile        Float?    @db.Real
+  cash_flow_percentile            Float?    @db.Real
+  debt_ratio_percentile           Float?    @db.Real
+  revenue_status                  String?
+  expense_status                  String?
+  profit_margin_status            String?
+  cash_flow_status                String?
+  debt_ratio_status               String?
+  revenue_impact                  String?
+  expense_impact                  String?
+  profit_margin_impact            String?
+  cash_flow_impact                String?
+  debt_ratio_impact               String?
+  key_strengths                   String[]
+  areas_for_improvement           String[]
+  recommendations                 String[]
+  seasonal_considerations         String[]
+  risk_factors                    String[]
+  analysis_version                String?   @default("2.0")
+  confidence_level                Float?    @db.Real
+  processing_time                 Int?
+  created_at                      DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                      DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([application_id], map: "idx_benchmark_comparisons_application_id")
+  @@index([industry], map: "idx_benchmark_comparisons_industry")
+  @@index([performance_score(sort: Desc)], map: "idx_benchmark_comparisons_performance_score")
+}
+
+model billing_plans {
+  key                 String          @id
+  name                String
+  monthly_price_cents Int             @default(0)
+  limits              Json            @default("{}")
+  created_at          DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime        @default(now()) @db.Timestamptz(6)
+  subscriptions       subscriptions[]
+}
+
+model bookings {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String   @db.Uuid
+  contact_email String
+  contact_name  String?
+  start_time    DateTime @db.Timestamptz(6)
+  end_time      DateTime @db.Timestamptz(6)
+  status        String?  @default("booked")
+  o365_event_id String?
+
+  @@index([user_id, start_time], map: "idx_bookings_user_time")
+}
+
+model business_loan_applications {
+  id                String    @id
+  industry          String?
+  annual_revenue    Float?    @db.Real
+  annual_expenses   Float?    @db.Real
+  existing_debt     Float?    @db.Real
+  years_in_business Int?
+  employee_count    Int?
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model businesses {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String               @db.VarChar
+  tenant_id           String               @db.Uuid
+  business_name       String               @db.VarChar(255)
+  business_type       String?              @db.VarChar(100)
+  industry            String?              @db.VarChar(100)
+  year_established    Int?
+  ein                 String?              @db.VarChar(20)
+  address             Json?
+  phone               String?              @db.VarChar(20)
+  website             String?              @db.VarChar(255)
+  description         String?
+  created_at          DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?            @default(now()) @db.Timestamp(6)
+  legal_business_name String?              @db.VarChar(255)
+  dba_name            String?              @db.VarChar(255)
+  business_email      String?              @db.VarChar(255)
+  number_of_employees Int?
+  contact_first_name  String?              @db.VarChar(100)
+  contact_last_name   String?              @db.VarChar(100)
+  contact_title       String?              @db.VarChar(100)
+  contact_email       String?              @db.VarChar(255)
+  contact_phone       String?              @db.VarChar(20)
+  owner_ssn           String?              @db.VarChar(20)
+  owner_date_of_birth DateTime?            @db.Timestamp(6)
+  owner_address       Json?
+  years_in_business   Int?
+  applications        applications[]
+  tenants             tenants              @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "businesses_tenant_id_tenants_id_fk")
+  financial_profiles  financial_profiles[]
+}
+
+model call_logs {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id       String?            @db.Uuid
+  direction        String?
+  duration_seconds Int?
+  twilio_sid       String?
+  recording_url    String?
+  transcription    String?
+  phone_number     String?
+  from_number      String?
+  to_number        String?
+  status           String?
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
+  call_transcripts call_transcripts[]
+}
+
+model call_participants {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  call_id    String   @db.Uuid
+  contact_id String   @db.Uuid
+  role       String   @default("participant")
+  calls      calls    @relation(fields: [call_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  contacts   contacts @relation(fields: [contact_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model call_recordings {
+  id                     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  call_id                String   @db.Uuid
+  provider_recording_sid String?  @unique
+  provider_uri           String?
+  duration_sec           Int?
+  audio_format           String?
+  created_at             DateTime @default(now()) @db.Timestamptz(6)
+  calls                  calls    @relation(fields: [call_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([call_id], map: "idx_recordings_call")
+}
+
+model call_records {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id       String?   @db.Uuid
+  sid              String?
+  status           String?
+  recording_url    String?
+  duration_seconds Int?
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  contacts         contacts? @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model call_transcripts {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  call_id    String?    @db.Uuid
+  transcript String?
+  confidence Json?
+  created_at DateTime?  @default(now()) @db.Timestamp(6)
+  call_logs  call_logs? @relation(fields: [call_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model calls {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  provider_call_sid String?             @unique
+  is_conference     Boolean             @default(false)
+  conference_sid    String?
+  direction         String
+  status            String?
+  started_at        DateTime            @default(now()) @db.Timestamptz(6)
+  ended_at          DateTime?           @db.Timestamptz(6)
+  meta              Json                @default("{}")
+  call_participants call_participants[]
+  call_recordings   call_recordings[]
+}
+
+model chat_escalations {
+  id                String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id        String        @db.VarChar(255)
+  user_name         String?       @db.VarChar(255)
+  user_email        String?       @db.VarChar(255)
+  message           String?
+  escalation_reason String?       @default("general_inquiry") @db.VarChar(100)
+  application_id    String?       @db.Uuid
+  status            String?       @default("pending") @db.VarChar(50)
+  assigned_staff_id String?       @db.Uuid
+  resolution        String?
+  created_at        DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?     @default(now()) @db.Timestamptz(6)
+  applications      applications? @relation(fields: [application_id], references: [id], onUpdate: NoAction)
+
+  @@index([created_at], map: "idx_chat_escalations_created_at")
+  @@index([session_id], map: "idx_chat_escalations_session_id")
+  @@index([status], map: "idx_chat_escalations_status")
+}
+
+model chat_handoff_requests {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id  String    @db.VarChar(255)
+  user_id     String?   @db.Uuid
+  message     String?
+  context     Json?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  status      String?   @default("pending") @db.VarChar(50)
+  assigned_to String?   @db.Uuid
+  resolved_at DateTime? @db.Timestamp(6)
+}
+
+model chat_issue_reports {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id     String        @db.VarChar(255)
+  user_name      String?       @db.VarChar(255)
+  user_email     String?       @db.VarChar(255)
+  issue_type     String        @db.VarChar(100)
+  description    String?
+  severity       String?       @default("medium") @db.VarChar(20)
+  application_id String?       @db.Uuid
+  status         String?       @default("open") @db.VarChar(50)
+  resolved_by    String?       @db.Uuid
+  created_at     DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?     @default(now()) @db.Timestamptz(6)
+  applications   applications? @relation(fields: [application_id], references: [id], onUpdate: NoAction)
+
+  @@index([session_id], map: "idx_chat_issue_reports_session_id")
+  @@index([severity], map: "idx_chat_issue_reports_severity")
+  @@index([status], map: "idx_chat_issue_reports_status")
+}
+
+model chat_messages {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id    String    @db.Uuid
+  role          String    @db.VarChar(50)
+  message       String
+  metadata      Json?
+  sent_at       DateTime? @default(now()) @db.Timestamp(6)
+  read_at       DateTime? @db.Timestamp(6)
+  staff_user_id String?   @db.Uuid
+  is_edited     Boolean?  @default(false)
+  edited_at     DateTime? @db.Timestamp(6)
+  tenant_id     String    @default(dbgenerated("'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid")) @db.Uuid
+  updated_at    DateTime? @default(now()) @db.Timestamptz(6)
+  user_id       String?   @db.Uuid
+  users         users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model chat_sessions {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id        String    @unique @db.VarChar(255)
+  user_name         String?   @db.VarChar(100)
+  user_email        String?   @db.VarChar(255)
+  user_phone        String?   @db.VarChar(20)
+  status            String?   @default("active") @db.VarChar(50)
+  priority          Int?      @default(1)
+  assigned_staff_id String?   @db.Uuid
+  started_at        DateTime? @default(now()) @db.Timestamp(6)
+  ended_at          DateTime? @db.Timestamp(6)
+  last_activity     DateTime? @default(now()) @db.Timestamp(6)
+  tags              String[]
+  metadata          Json?
+  tenant_id         String    @default(dbgenerated("'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid")) @db.Uuid
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model client_errors {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  app_user_id String?   @db.Uuid
+  message     String
+  stack       String?
+  meta        Json?     @default("{}")
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  resolved    Boolean?  @default(false)
+}
+
+model comm_calls {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id         String   @db.Uuid
+  direction          String   @db.VarChar(8)
+  status             String   @default("queued") @db.VarChar(32)
+  twilio_sid         String?  @db.VarChar(64)
+  from_number        String   @db.VarChar(32)
+  to_number          String   @db.VarChar(32)
+  duration_sec       Int?
+  recording_url      String?
+  transcript         String?
+  created_by_user_id String?  @db.Uuid
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model comm_messages {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  thread_id          String   @db.Uuid
+  direction          String   @db.VarChar(8)
+  channel            String   @db.VarChar(16)
+  body               String
+  meta               String?
+  created_by_user_id String?  @db.Uuid
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  delivery_status    String?  @db.VarChar(24)
+  provider_sid       String?  @db.VarChar(128)
+}
+
+model comm_outbox {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  channel            String    @db.VarChar(16)
+  contact_id         String?   @db.Uuid
+  lender_org_id      String?   @db.Uuid
+  to_address         String
+  subject            String?
+  body               String
+  template_id        String?   @db.Uuid
+  version_id         String?   @db.Uuid
+  locale             String    @default("en") @db.VarChar(8)
+  merge_vars         Json?
+  status             String    @default("pending") @db.VarChar(16)
+  reviewer_user_id   String?   @db.Uuid
+  reviewed_at        DateTime? @db.Timestamptz(6)
+  error              String?
+  created_by_user_id String?   @db.Uuid
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  sent_at            DateTime? @db.Timestamptz(6)
+
+  @@index([status, created_at], map: "idx_outbox_status")
+}
+
+model comm_template_approvals {
+  id                     String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  version_id             String                 @db.Uuid
+  approver_user_id       String                 @db.Uuid
+  status                 String
+  reason                 String?
+  created_at             DateTime               @default(now()) @db.Timestamptz(6)
+  comm_template_versions comm_template_versions @relation(fields: [version_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model comm_template_sets {
+  id                     String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  set_key                String                   @unique
+  description            String?
+  created_at             DateTime                 @default(now()) @db.Timestamptz(6)
+  comm_template_versions comm_template_versions[]
+}
+
+model comm_template_versions {
+  id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  set_id                  String                    @db.Uuid
+  name                    String
+  channel                 String
+  subject                 String?
+  body                    String
+  placeholders            String[]                  @default([])
+  status                  template_status           @default(draft)
+  created_by_user_id      String?                   @db.Uuid
+  created_at              DateTime                  @default(now()) @db.Timestamptz(6)
+  approved_by_user_id     String?                   @db.Uuid
+  approved_at             DateTime?                 @db.Timestamptz(6)
+  published_at            DateTime?                 @db.Timestamptz(6)
+  comm_template_approvals comm_template_approvals[]
+  comm_template_sets      comm_template_sets        @relation(fields: [set_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([set_id, created_at(sort: Desc)], map: "idx_ctv_set")
+}
+
+model comm_templates {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String   @db.VarChar(128)
+  channel        String   @db.VarChar(16)
+  subject        String?  @db.VarChar(256)
+  body           String
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  engine         String   @default("liquid") @db.VarChar(16)
+  kind           String   @default("manual") @db.VarChar(16)
+  description    String?
+  trigger        Json?
+  default_locale String   @default("en") @db.VarChar(8)
+  folder         String?
+  tags           String[]
+}
+
+model comm_threads {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id          String    @db.Uuid
+  channel             String    @db.VarChar(16)
+  subject             String?
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @db.Timestamptz(6)
+  assigned_to_user_id String?   @db.Uuid
+  status              String    @default("open") @db.VarChar(16)
+  last_inbound_at     DateTime? @db.Timestamptz(6)
+  unread_count        Int       @default(0)
+  snooze_until        DateTime? @db.Timestamptz(6)
+  muted               Boolean   @default(false)
+  sla_due_at          DateTime? @db.Timestamptz(6)
+  sla_status          String?   @db.VarChar(16)
+}
+
+model comms {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id String?   @db.Uuid
+  kind       String    @db.VarChar(32)
+  direction  String?   @db.VarChar(16)
+  subject    String?
+  body       String?
+  meta       String?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  read_at    DateTime? @db.Timestamptz(6)
+  contacts   contacts? @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model communication_logs {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id   String?   @db.Uuid
+  type         String    @db.VarChar(20)
+  direction    String    @db.VarChar(10)
+  phone_number String?   @db.VarChar(20)
+  content      String?
+  status       String?   @default("pending") @db.VarChar(20)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @default(now()) @db.Timestamp(6)
+  source       String?   @default("SLF")
+  contacts     contacts? @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([contact_id], map: "idx_communication_logs_contact_id")
+  @@index([source], map: "idx_communication_logs_source")
+  @@index([type], map: "idx_communication_logs_type")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model communication_templates {
+  id          Int       @id @default(autoincrement())
+  name        String
+  type        String
+  category    String
+  subject     String?
+  body        String
+  variables   String[]
+  is_active   Boolean?  @default(true)
+  is_default  Boolean?  @default(false)
+  usage_count Int?      @default(0)
+  last_used   DateTime? @db.Timestamp(6)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([category], map: "idx_communication_templates_category")
+  @@index([type], map: "idx_communication_templates_type")
+}
+
+model contact_activity {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id String   @db.Uuid
+  type       String   @db.VarChar(16)
+  direction  String   @db.VarChar(8)
+  title      String?
+  body       String?
+  meta       Json?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([contact_id], map: "idx_contact_activity_contact")
+}
+
+model contact_logs {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id    String?       @db.Uuid
+  activity_type String        @db.VarChar(50)
+  activity_data Json?
+  created_at    DateTime?     @default(now()) @db.Timestamp(6)
+  created_by    String?       @db.VarChar(255)
+  crm_contacts  crm_contacts? @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model contacts {
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name          String               @db.VarChar(255)
+  email              String               @db.VarChar(255)
+  phone              String?              @db.VarChar(50)
+  role               String               @default("Applicant") @db.VarChar(50)
+  company_name       String?              @db.VarChar(255)
+  application_id     String?              @db.Uuid
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  slf_contact_id     String?              @db.VarChar(100)
+  slf_lead_status    String?              @db.VarChar(50)
+  slf_last_sync      DateTime?            @db.Timestamp(6)
+  source             String?              @default("application") @db.VarChar(50)
+  status             String?              @default("active") @db.VarChar(50)
+  job_title          String?              @db.VarChar(255)
+  sms_opt_out        Boolean              @default(false)
+  first_name         String?
+  last_name          String?
+  tags               Json?                @default("[]")
+  utm_source         String?
+  utm_medium         String?
+  utm_campaign       String?
+  gclid              String?
+  ad_platform        String?
+  ad_campaign_id     String?
+  ad_group_id        String?
+  ad_id              String?
+  call_participants  call_participants[]
+  call_records       call_records[]
+  comms              comms[]
+  communication_logs communication_logs[]
+  issues             issues[]
+
+  @@index([gclid], map: "idx_contacts_gclid")
+}
+
+model credit_reports {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String   @db.Uuid
+  provider       String
+  bureau_ref     String?
+  score          Int?
+  score_band     String?
+  tradelines     Json?
+  inquiries      Json?
+  public_records Json?
+  raw            Json?
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([application_id, created_at(sort: Desc)], map: "idx_credrep_app")
+}
+
+model crm_activities {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type         String        @db.VarChar(50)
+  description  String
+  user_id      String        @db.Uuid
+  contact_id   String?       @db.Uuid
+  deal_id      String?       @db.Uuid
+  metadata     Json?
+  tenant_id    String        @db.Uuid
+  created_at   DateTime?     @default(now()) @db.Timestamp(6)
+  crm_contacts crm_contacts? @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  crm_deals    crm_deals?    @relation(fields: [deal_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model crm_companies {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String         @db.VarChar(255)
+  industry     String?        @db.VarChar(100)
+  size         String?        @db.VarChar(50)
+  revenue      Int?
+  phone        String?        @db.VarChar(20)
+  website      String?        @db.VarChar(255)
+  address      String?
+  city         String?        @db.VarChar(100)
+  state        String?        @db.VarChar(10)
+  zip_code     String?        @db.VarChar(20)
+  tenant_id    String         @db.Uuid
+  created_at   DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?      @default(now()) @db.Timestamp(6)
+  crm_contacts crm_contacts[]
+  crm_deals    crm_deals[]
+}
+
+model crm_contacts {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  first_name     String           @db.VarChar(100)
+  last_name      String           @db.VarChar(100)
+  email          String?          @unique @db.VarChar(255)
+  phone          String?          @db.VarChar(20)
+  title          String?          @db.VarChar(100)
+  company_id     String?          @db.Uuid
+  source         String?          @db.VarChar(100)
+  status         String?          @default("active") @db.VarChar(50)
+  notes          String?
+  tenant_id      String           @db.Uuid
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamp(6)
+  contact_logs   contact_logs[]
+  crm_activities crm_activities[]
+  crm_companies  crm_companies?   @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  crm_deals      crm_deals[]
+  crm_tasks      crm_tasks[]
+}
+
+model crm_deals {
+  id                  String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title               String           @db.VarChar(255)
+  amount              Int?
+  stage               String?          @default("new") @db.VarChar(50)
+  probability         Int?             @default(0)
+  expected_close_date DateTime?        @db.Date
+  contact_id          String?          @db.Uuid
+  company_id          String?          @db.Uuid
+  deal_type           String?          @db.VarChar(100)
+  status              String?          @default("active") @db.VarChar(50)
+  description         String?
+  tenant_id           String           @db.Uuid
+  created_at          DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?        @default(now()) @db.Timestamp(6)
+  crm_activities      crm_activities[]
+  crm_companies       crm_companies?   @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  crm_contacts        crm_contacts?    @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  crm_tasks           crm_tasks[]
+}
+
+model crm_tasks {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String        @db.VarChar(255)
+  description  String?
+  status       String?       @default("pending") @db.VarChar(50)
+  priority     String?       @default("medium") @db.VarChar(20)
+  due_date     DateTime?     @db.Timestamp(6)
+  assigned_to  String?       @db.Uuid
+  contact_id   String?       @db.Uuid
+  deal_id      String?       @db.Uuid
+  tenant_id    String        @db.Uuid
+  created_at   DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?     @default(now()) @db.Timestamp(6)
+  crm_contacts crm_contacts? @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  crm_deals    crm_deals?    @relation(fields: [deal_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model debug_tracking {
+  id         Int       @id @default(autoincrement())
+  operation  String?   @db.VarChar(255)
+  details    String?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model decision_traces {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String   @db.Uuid
+  variant        String
+  results        Json
+  rules_applied  Json
+  inputs         Json
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model doc_request_uploads {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  request_id   String       @db.Uuid
+  document_id  String?      @db.Uuid
+  filename     String?
+  s3_key       String?
+  content_type String?
+  size_bytes   Int?
+  uploaded_by  String
+  partner_id   String?      @db.Uuid
+  created_at   DateTime     @default(now()) @db.Timestamptz(6)
+  doc_requests doc_requests @relation(fields: [request_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([request_id], map: "idx_docreq_uploads_req")
+}
+
+model doc_requests {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id      String                @db.Uuid
+  title               String
+  description         String?
+  required            Boolean               @default(true)
+  status              String                @default("pending") @db.VarChar(16)
+  due_date            DateTime?             @db.Date
+  created_by_user_id  String?               @db.Uuid
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @default(now()) @db.Timestamptz(6)
+  doc_request_uploads doc_request_uploads[]
+
+  @@index([application_id, status, due_date], map: "idx_docreq_app")
+}
+
+model document_analysis {
+  id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id       String?    @db.Uuid
+  ocr_results       Json?
+  confidence_scores Json?
+  risk_score        Int?
+  field_mismatches  Json?
+  extracted_fields  Json?
+  analysis_version  String?    @default("1.0") @db.VarChar(20)
+  created_at        DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?  @default(now()) @db.Timestamp(6)
+  documents         documents? @relation(fields: [document_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model document_audit_log {
+  id                  Int       @id @default(autoincrement())
+  operation           String    @db.VarChar(100)
+  status              String    @db.VarChar(50)
+  documents_processed Int?      @default(0)
+  issues_found        Int?      @default(0)
+  details             Json?
+  created_at          DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model document_backups {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  backup_date     DateTime  @db.Date
+  documents_count Int?      @default(0)
+  backup_size_mb  Decimal?  @db.Decimal(10, 2)
+  s3_location     String?   @db.VarChar(500)
+  checksum_sha256 String?   @db.VarChar(64)
+  status          String?   @default("pending") @db.VarChar(20)
+  error_message   String?
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  completed_at    DateTime? @db.Timestamp(6)
+}
+
+model document_preview_log {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id    String    @db.Uuid
+  status         Int
+  error_message  String?
+  file_exists    Boolean?
+  checksum_valid Boolean?
+  timestamp      DateTime? @default(now()) @db.Timestamptz(6)
+  user_agent     String?
+  ip_address     String?
+}
+
+model document_recovery_log {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id     String?    @db.Uuid
+  event_type      String     @db.VarChar(20)
+  timestamp       DateTime?  @default(now()) @db.Timestamp(6)
+  user_id         String?    @db.Uuid
+  notes           String?
+  previous_status String?    @db.VarChar(20)
+  new_status      String?    @db.VarChar(20)
+  documents       documents? @relation(fields: [document_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model document_similarity {
+  id                   Int       @id @default(autoincrement())
+  document_id          Int
+  similar_document_id  Int
+  similarity_score     Float     @db.Real
+  similarity_type      String
+  confidence           Float     @db.Real
+  content_hash         String?
+  visual_features      String?
+  metadata_fingerprint String?
+  extracted_entities   String[]
+  key_numbers          String[]
+  document_structure   String?
+  fraud_risk_score     Float?    @db.Real
+  risk_level           String?
+  fraud_indicators     String[]
+  reason               String?
+  analysis_data        Json?
+  flagged_for_review   Boolean?  @default(false)
+  review_status        String?   @default("pending")
+  reviewed_by          String?
+  reviewed_at          DateTime? @db.Timestamp(6)
+  created_at           DateTime? @default(now()) @db.Timestamp(6)
+  updated_at           DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([document_id, similar_document_id])
+  @@index([document_id], map: "idx_document_similarity_document_id")
+  @@index([flagged_for_review], map: "idx_document_similarity_flagged")
+  @@index([similarity_score(sort: Desc)], map: "idx_document_similarity_score")
+}
+
+model document_upload_log {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id           String    @db.Uuid
+  application_id        String    @db.Uuid
+  file_name             String    @db.VarChar(255)
+  upload_attempted_at   DateTime? @default(now()) @db.Timestamptz(6)
+  disk_write_successful Boolean?  @default(false)
+  s3_backup_successful  Boolean?  @default(false)
+  checksum_verified     Boolean?  @default(false)
+  error_message         String?
+  recovery_attempted_at DateTime? @db.Timestamptz(6)
+  created_at            DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model document_upload_logs {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id   String?    @db.Uuid
+  uploaded_by   String?
+  timestamp     DateTime?  @default(now()) @db.Timestamp(6)
+  status        String
+  file_size     BigInt?
+  document_type String?
+  error_message String?
+  documents     documents? @relation(fields: [document_id], references: [id], onUpdate: NoAction)
+}
+
+model document_versions {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id    String    @db.Uuid
+  version_number Int       @default(1)
+  file_path      String
+  uploaded_by    String?
+  change_log     String?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  documents      documents @relation(fields: [document_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model documents {
+  id                                                          String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id                                              String                  @db.Uuid
+  file_name                                                   String                  @db.VarChar(255)
+  file_type                                                   String?                 @db.VarChar(50)
+  file_size                                                   Int?
+  document_type                                               document_type
+  file_path                                                   String?                 @db.VarChar(500)
+  uploaded_by                                                 String                  @default("public-api") @db.VarChar
+  is_required                                                 Boolean?                @default(false)
+  is_verified                                                 Boolean?                @default(false)
+  created_at                                                  DateTime?               @default(now()) @db.Timestamp(6)
+  status                                                      document_status         @default(pending)
+  rejection_reason                                            String?
+  verified_at                                                 DateTime?               @db.Timestamp(6)
+  reviewed_by                                                 String?                 @db.Uuid
+  updated_at                                                  DateTime?               @default(now()) @db.Timestamp(6)
+  storage_key                                                 String?                 @db.VarChar(500)
+  checksum                                                    String?                 @db.VarChar(128)
+  tags                                                        String[]
+  description                                                 String?
+  sha256                                                      String?                 @db.VarChar(64)
+  version_number                                              Int?                    @default(1)
+  preview_status                                              String?                 @default("original") @db.VarChar(20)
+  file_exists                                                 Boolean?                @default(true)
+  mime_type                                                   String?                 @db.VarChar(100)
+  sha256_checksum                                             String?                 @db.VarChar(64)
+  backup_status                                               backup_status?          @default(pending)
+  object_storage_key                                          String?                 @db.VarChar(500)
+  storage_status                                              String?                 @default("success") @db.VarChar(20)
+  av_status                                                   String?
+  av_checked_at                                               DateTime?               @db.Timestamptz(6)
+  group_id                                                    String?                 @db.Uuid
+  version                                                     Int?                    @default(1)
+  quarantine_reason                                           String?
+  signature_present                                           Boolean?
+  s3_version_id                                               String?
+  applications_applications_signed_pdf_document_idTodocuments applications[]          @relation("applications_signed_pdf_document_idTodocuments")
+  document_analysis                                           document_analysis[]
+  document_recovery_log                                       document_recovery_log[]
+  document_upload_logs                                        document_upload_logs[]
+  document_versions                                           document_versions[]
+  applications_documents_application_idToapplications         applications            @relation("documents_application_idToapplications", fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "documents_application_id_applications_id_fk")
+  users                                                       users?                  @relation(fields: [reviewed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  expected_documents                                          expected_documents[]
+  ocr_results                                                 ocr_results[]
+  banking_analysis_records                                    banking_analysis[] @relation("banking_analysis_records")
+
+  @@index([av_status], map: "idx_docs_av")
+  @@index([group_id], map: "ix_documents_group")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model email_accounts {
+  id                    Int              @id @default(autoincrement())
+  user_id               String
+  email                 String           @unique
+  provider              String
+  display_name          String?
+  imap_host             String?
+  imap_port             Int?
+  smtp_host             String?
+  smtp_port             Int?
+  use_ssl               Boolean?         @default(true)
+  encrypted_credentials String?
+  access_token          String?
+  refresh_token         String?
+  token_expiry          DateTime?        @db.Timestamp(6)
+  is_active             Boolean?         @default(true)
+  last_sync             DateTime?        @db.Timestamp(6)
+  sync_status           String?          @default("pending")
+  error_message         String?
+  created_at            DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at            DateTime?        @default(now()) @db.Timestamp(6)
+  email_messages        email_messages[]
+
+  @@index([email], map: "idx_email_accounts_email")
+  @@index([user_id], map: "idx_email_accounts_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model email_messages {
+  id               Int            @id @default(autoincrement())
+  account_id       Int
+  message_id       String
+  thread_id        String?
+  subject          String?
+  from_address     String
+  to_addresses     String[]
+  cc_addresses     String[]
+  bcc_addresses    String[]
+  reply_to         String?
+  body             String?
+  body_html        String?
+  body_text        String?
+  message_date     DateTime?      @db.Timestamp(6)
+  is_read          Boolean?       @default(false)
+  is_starred       Boolean?       @default(false)
+  is_sent          Boolean?       @default(false)
+  is_draft         Boolean?       @default(false)
+  is_deleted       Boolean?       @default(false)
+  has_attachments  Boolean?       @default(false)
+  attachment_count Int?           @default(0)
+  attachment_data  Json?
+  contact_id       Int?
+  application_id   String?
+  category         String?
+  priority         String?        @default("normal")
+  tags             String[]
+  created_at       DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?      @default(now()) @db.Timestamp(6)
+  email_accounts   email_accounts @relation(fields: [account_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([account_id], map: "idx_email_messages_account_id")
+  @@index([application_id], map: "idx_email_messages_application_id")
+  @@index([message_date(sort: Desc)], map: "idx_email_messages_message_date")
+}
+
+model email_opens {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tracking_id String   @db.Uuid
+  opened_at   DateTime @default(now()) @db.Timestamptz(6)
+  user_agent  String?
+  ip          String?
+}
+
+model email_outbox {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  to_email   String
+  subject    String
+  body       String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model endpoint_hits {
+  id          BigInt    @id @default(autoincrement())
+  method      String?
+  path        String?
+  hits        Int?      @default(0)
+  last_hit_at DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@unique([method, path], map: "idx_hits_uni")
+}
+
+model engine_policies {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scope              String
+  rule               String
+  created_by_user_id String?  @db.Uuid
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model engine_variants {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key        String   @unique
+  weights    Json
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model erasure_requests {
+  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scope              String
+  contact_id         String?        @db.Uuid
+  application_id     String?        @db.Uuid
+  reason             String?
+  status             erasure_status @default(pending)
+  created_by_user_id String?        @db.Uuid
+  decided_by_user_id String?        @db.Uuid
+  decided_at         DateTime?      @db.Timestamptz(6)
+  created_at         DateTime       @default(now()) @db.Timestamptz(6)
+  processed_at       DateTime?      @db.Timestamptz(6)
+}
+
+model expected_documents {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String       @db.Uuid
+  category       String       @db.VarChar(100)
+  requirement_id String       @db.VarChar(100)
+  required       Boolean?     @default(true)
+  status         String?      @default("pending") @db.VarChar(50)
+  document_id    String?      @db.Uuid
+  created_at     DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?    @default(now()) @db.Timestamp(6)
+  applications   applications @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documents      documents?   @relation(fields: [document_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model experiment_assignments {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  experiment_key String
+  subject_type   String
+  subject_id     String
+  variant_key    String
+  bucket         Int
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([experiment_key, subject_id], map: "idx_exp_assign")
+}
+
+model experiment_conversions {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String?
+  experiment_id String?   @db.Uuid
+  variant       String?
+  contact_id    String?   @db.Uuid
+  revenue_cents Int?      @default(0)
+  meta          Json?     @default("{}")
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([code], map: "idx_conv_by_code")
+  @@index([experiment_id], map: "idx_conv_by_exp")
+}
+
+model experiment_events {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  experiment_key String
+  variant_key    String
+  subject_type   String
+  subject_id     String
+  event          String
+  value          Decimal? @db.Decimal
+  meta           Json?
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([experiment_key, event, created_at(sort: Desc)], map: "idx_exp_events")
+}
+
+model experiment_variants {
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  experiment_key String
+  variant_key    String
+  weight         Int         @default(50)
+  config         Json?
+  experiments    experiments @relation(fields: [experiment_key], references: [key], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([experiment_key, variant_key])
+}
+
+model experiments {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key                 String                @unique
+  description         String?
+  status              experiment_status     @default(draft)
+  allocation_pct      Int                   @default(100)
+  exposure_flag_key   String?
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime              @default(now()) @db.Timestamptz(6)
+  experiment_variants experiment_variants[]
+  short_links         short_links[]
+}
+
+model feature_flags {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key            String           @unique
+  description    String?
+  enabled        Boolean          @default(false)
+  rollout_pct    Int              @default(0)
+  tags           String[]         @default([])
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime         @default(now()) @db.Timestamptz(6)
+  flag_overrides flag_overrides[]
+}
+
+model feedback {
+  id           Int       @id @default(autoincrement())
+  user_id      String?   @db.VarChar(255)
+  text         String
+  conversation String?
+  status       String?   @default("new") @db.VarChar(50)
+  category     String?   @db.VarChar(100)
+  priority     String?   @default("normal") @db.VarChar(20)
+  assigned_to  String?   @db.VarChar(255)
+  resolution   String?
+  tags         String[]
+  metadata     Json?
+  created_at   DateTime  @default(now()) @db.Timestamp(6)
+  updated_at   DateTime  @default(now()) @db.Timestamp(6)
+  resolved_at  DateTime? @db.Timestamp(6)
+}
+
+model financial_profiles {
+  id               String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  business_id      String     @db.Uuid
+  annual_revenue   Decimal?   @db.Decimal(12, 2)
+  monthly_revenue  Decimal?   @db.Decimal(12, 2)
+  monthly_expenses Decimal?   @db.Decimal(12, 2)
+  time_in_business String?    @db.VarChar(50)
+  credit_score     Int?
+  bank_balance     Decimal?   @db.Decimal(12, 2)
+  created_at       DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?  @default(now()) @db.Timestamp(6)
+  businesses       businesses @relation(fields: [business_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "financial_profiles_business_id_businesses_id_fk")
+}
+
+model flag_overrides {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  flag_key      String
+  scope         String
+  tenant_id     String?       @db.Uuid
+  user_id       String?       @db.Uuid
+  role          String?
+  value         Boolean
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  feature_flags feature_flags @relation(fields: [flag_key], references: [key], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([flag_key, scope], map: "idx_flag_overrides")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model fraud_detection_results {
+  id                        Int       @id @default(autoincrement())
+  application_id            String
+  document_id               Int?
+  overall_fraud_score       Float     @db.Real
+  risk_level                String
+  fraud_type                String?
+  similar_documents         Json?
+  fraud_indicators          String[]
+  suspicious_patterns       Json?
+  template_matches          Json?
+  confidence_level          Float?    @db.Real
+  analysis_model            String?   @default("gpt-4o")
+  processing_time           Int?
+  flagged_for_manual_review Boolean?  @default(false)
+  review_priority           String?   @default("medium")
+  review_status             String?   @default("pending")
+  review_notes              String?
+  reviewed_by               String?
+  reviewed_at               DateTime? @db.Timestamp(6)
+  action_taken              String?
+  auto_rejected             Boolean?  @default(false)
+  created_at                DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([application_id], map: "idx_fraud_detection_application_id")
+  @@index([flagged_for_manual_review], map: "idx_fraud_detection_flagged")
+  @@index([risk_level], map: "idx_fraud_detection_risk_level")
+}
+
+model handoff_queue {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id  String    @db.Uuid
+  priority    Int?      @default(1)
+  reason      String?
+  assigned_to String?   @db.Uuid
+  status      String?   @default("pending") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  assigned_at DateTime? @db.Timestamp(6)
+  resolved_at DateTime? @db.Timestamp(6)
+  tenant_id   String    @default(dbgenerated("'a1b2c3d4-e5f6-7890-abcd-ef1234567890'::uuid")) @db.Uuid
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model industry_benchmarks {
+  id                            Int       @id @default(autoincrement())
+  industry                      String    @unique
+  average_monthly_revenue       Float?    @db.Real
+  average_monthly_expenses      Float?    @db.Real
+  healthy_profit_margin         Float?    @db.Real
+  average_cash_flow_ratio       Float?    @db.Real
+  typical_debt_to_revenue_ratio Float?    @db.Real
+  average_transaction_volume    Int?
+  seasonal_variance_percent     Float?    @db.Real
+  growth_rate_expected          Float?    @db.Real
+  default_rate                  Float?    @db.Real
+  cyclical_sensitivity          String?
+  regulatory_risk               String?
+  market_volatility             String?
+  competitive_intensity         String?
+  capital_intensity             String?
+  has_seasonality               Boolean?  @default(false)
+  peak_months                   Int[]
+  low_months                    Int[]
+  variance_coefficient          Float?    @db.Real
+  predictability_score          Float?    @db.Real
+  current_trend                 String?
+  disruption_risk               String?
+  technology_impact             String?
+  economic_sensitivity          String?
+  data_source                   String?
+  last_updated                  DateTime? @default(now()) @db.Timestamp(6)
+  sample_size                   Int?
+  confidence_level              Float?    @db.Real
+  created_at                    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                    DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([industry], map: "idx_industry_benchmarks_industry")
+}
+
+model integration_events {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  provider   String
+  kind       String
+  status     String
+  message    String?
+  meta       Json?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model ip_rules {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  action     String
+  value      String
+  note       String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([action, value], map: "idx_ip_rules")
+}
+
+model issues {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id  String?   @db.Uuid
+  message     String
+  app_context Json?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  contacts    contacts? @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model legal_holds {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scope              String
+  contact_id         String?   @db.Uuid
+  application_id     String?   @db.Uuid
+  reason             String?
+  expires_at         DateTime? @db.Timestamptz(6)
+  created_by_user_id String?   @db.Uuid
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+}
+
+model lender_activity {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  share_id       String?  @db.Uuid
+  partner_id     String?  @db.Uuid
+  application_id String?  @db.Uuid
+  event          String
+  meta           Json?
+  ip             String?  @db.Inet
+  ua             String?
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([application_id, created_at(sort: Desc)], map: "idx_lender_activity_app")
+}
+
+model lender_credentials {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lender_name   String
+  username      String
+  password_hash String
+  status        String?   @default("active")
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model lender_partners {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  email      String?
+  notes      String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model lender_product_audit_log {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lender_product_id String?          @db.VarChar(50)
+  changed_by        String?          @db.Uuid
+  field_changed     String?
+  old_value         String?
+  new_value         String?
+  changed_at        DateTime?        @default(now()) @db.Timestamp(6)
+  users             users?           @relation(fields: [changed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lender_products   lender_products? @relation(fields: [lender_product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model lender_products {
+  id                       String                     @id @db.VarChar(50)
+  name                     String                     @db.VarChar(255)
+  country                  lender_country
+  category                 lender_category
+  doc_requirements         String[]                   @default([]) @db.VarChar(100)
+  tenant_id                String                     @db.Uuid
+  product_name             String?                    @db.VarChar(255)
+  lender_name              String?                    @db.VarChar(255)
+  product_type             product_type?
+  geography                geography[]
+  industries               String[]                   @db.VarChar(500)
+  description              String?
+  video_url                String?                    @db.VarChar(500)
+  is_active                Boolean?                   @default(true)
+  created_at               DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at               DateTime?                  @default(now()) @db.Timestamp(6)
+  deleted_at               DateTime?                  @db.Timestamp(6)
+  interest_rate_min        Float?                     @db.Real
+  interest_rate_max        Float?                     @db.Real
+  term_min                 Int?
+  term_max                 Int?
+  rate_type                String?                    @db.VarChar(50)
+  rate_frequency           String?                    @db.VarChar(50)
+  min_credit_score         Int?
+  lender_id                String?                    @db.Uuid
+  amount_min               Int?                       @default(0)
+  amount_max               Int?
+  revenue_min              Int?                       @default(0)
+  schema_version           Decimal?                   @default(1.0) @db.Decimal(3, 1)
+  raw_doc_requirements     String[]
+  knobs                    Json?
+  lender_product_audit_log lender_product_audit_log[]
+  lenders                  lenders?                   @relation(fields: [lender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lender_products_history {
+  id                  String?          @db.VarChar(50)
+  name                String?          @db.VarChar(255)
+  country             lender_country?
+  category            lender_category?
+  min_amount          Int?
+  max_amount          Int?
+  min_revenue         Int?
+  doc_requirements    String[]         @db.VarChar(100)
+  tenant_id           String?          @db.Uuid
+  product_name        String?          @db.VarChar(255)
+  lender_name         String?          @db.VarChar(255)
+  product_type        product_type?
+  geography           geography[]
+  industries          String[]         @db.VarChar(500)
+  description         String?
+  video_url           String?          @db.VarChar(500)
+  is_active           Boolean?
+  created_at          DateTime?        @db.Timestamp(6)
+  updated_at          DateTime?        @db.Timestamp(6)
+  deleted_at          DateTime?        @db.Timestamp(6)
+  operation_type      String?          @db.VarChar(10)
+  operation_timestamp DateTime?        @default(now()) @db.Timestamp(6)
+  interest_rate_min   Float?           @db.Real
+  interest_rate_max   Float?           @db.Real
+  term_min            Int?
+  term_max            Int?
+  rate_type           String?          @db.VarChar(50)
+  rate_frequency      String?          @db.VarChar(50)
+  min_credit_score    Int?
+
+  @@ignore
+}
+
+model lender_report_logs {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lender_id     String?   @db.Uuid
+  period        String?
+  sent_to       String[]
+  matched_count Int?      @default(0)
+  funded_count  Int?      @default(0)
+  attachments   Json?     @default("{}")
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model lender_transmissions {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String    @db.Uuid
+  lender_id      String    @db.Uuid
+  channel        String    @default("email")
+  status         String    @default("sent")
+  sent_to        String?
+  payload        Json?     @default("{}")
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model lender_users {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lender_id     String    @db.Uuid
+  email         String    @unique
+  first_name    String?
+  last_name     String?
+  password_hash String
+  role          String?   @default("lender_user")
+  phone         String?   @db.VarChar(20)
+  status        String?   @default("active")
+  last_login    DateTime? @db.Timestamp(6)
+  is_admin      Boolean?  @default(false)
+  permissions   String[]  @default([])
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+  mobile_phone  String?   @db.VarChar(20)
+  lenders       lenders   @relation(fields: [lender_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model lenderproducts {
+  id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lendername           String
+  productname          String
+  productcategory      String?
+  minamount            Decimal? @db.Decimal(14, 2)
+  maxamount            Decimal? @db.Decimal(14, 2)
+  minratepct           Decimal? @db.Decimal(5, 2)
+  maxratepct           Decimal? @db.Decimal(5, 2)
+  mintermmonths        Int?
+  maxtermmonths        Int?
+  ratetype             String?
+  ratefrequency        String?
+  country              String?
+  minavgmonthlyrevenue Decimal? @db.Decimal(14, 2)
+  mincreditscore       Int?
+  requireddocuments    String[]
+}
+
+model lenders {
+  id                       String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  company_name             String            @db.VarChar(255)
+  contact_name             String?           @db.VarChar(255)
+  email                    String?           @db.VarChar(255)
+  phone                    String?           @db.VarChar(50)
+  website                  String?           @db.VarChar(500)
+  description              String?
+  lending_categories       String[]
+  min_loan_amount          Int?
+  max_loan_amount          Int?
+  interest_rate_range      String?           @db.VarChar(50)
+  geographic_focus         String[]
+  preferred_industries     String[]
+  notification_preferences Json?             @default("{}")
+  api_settings             Json?             @default("{}")
+  is_active                Boolean?          @default(true)
+  created_at               DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at               DateTime?         @default(now()) @db.Timestamp(6)
+  mobile_phone             String?           @db.VarChar(20)
+  report_emails            String[]          @default([])
+  lender_products          lender_products[]
+  lender_users             lender_users[]
+  users                    users[]
+}
+
+model login_attempts {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email          String    @db.VarChar(255)
+  ip_address     String?   @db.VarChar(45)
+  user_agent     String?
+  success        Boolean   @default(false)
+  failure_reason String?   @db.VarChar(255)
+  attempted_at   DateTime? @default(now()) @db.Timestamptz(6)
+  tenant_id      String?   @db.Uuid
+}
+
+model marketing_budgets {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  source        String    @unique(map: "idx_budgets_source")
+  monthly_cents Int
+  alert_pct     Int       @default(80)
+  emails        Json?     @default("[]")
+  phones        Json?     @default("[]")
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model marketing_enrollments {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sequence_id         String?              @db.Uuid
+  contact_id          String               @db.Uuid
+  status              String               @default("active")
+  current_idx         Int?                 @default(0)
+  next_run_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  last_error          String?
+  created_at          DateTime?            @default(now()) @db.Timestamptz(6)
+  marketing_sequences marketing_sequences? @relation(fields: [sequence_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model marketing_sequences {
+  id                    String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                  String
+  created_by            String?                 @db.Uuid
+  created_at            DateTime?               @default(now()) @db.Timestamptz(6)
+  marketing_enrollments marketing_enrollments[]
+  marketing_steps       marketing_steps[]
+}
+
+model marketing_steps {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sequence_id         String?              @db.Uuid
+  idx                 Int
+  kind                String
+  config              Json                 @default("{}")
+  created_at          DateTime?            @default(now()) @db.Timestamptz(6)
+  marketing_sequences marketing_sequences? @relation(fields: [sequence_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model message_templates {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  channel   String
+  name      String  @unique
+  body      String
+  variables String?
+}
+
+model missed_calls {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  call_sid    String    @unique
+  from_number String
+  to_number   String
+  reason      String    @default("unanswered")
+  staff_id    String?
+  handled     Boolean   @default(false)
+  handled_by  String?
+  handled_at  DateTime? @db.Timestamp(6)
+  notes       String?
+  created_at  DateTime  @default(now()) @db.Timestamp(6)
+}
+
+model ms_tasks {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  contact_id String?   @db.Uuid
+  ms_task_id String?
+  title      String
+  status     String?   @default("notStarted")
+  due_date   DateTime? @db.Date
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model notifications_log {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  event_key  String
+  channel    String
+  to_ref     String
+  payload    Json
+  status     String
+  error      String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([channel], map: "idx_notifications_log_channel")
+  @@index([created_at], map: "idx_notifications_log_created")
+  @@index([event_key], map: "idx_notifications_log_event")
+}
+
+model o365_tokens {
+  user_id       String    @id @db.Uuid
+  access_token  String
+  refresh_token String
+  expires_at    DateTime  @db.Timestamptz(6)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model ocr_exceptions {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id String   @db.Uuid
+  reason      String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model ocr_mapping_runs {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id  String       @db.Uuid
+  mapping_id   String       @db.Uuid
+  status       String
+  score        Decimal?     @db.Decimal
+  results      Json?
+  created_at   DateTime     @default(now()) @db.Timestamptz(6)
+  ocr_mappings ocr_mappings @relation(fields: [mapping_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([document_id, created_at(sort: Desc)], map: "idx_ocrmap_runs_doc")
+}
+
+model ocr_mappings {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  doc_type           String
+  name               String
+  description        String?
+  rules              Json
+  created_by_user_id String?            @db.Uuid
+  created_at         DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime           @default(now()) @db.Timestamptz(6)
+  ocr_mapping_runs   ocr_mapping_runs[]
+
+  @@unique([doc_type, name], map: "uniq_ocrmap_type_name")
+}
+
+model ocr_results {
+  id                 String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id        String       @db.Uuid
+  application_id     String       @db.Uuid
+  extracted_data     Json
+  confidence         Decimal      @db.Decimal(5, 2)
+  field_confidences  Json?
+  processing_status  String?      @default("processing") @db.VarChar(50)
+  error_message      String?
+  processed_at       DateTime?    @default(now()) @db.Timestamp(6)
+  processing_time_ms Int?
+  applications       applications @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ocr_results_application_id_applications_id_fk")
+  documents          documents    @relation(fields: [document_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ocr_results_document_id_documents_id_fk")
+}
+
+model otp_verifications {
+  id             Int       @id @default(autoincrement())
+  phone_number   String
+  code           String
+  purpose        String
+  user_id        String?
+  application_id String?
+  is_verified    Boolean?  @default(false)
+  attempts       Int?      @default(0)
+  max_attempts   Int?      @default(3)
+  expires_at     DateTime  @db.Timestamp(6)
+  verified_at    DateTime? @db.Timestamp(6)
+  ip_address     String?
+  user_agent     String?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([expires_at], map: "idx_otp_verifications_expires_at")
+  @@index([phone_number], map: "idx_otp_verifications_phone_number")
+}
+
+model passkeys {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String   @db.Uuid
+  cred_id      String   @unique
+  public_key   String
+  counter      Int      @default(0)
+  device_type  String?
+  backed_up    Boolean?
+  transports   String?
+  label        String?  @default("Passkey")
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  last_used_at DateTime @default(now()) @db.Timestamptz(6)
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model password_reset_tokens {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  token      String    @unique @db.VarChar
+  expires_at DateTime  @db.Timestamp(6)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_reset_user")
+}
+
+model perf_vitals {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  value      Decimal? @db.Decimal
+  rating     String?
+  page       String?
+  path       String?
+  user_id    String?  @db.Uuid
+  ua         String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([created_at(sort: Desc)], map: "idx_perf_vitals_created")
+}
+
+model push_subscriptions {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  endpoint   String
+  p256dh_key String
+  auth_key   String
+  user_agent String?
+  is_active  Boolean?  @default(true)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  last_used  DateTime? @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_push_subscriptions_user")
+  @@index([user_id], map: "idx_push_subscriptions_user_id")
+}
+
+model recommendation_logs {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicant_id        String       @db.Uuid
+  recommended_lenders Json?        @default("[]")
+  rejected_lenders    Json?        @default("[]")
+  filters_applied     Json?        @default("[]")
+  created_at          DateTime?    @default(now()) @db.Timestamptz(6)
+  applications        applications @relation(fields: [applicant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([applicant_id], map: "idx_recommendation_logs_applicant_id")
+  @@index([created_at], map: "idx_recommendation_logs_created_at")
+}
+
+model recovery_logs {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id    String    @db.Uuid
+  file_name      String    @db.VarChar(255)
+  application_id String    @db.Uuid
+  business_name  String?   @db.VarChar(255)
+  event_type     String    @db.VarChar(50)
+  status         String    @db.VarChar(50)
+  original_path  String?   @db.VarChar(500)
+  new_path       String?   @db.VarChar(500)
+  file_size      Int?
+  uploaded_by    String?   @db.VarChar(100)
+  error_message  String?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model release_tasks {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  release_id String    @db.Uuid
+  job_key    String
+  name       String?
+  status     String    @default("pending")
+  last_error String?
+  run_at     DateTime? @db.Timestamptz(6)
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  releases   releases  @relation(fields: [release_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([release_id, status], map: "idx_release_tasks_rel")
+}
+
+model releases {
+  id                   String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  version              String                 @unique(map: "uniq_releases_version")
+  codename             String?
+  notes_md             String?
+  status               release_status         @default(draft)
+  rollout_flag_key     String?
+  staged_at            DateTime?              @db.Timestamptz(6)
+  live_at              DateTime?              @db.Timestamptz(6)
+  archived_at          DateTime?              @db.Timestamptz(6)
+  created_at           DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime               @default(now()) @db.Timestamptz(6)
+  release_tasks        release_tasks[]
+  whats_new_dismissals whats_new_dismissals[]
+}
+
+model reminders_queue {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  target_type   String    @db.VarChar(16)
+  target_id     String    @db.Uuid
+  channel       String    @db.VarChar(16)
+  template_id   String    @db.Uuid
+  scheduled_for DateTime  @db.Timestamptz(6)
+  status        String    @default("queued") @db.VarChar(16)
+  last_error    String?
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  sent_at       DateTime? @db.Timestamptz(6)
+
+  @@index([scheduled_for, status], map: "idx_reminders_sched")
+}
+
+model reported_issues {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String?   @db.VarChar(255)
+  email       String?   @db.VarChar(255)
+  message     String
+  page        String?   @db.VarChar(500)
+  screenshot  String?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  status      String?   @default("new") @db.VarChar(50)
+  resolved_at DateTime? @db.Timestamp(6)
+  resolved_by String?   @db.Uuid
+}
+
+model retention_policies {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  target     String   @unique(map: "uniq_retention_target")
+  days       Int
+  where_sql  String?
+  enabled    Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model retry_upload_logs {
+  id                  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id      String        @db.Uuid
+  file_name           String        @db.VarChar(255)
+  document_type       document_type
+  error_message       String
+  attempt             Int
+  retry_scheduled_at  DateTime?     @db.Timestamp(6)
+  retry_completed_at  DateTime?     @db.Timestamp(6)
+  retry_success       Boolean?
+  final_error_message String?
+  created_at          DateTime?     @default(now()) @db.Timestamp(6)
+  applications        applications  @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model risk_assessments {
+  id                   String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id       String       @db.Uuid
+  risk_score           Int
+  risk_level           risk_level
+  debt_to_income_ratio String
+  cash_flow_score      String
+  industry_risk_factor String
+  default_probability  String
+  confidence_level     String
+  compliance_flags     String[]     @default([])
+  recommendations      String[]     @default([])
+  key_risk_factors     String[]     @default([])
+  stress_test_results  Json?        @default("{}")
+  industry_benchmarks  Json?        @default("{}")
+  analysis_data        Json?        @default("{}")
+  ai_provider          String?      @default("openai")
+  model_version        String?      @default("gpt-4o")
+  processing_time_ms   Int?         @default(0)
+  created_at           DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at           DateTime?    @default(now()) @db.Timestamp(6)
+  credit_score         Int?
+  applications         applications @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model roi_mappings {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id     String?   @db.Uuid
+  application_id String?   @db.Uuid
+  source         String?
+  campaign_id    String?
+  ad_group_id    String?
+  ad_id          String?
+  event_name     String?
+  day            DateTime? @db.Date
+  cost_micros    BigInt?   @default(0)
+  conversions    Float?    @default(0)
+  revenue_cents  Int?      @default(0)
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([application_id], map: "idx_roi_map_app")
+  @@index([day], map: "idx_roi_map_day")
+}
+
+model s3_audit_logs {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  run_date         DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
+  total_objects    Int
+  total_size_bytes BigInt
+  sample_keys      String[]  @default([])
+  mismatches       Json?     @default("[]")
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model saved_views {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String?   @db.Uuid
+  scope      String
+  name       String
+  query      Json      @default("{}")
+  is_default Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([scope, user_id], map: "idx_saved_views_scope_user")
+}
+
+model schedule_links {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug             String         @unique
+  owner_ids        String[]       @db.Uuid
+  duration_minutes Int            @default(30)
+  buffer_before    Int            @default(10)
+  buffer_after     Int            @default(10)
+  tz               String         @default("America/Edmonton")
+  active           Boolean?       @default(true)
+  created_at       DateTime?      @default(now()) @db.Timestamptz(6)
+  appointments     appointments[]
+}
+
+model scheduled_notifications {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String?       @db.Uuid
+  user_id        String?       @db.Uuid
+  type           String        @db.VarChar(50)
+  title          String        @db.VarChar(255)
+  body           String
+  data           Json?
+  scheduled_at   DateTime      @db.Timestamp(6)
+  sent           Boolean?      @default(false)
+  sent_at        DateTime?     @db.Timestamp(6)
+  created_at     DateTime?     @default(now()) @db.Timestamp(6)
+  payload        Json?
+  updated_at     DateTime?     @default(now()) @db.Timestamp(6)
+  applications   applications? @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users          users?        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([scheduled_at], map: "idx_scheduled_notifications_scheduled_at")
+  @@index([sent], map: "idx_scheduled_notifications_sent")
+}
+
+model scheduling_settings {
+  user_id       String  @id @db.Uuid
+  time_zone     String? @default("America/Edmonton")
+  slot_minutes  Int?    @default(30)
+  buffer_before Int?    @default(10)
+  buffer_after  Int?    @default(10)
+  workdays      Int[]   @default([1, 2, 3, 4, 5])
+  start_hour    Int?    @default(9)
+  end_hour      Int?    @default(17)
+}
+
+model secrets_registry {
+  name            String    @id
+  version         Int       @default(1)
+  last_rotated_at DateTime? @db.Timestamptz(6)
+  notes           String?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model session_messages {
+  id                 Int                 @id @default(autoincrement())
+  session_id         Int?
+  message_type       String              @db.VarChar(20)
+  content            String
+  timestamp_sent     DateTime            @default(now()) @db.Timestamp(6)
+  metadata           Json?
+  created_at         DateTime            @default(now()) @db.Timestamp(6)
+  applicant_sessions applicant_sessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model sessions {
+  sid    String   @id @db.VarChar
+  sess   Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+}
+
+model short_links {
+  code          String       @id
+  url           String
+  experiment_id String?      @db.Uuid
+  variant       String?
+  clicks        Int?         @default(0)
+  created_at    DateTime?    @default(now()) @db.Timestamptz(6)
+  experiments   experiments? @relation(fields: [experiment_id], references: [id], onUpdate: NoAction)
+}
+
+model signature_log {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  document_id    String        @db.VarChar(255)
+  event_type     String        @db.VarChar(100)
+  received_at    DateTime      @default(now()) @db.Timestamp(6)
+  source         String        @default("signnow_webhook") @db.VarChar(50)
+  application_id String?       @db.Uuid
+  ip_address     String?       @db.VarChar(45)
+  created_at     DateTime      @default(now()) @db.Timestamp(6)
+  applications   applications? @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model silos {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code       String    @unique @db.VarChar(10)
+  name       String    @db.VarChar(100)
+  color      String    @db.VarChar(7)
+  logo_url   String?   @db.VarChar(255)
+  is_active  Boolean?  @default(true)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model sla_policies {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  applies_to          String   @db.VarChar(16)
+  target_minutes      Int
+  active              Boolean  @default(true)
+  escalate_to_user_id String?  @db.Uuid
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model slf_backup_logs {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  filename      String    @unique @db.VarChar(255)
+  contact_count Int?      @default(0)
+  file_size     BigInt?   @default(0)
+  backup_date   DateTime? @default(now()) @db.Timestamp(6)
+  status        String?   @default("pending") @db.VarChar(20)
+  error_message String?
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model slf_contact_logs {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contact_id    String       @db.Uuid
+  type          String       @db.VarChar(50)
+  direction     String?      @db.VarChar(20)
+  content       String
+  staff_user_id String?      @db.Uuid
+  call_sid      String?      @db.VarChar(64)
+  duration      Int?
+  metadata      Json?
+  created_at    DateTime?    @default(now()) @db.Timestamp(6)
+  slf_contacts  slf_contacts @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users         users?       @relation(fields: [staff_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model slf_contact_tags {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slf_contact_id String       @db.Uuid
+  tag            String       @db.VarChar(50)
+  created_at     DateTime?    @default(now()) @db.Timestamp(6)
+  slf_contacts   slf_contacts @relation(fields: [slf_contact_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([slf_contact_id, tag])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model slf_contacts {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slf_id            String?            @db.VarChar(64)
+  full_name         String?            @db.VarChar(128)
+  email             String?            @db.VarChar(128)
+  phone             String?            @db.VarChar(32)
+  company_name      String?            @db.VarChar(128)
+  business_type     String?            @db.VarChar(64)
+  status            String?            @default("active") @db.VarChar(32)
+  lead_stage        String?            @db.VarChar(32)
+  last_contact      DateTime?          @db.Timestamp(6)
+  notes             String?
+  metadata          Json?
+  created_at        DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?          @default(now()) @db.Timestamp(6)
+  lead_status       String?            @db.VarChar(32)
+  last_contact_date DateTime?          @db.Timestamp(6)
+  tags              String[]
+  slf_contact_logs  slf_contact_logs[]
+  slf_contact_tags  slf_contact_tags[]
+}
+
+model sms_messages {
+  id              Int       @id @default(autoincrement())
+  message_sid     String?   @unique
+  from_number     String
+  to_number       String
+  body            String
+  direction       String
+  status          String?
+  num_segments    Int?
+  price           Float?    @db.Real
+  price_unit      String?
+  error_code      Int?
+  error_message   String?
+  contact_id      Int?
+  application_id  String?
+  is_processed    Boolean?  @default(false)
+  is_read         Boolean?  @default(false)
+  is_automated    Boolean?  @default(false)
+  automation_type String?
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  updated_at      DateTime? @default(now()) @db.Timestamp(6)
+  twilio_sid      String?
+  phone_number    String?
+
+  @@index([application_id], map: "idx_sms_messages_application_id")
+  @@index([created_at(sort: Desc)], map: "idx_sms_messages_created_at")
+  @@index([direction], map: "idx_sms_messages_direction")
+}
+
+model sms_optouts {
+  phone      String    @id
+  opted_out  Boolean   @default(false)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model staff_auth_events {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email_lower String?
+  user_id     String?  @db.Uuid
+  ip          String?  @db.Inet
+  ok          Boolean
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([email_lower], map: "idx_auth_events_email")
+  @@index([ip], map: "idx_auth_events_ip")
+}
+
+model staff_invites {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email_lower      String
+  role             String    @default("viewer")
+  token_hash       String
+  invited_by       String?   @db.Uuid
+  expires_at       DateTime  @db.Timestamptz(6)
+  accepted_user_id String?   @db.Uuid
+  used_at          DateTime? @db.Timestamptz(6)
+
+  @@index([email_lower], map: "idx_invites_email")
+}
+
+model staff_lockouts {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String?  @db.Uuid
+  email_lower String?
+  ip          String?  @db.Inet
+  until       DateTime @db.Timestamptz(6)
+  attempts    Int      @default(0)
+  reason      String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([email_lower, ip, user_id], map: "idx_lockouts_keys")
+}
+
+model staff_sessions {
+  id          String      @id @default(dbgenerated("(gen_random_uuid())::text"))
+  user_id     String
+  token       String      @unique
+  expires_at  DateTime    @db.Timestamptz(6)
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime?   @default(now()) @db.Timestamptz(6)
+  staff_users staff_users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([expires_at], map: "idx_staff_sessions_expires")
+  @@index([token], map: "idx_staff_sessions_token")
+  @@index([user_id], map: "idx_staff_sessions_user_id")
+}
+
+model staff_users {
+  id                   String           @id @default(dbgenerated("(gen_random_uuid())::text"))
+  email                String           @unique
+  password_hash        String?
+  first_name           String?
+  last_name            String?
+  role                 String?          @default("staff")
+  status               String?          @default("active")
+  last_login           DateTime?        @db.Timestamptz(6)
+  created_at           DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime?        @default(now()) @db.Timestamptz(6)
+  is_active            Boolean?         @default(true)
+  must_change_password Boolean          @default(false)
+  staff_sessions       staff_sessions[]
+}
+
+model subscriptions {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant_key    String        @default("default")
+  plan_key      String
+  started_at    DateTime      @default(now()) @db.Timestamptz(6)
+  canceled_at   DateTime?     @db.Timestamptz(6)
+  meta          Json?
+  billing_plans billing_plans @relation(fields: [plan_key], references: [key], onUpdate: NoAction)
+}
+
+model tags {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String    @unique @db.VarChar(100)
+  color      String?   @default("#3b82f6") @db.VarChar(7)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model tenants {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String         @db.VarChar(255)
+  domain       String?        @unique(map: "tenants_domain_unique") @db.VarChar(255)
+  settings     Json?          @default("{}")
+  created_at   DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?      @default(now()) @db.Timestamp(6)
+  applications applications[]
+  audit_log    audit_log[]
+  businesses   businesses[]
+  users        users[]
+}
+
+model thread_slas {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  thread_id     String    @db.Uuid
+  policy_id     String    @db.Uuid
+  due_at        DateTime  @db.Timestamptz(6)
+  satisfied_at  DateTime? @db.Timestamptz(6)
+  breached_at   DateTime? @db.Timestamptz(6)
+  last_check_at DateTime? @db.Timestamptz(6)
+  status        String    @default("ok") @db.VarChar(16)
+
+  @@index([due_at], map: "idx_thread_slas_due")
+  @@index([thread_id], map: "idx_thread_slas_thread")
+}
+
+model todo_tasks {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String?   @db.Uuid
+  graph_task_id String?   @unique
+  title         String?
+  status        String?
+  due_date      DateTime? @db.Date
+  raw           Json?     @default("{}")
+  updated_at    DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([user_id], map: "idx_todo_user")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model training_doc_chunks {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  doc_id     String    @db.Uuid
+  idx        Int
+  text       String
+  embedding  Json?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([doc_id], map: "idx_chunks_doc")
+}
+
+model training_docs {
+  id              Int                      @id @default(autoincrement())
+  filename        String                   @db.VarChar(255)
+  path            String                   @db.VarChar(500)
+  file_size       Int?
+  file_type       String?                  @db.VarChar(100)
+  content_preview String?
+  status          String?                  @default("uploaded") @db.VarChar(50)
+  uploaded_by     String?                  @db.VarChar(255)
+  uploaded_at     DateTime                 @default(now()) @db.Timestamp(6)
+  indexed_at      DateTime?                @db.Timestamp(6)
+  metadata        Json?
+  created_at      DateTime                 @default(now()) @db.Timestamp(6)
+  updated_at      DateTime                 @default(now()) @db.Timestamp(6)
+  tsv             Unsupported("tsvector")?
+
+  @@index([tsv], map: "idx_training_docs_tsv", type: Gin)
+  @@index([tsv], map: "idx_training_tsv", type: Gin)
+}
+
+model transmissions {
+  id                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id    String       @db.Uuid
+  lender_product_id String       @db.Uuid
+  transmitted_by    String?      @db.Uuid
+  status            String?      @default("sent") @db.VarChar(50)
+  transmission_data Json?
+  response_data     Json?
+  created_at        DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?    @default(now()) @db.Timestamp(6)
+  applications      applications @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users             users?       @relation(fields: [transmitted_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([application_id], map: "idx_transmissions_application_id")
+  @@index([lender_product_id], map: "idx_transmissions_lender_product_id")
+  @@index([status], map: "idx_transmissions_status")
+}
+
+model upload_retry_queue {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id String       @db.Uuid
+  file_name      String       @db.VarChar(255)
+  category       String       @db.VarChar(255)
+  file_buffer    String?
+  sha256         String?      @db.VarChar(64)
+  file_size      Int?
+  file_type      String?      @db.VarChar(100)
+  attempts       Int?         @default(0)
+  last_attempt   DateTime?    @db.Timestamp(6)
+  error_message  String?
+  status         String?      @default("pending") @db.VarChar(20)
+  created_at     DateTime?    @default(now()) @db.Timestamp(6)
+  applications   applications @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model uploads_log {
+  id             Int       @id @default(autoincrement())
+  document_id    String?   @db.VarChar(255)
+  application_id String?   @db.VarChar(255)
+  filename       String?   @db.VarChar(255)
+  client_ip      String?   @db.VarChar(45)
+  user_agent     String?
+  error_message  String?
+  error_type     String?   @db.VarChar(100)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model usage_counters {
+  tenant_key   String   @default("default")
+  metric       String
+  period_start DateTime @db.Date
+  value        BigInt   @default(0)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@id([tenant_key, metric, period_start])
+}
+
+model usage_events {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant_key String   @default("default")
+  metric     String
+  qty        Int      @default(1)
+  ref_type   String?
+  ref_id     String?  @db.Uuid
+  meta       Json?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model user_audit_log {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String    @db.Uuid
+  action      String    @db.VarChar(255)
+  details     Json?
+  ip_address  String?   @db.VarChar(45)
+  user_agent  String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  tenant_id   String?   @db.Uuid
+  resource    String?   @db.VarChar(255)
+  resource_id String?   @db.VarChar(255)
+  old_values  Json?
+  new_values  Json?
+}
+
+model user_sessions {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model users {
+  id                         String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                      String                     @unique @db.VarChar
+  password_hash              String                     @db.VarChar
+  phone                      String
+  first_name                 String?                    @db.VarChar
+  last_name                  String?                    @db.VarChar
+  profile_image_url          String?                    @db.VarChar
+  role                       user_role?                 @default(staff)
+  tenant_id                  String?                    @db.Uuid
+  otp_code                   String?
+  otp_expires                DateTime?                  @db.Timestamp(6)
+  created_at                 DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime?                  @default(now()) @db.Timestamp(6)
+  username                   String?                    @unique @db.VarChar(50)
+  department                 String?                    @db.VarChar(100)
+  is_active                  Boolean?                   @default(true)
+  is_email_verified          Boolean?                   @default(false)
+  is_phone_verified          Boolean?                   @default(false)
+  last_login                 DateTime?                  @db.Timestamp(6)
+  password_reset_token       String?
+  password_reset_expires_at  DateTime?                  @db.Timestamp(6)
+  email_verification_token   String?                    @db.VarChar(255)
+  email_verification_expires DateTime?                  @db.Timestamp(6)
+  preferences                Json?                      @default("{}")
+  metadata                   Json?                      @default("{}")
+  lender_id                  String?                    @db.Uuid
+  password_is_temporary      Boolean?                   @default(false)
+  webauthn_credentials       Json?
+  push_subscription          Json?
+  otp_verified               Boolean?                   @default(false)
+  mfa_enabled                Boolean?                   @default(true)
+  totp_secret                String?
+  totp_enabled               Boolean                    @default(false)
+  roles                      String[]                   @default(["user"])
+  phone_e164                 String?                    @unique
+  applications               applications[]
+  chat_messages              chat_messages[]
+  document_recovery_log      document_recovery_log[]
+  documents                  documents[]
+  lender_product_audit_log   lender_product_audit_log[]
+  passkeys                   passkeys[]
+  password_reset_tokens      password_reset_tokens[]
+  push_subscriptions         push_subscriptions[]
+  scheduled_notifications    scheduled_notifications[]
+  slf_contact_logs           slf_contact_logs[]
+  transmissions              transmissions[]
+  webauthn_credentials_records webauthn_credentials[] @relation("webauthn_credentials_records")
+  lenders                    lenders?                   @relation(fields: [lender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenants                    tenants?                   @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model voice_calls {
+  id                 Int       @id @default(autoincrement())
+  call_sid           String?   @unique
+  from_number        String
+  to_number          String
+  direction          String
+  status             String?
+  duration           Int?
+  recording_url      String?
+  recording_sid      String?
+  recording_duration Int?
+  ivr_path           String?
+  ivr_data           Json?
+  price              Float?    @db.Real
+  price_unit         String?
+  contact_id         Int?
+  application_id     String?
+  user_id            String?
+  notes              String?
+  call_purpose       String?
+  outcome            String?
+  requires_follow_up Boolean?  @default(false)
+  follow_up_date     DateTime? @db.Timestamp(6)
+  follow_up_notes    String?
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  updated_at         DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([application_id], map: "idx_voice_calls_application_id")
+  @@index([created_at(sort: Desc)], map: "idx_voice_calls_created_at")
+  @@index([direction], map: "idx_voice_calls_direction")
+}
+
+model webauthn_credentials {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String    @db.Uuid
+  credential_id String    @unique @db.VarChar(255)
+  public_key    String
+  counter       Int?      @default(0)
+  device_type   String?   @default("unknown") @db.VarChar(50)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  last_used     DateTime? @db.Timestamp(6)
+  users         users     @relation("webauthn_credentials_records", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_webauthn_credentials_user_id")
+}
+
+model whats_new_dismissals {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String?  @db.Uuid
+  release_id   String   @db.Uuid
+  dismissed_at DateTime @default(now()) @db.Timestamptz(6)
+  releases     releases @relation(fields: [release_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, release_id])
+}
+
+enum application_status {
+  draft
+  submitted
+  under_review
+  lender_match
+  approved
+  declined
+  funded
+}
+
+enum backup_status {
+  pending
+  completed
+  failed
+}
+
+enum document_status {
+  pending
+  accepted
+  rejected
+}
+
+enum document_type {
+  bank_statements
+  tax_returns
+  financial_statements
+  business_license
+  other
+  signed_application
+  equipment_quote
+  accounts_receivable
+  invoice_samples
+  business_plan
+  collateral_docs
+  personal_guarantee
+  articles_of_incorporation
+  proof_of_identity
+  accounts_payable
+  balance_sheet
+  cash_flow_statement
+  drivers_license_front_back
+  personal_financial_statement
+  profit_loss_statement
+  void_pad
+  supplier_agreement
+  purchase_orders
+  equipment_photos
+  sba_forms
+  ar
+  ap
+  profit_and_loss_statement
+  account_prepared_financials
+  pnl_statement
+}
+
+enum erasure_status {
+  pending
+  approved
+  denied
+  processing
+  done
+}
+
+enum experiment_status {
+  draft
+  running
+  paused
+  stopped
+}
+
+enum geography {
+  US
+  CA
+  INTL
+}
+
+enum lead_source {
+  application
+  partner_referral
+  direct_call
+  web_inquiry
+  manual_entry
+}
+
+enum lender_category {
+  line_of_credit
+  term_loan
+  equipment_financing
+  invoice_factoring
+  purchase_order_financing
+  Business_Line_of_Credit  @map("Business Line of Credit")
+  Term_Loan                @map("Term Loan")
+  Equipment_Financing      @map("Equipment Financing")
+  Invoice_Factoring        @map("Invoice Factoring")
+  Purchase_Order_Financing @map("Purchase Order Financing")
+  Working_Capital          @map("Working Capital")
+  Asset_Based_Lending      @map("Asset-Based Lending")
+  SBA_Loan                 @map("SBA Loan")
+}
+
+enum lender_country {
+  US
+  CA
+}
+
+enum loan_category {
+  term_loan
+  line_of_credit
+  sba_loan
+  equipment_loan
+  merchant_cash_advance
+}
+
+enum pipeline_stage {
+  New
+  In_Review     @map("In Review")
+  Requires_Docs @map("Requires Docs")
+  Off_to_Lender @map("Off to Lender")
+  Accepted
+  Denied
+}
+
+enum product_type {
+  term_loan
+  line_of_credit
+  factoring
+  merchant_cash_advance
+  sba_loan
+  equipment_financing
+  invoice_factoring
+  purchase_order_financing
+  working_capital
+}
+
+enum release_status {
+  draft
+  staged
+  live
+  archived
+}
+
+enum risk_level {
+  Low
+  Medium
+  High
+  Critical
+}
+
+enum status {
+  pending
+  completed
+  failed
+  active
+  inactive
+}
+
+enum template_status {
+  draft
+  pending
+  approved
+  published
+}
+
+enum user_role {
+  client
+  staff
+  admin
+  lender
+  referrer
+}
+
+// LinkedIn Pack Models
+enum LiTemplateType {
+  message
+  conversation
+  comment
+}
+
+model LinkedInAudience {
+  id              String   @id @default(cuid())
+  tenant          String   @default("bf") // "bf" | "slf"
+  name            String
+  definition_json Json     // filter tree (see routes)
+  matchedAudienceUrn String?
+  status          String   @default("draft") // draft|ready|syncing|synced|error
+  sizeCache       Int?     
+  lastSyncAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  campaigns       LinkedInMessageCampaign[]
+}
+
+model LinkedInTemplate {
+  id         String         @id @default(cuid())
+  tenant     String         @default("bf")
+  type       LiTemplateType
+  name       String
+  version    Int            @default(1)
+  body_json  Json           // message or conversation tree
+  lint_json  Json?
+  ownerId    String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  campaigns  LinkedInMessageCampaign[]
+}
+
+model LinkedInMessageCampaign {
+  id            String   @id @default(cuid())
+  tenant        String   @default("bf")
+  templateId    String
+  audienceId    String
+  mode          String   @default("ads")   // "ads" | "sdr"
+  scheduleAt    DateTime?
+  budgetCents   Int?
+  status        String   @default("draft") // draft|queued|running|paused|completed|error
+  adAccountUrn  String?  // for ads mode
+  campaignUrn   String?
+  meta          Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  template      LinkedInTemplate @relation(fields: [templateId], references: [id])
+  audience      LinkedInAudience @relation(fields: [audienceId], references: [id])
+
+  @@index([tenant])
+  @@index([status])
+}
+
+// AI Ads Pack Models
+model AiRecommendation {
+  id          String   @id @default(cuid())
+  tenant      String   @default("bf")
+  windowDays  Int      @default(7)
+  goal        String   @default("revenue")
+  plan_json   Json
+  rationale   String?
+  risk_score  Float?   @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([tenant])
+  @@index([createdAt])
+}
+
+model Approval {
+  id         String   @id @default(cuid())
+  planId     String
+  status     String   @default("queued") // queued|approved|rejected|applied|failed
+  approver   String?  // E164 or user id
+  token      String   // single-use
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model ChangeLog {
+  id          String   @id @default(cuid())
+  provider    String   // google_ads | linkedin_ads
+  scope       String?  // campaign/ad/adgroup
+  targetId    String?
+  before_json Json?
+  after_json  Json?
+  appliedBy   String?
+  appliedAt   DateTime @default(now())
+  rollback_token String?
+
+  @@index([provider])
+  @@index([appliedAt])
+}
+
+model PolicyRule {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value_json Json
+  updatedAt DateTime @updatedAt
+}
+
+model CreativeDraft {
+  id        String   @id @default(cuid())
+  channel   String   // google_search | linkedin_message | linkedin_single_image
+  tenant    String   @default("bf")
+  input     Json     // prompt/context
+  output    Json     // variants
+  lint      Json?
+  createdAt DateTime @default(now())
+
+  @@index([tenant])
+  @@index([channel])
+}
+
+model Experiment {
+  id         String   @id @default(cuid())
+  tenant     String   @default("bf")
+  provider   String
+  campaignId String
+  hypothesis String?
+  plan_json  Json
+  status     String   @default("draft") // draft|running|stopped|completed
+  startedAt  DateTime?
+  endedAt    DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([tenant])
+  @@index([status])
+}
+
+// Voice + Activity Logging Pack Models
+model Activity {
+  id            String   @id @default(cuid())
+  tenant        String   @default("bf")
+  type          String   // call_in|call_out|call_summary|doc_upload|stage_change|task_created|merge|note|… 
+  contactId     String?
+  applicationId String?
+  actorId       String?  // user/bot that performed the action
+  tags          Json?    // string[]
+  meta          Json?    // free-form payload
+  createdAt     DateTime @default(now())
+
+  @@index([tenant])
+  @@index([contactId])
+  @@index([applicationId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Call {
+  id            String   @id @default(cuid())
+  tenant        String   @default("bf")
+  direction     String   // inbound|outbound
+  fromE164      String?
+  toE164        String?
+  contactId     String?
+  applicationId String?
+  twilioCallSid String?  @unique
+  recordingUrl  String?
+  durationSec   Int?
+  endedAt       DateTime?
+  createdAt     DateTime @default(now())
+
+  summary       CallSummary?
+
+  @@index([tenant])
+  @@index([contactId])
+  @@index([applicationId])
+  @@index([twilioCallSid])
+  @@index([createdAt])
+}
+
+model CallSummary {
+  id          String   @id @default(cuid())
+  callId      String   @unique
+  transcript  String?  @db.Text
+  summary     String?  @db.Text
+  disposition String?  // qualified|callback|docs_requested|not_a_fit|…
+  nextActions Json?    // [{type:"task", title:"…", dueAt:"…"}]
+  tags        Json?    // string[]
+  quality     Float?   // QA score 0..1
+  createdAt   DateTime @default(now())
+
+  call        Call     @relation(fields: [callId], references: [id])
+
+  @@index([callId])
+  @@index([disposition])
+  @@index([createdAt])
+}
+
+model Task {
+  id            String   @id @default(cuid())
+  tenant        String   @default("bf")
+  title         String
+  status        String   @default("open") // open|done|blocked|cancelled
+  contactId     String?
+  applicationId String?
+  ownerId       String?
+  dueAt         DateTime?
+  tags          Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([tenant])
+  @@index([contactId])
+  @@index([applicationId])
+  @@index([status])
+  @@index([dueAt])
+}
+
+model DocExtract {
+  id            String   @id @default(cuid())
+  applicationId String?
+  contactId     String?
+  docType       String   // e.g., tax_return, financials, bank_statement
+  periodStart   DateTime?
+  periodEnd     DateTime?
+
+  // Structured extraction (normalized)
+  extracted_json Json    // includes arrays (years/months/transactions)
+
+  // Highly sensitive PII encrypted blob (see crypto)
+  pii_encrypted  Bytes?  // opaque; decrypt on demand
+
+  quality       Float?
+  redflags      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([applicationId])
+  @@index([contactId])
+  @@index([docType])
+  @@index([createdAt])
+}
+
+model AdsSpend {
+  id          String   @id @default(cuid())
+  tenant      String   @default("bf")
+  date        DateTime
+  campaignId  String?
+  costMicros  BigInt   @default(0)
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([tenant])
+  @@index([date])
+  @@index([campaignId])
+}
+
+// Database Integration Pack - Core Models
+model Lender {
+  id                String          @id @default(cuid())
+  tenant            String          @default("bf") // "bf" | "slf"
+  name              String
+  displayName       String?
+  status            String          @default("active") // active|inactive|suspended
+  category          String?         // term_loan, line_of_credit, etc
+  minAmount         Decimal?        @db.Decimal(12, 2)
+  maxAmount         Decimal?        @db.Decimal(12, 2)
+  minCreditScore    Int?
+  maxLoanTerm       Int?            // months
+  geographies       String[]        @default(["US"])
+  industries        String[]        @default([])
+  requirements      Json?           // structured requirements
+  fees              Json?           // fee structure
+  rates             Json?           // rate information
+  turnaroundDays    Int?            // typical processing time
+  apiEndpoint       String?
+  apiKey            String?
+  contactEmail      String?
+  contactPhone      String?
+  partnershipLevel  String?         @default("standard") // standard|preferred|exclusive
+  commissionRate    Decimal?        @db.Decimal(5, 4) // e.g., 0.0250 for 2.5%
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  products          LenderProduct[]
+  applications      applications[]  @relation("LenderApplications")
+
+  @@index([tenant])
+  @@index([status])
+  @@index([category])
+  @@unique([tenant, name]) // Prevent duplicate lender names per tenant
+}
+
+model LenderProduct {
+  id                String   @id @default(cuid())
+  lenderId          String
+  tenant            String   @default("bf")
+  name              String
+  productType       String   // term_loan, line_of_credit, etc
+  minAmount         Decimal  @db.Decimal(12, 2)
+  maxAmount         Decimal  @db.Decimal(12, 2)
+  minCreditScore    Int?
+  maxCreditScore    Int?
+  minAnnualRevenue  Decimal? @db.Decimal(12, 2)
+  maxLoanTerm       Int      // months
+  interestRateMin   Decimal? @db.Decimal(5, 4)
+  interestRateMax   Decimal? @db.Decimal(5, 4)
+  originationFee    Decimal? @db.Decimal(5, 4)
+  isActive          Boolean  @default(true)
+  requirements      Json?    // structured requirements
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  lender            Lender   @relation(fields: [lenderId], references: [id], onDelete: Cascade)
+
+  @@index([lenderId])
+  @@index([tenant])
+  @@index([productType])
+  @@index([isActive])
+  @@unique([lenderId, name]) // Prevent duplicate product names per lender
+}
+
+model AdsCampaign {
+  id              String   @id @default(cuid())
+  tenant          String   @default("bf")
+  name            String
+  platform        String   // google_ads, facebook_ads, linkedin_ads
+  campaignId      String   // platform-specific ID
+  status          String   @default("active") // active|paused|ended
+  budget          Decimal? @db.Decimal(10, 2)
+  budgetType      String?  @default("daily") // daily|total
+  targetAudience  Json?    // audience targeting criteria
+  adGroups        Json?    // ad group configuration
+  keywords        String[] @default([])
+  negativeKeywords String[] @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([tenant])
+  @@index([platform])
+  @@index([status])
+  @@unique([tenant, platform, campaignId]) // Prevent duplicate campaigns per platform
+}

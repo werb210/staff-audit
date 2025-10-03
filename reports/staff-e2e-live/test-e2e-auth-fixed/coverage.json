@@ -1,0 +1,59 @@
+{
+  "inbound_total": 10,
+  "normalized_total": 12,
+  "card_total": 18,
+  "pdf_total": 39,
+  "lender_total": 17,
+  "normalized_hit_rate": 1,
+  "card_hit_rate": 1.5,
+  "pdf_hit_rate": 0,
+  "lender_hit_rate": 1.4,
+  "missing_in_normalized": [
+    "loanAmount",
+    "country",
+    "province",
+    "revenue",
+    "timeInBusiness",
+    "industry",
+    "employees",
+    "email",
+    "phone",
+    "useOfFunds"
+  ],
+  "missing_in_card": [
+    "loanAmount",
+    "country",
+    "province",
+    "revenue",
+    "timeInBusiness",
+    "industry",
+    "employees",
+    "email",
+    "phone",
+    "useOfFunds"
+  ],
+  "missing_in_pdf": [
+    "loanAmount",
+    "country",
+    "province",
+    "revenue",
+    "timeInBusiness",
+    "industry",
+    "employees",
+    "email",
+    "phone",
+    "useOfFunds"
+  ],
+  "missing_in_lender": [
+    "loanAmount",
+    "country",
+    "province",
+    "revenue",
+    "timeInBusiness",
+    "industry",
+    "employees",
+    "email",
+    "phone",
+    "useOfFunds"
+  ]
+}

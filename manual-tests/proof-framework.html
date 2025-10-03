@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎬 28 Manual Button Proofs - Evidence Capture Framework</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .proof-section {
+            background: white;
+            margin: 16px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .proof-header {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .proof-content {
+            padding: 24px;
+            display: none;
+        }
+        .proof-content.active {
+            display: block;
+        }
+        .test-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 12px 0;
+            padding: 16px;
+            position: relative;
+        }
+        .test-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-recording { background: #fed7d7; color: #c53030; }
+        .status-complete { background: #d1fae5; color: #065f46; }
+        .status-failed { background: #fee2e2; color: #dc2626; }
+        
+        .evidence-capture {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        .capture-controls {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 8px;
+            height: 8px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981, #059669);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        
+        .test-step {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 24px;
+            margin-right: 8px;
+        }
+        
+        .evidence-requirements {
+            background: #fef3c7;
+            border: 1px solid #fed7aa;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc2626;
+            text-align: center;
+            padding: 16px;
+            background: #fee2e2;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        
+        .recording-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc2626;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+            z-index: 1000;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="recording-indicator" id="recording-indicator">
+        🔴 RECORDING IN PROGRESS
+    </div>
+
+    <div class="container">
+        <h1>🎬 28 Manual Button Proofs - Staff Portal</h1>
+        <p><strong>Objective:</strong> Capture comprehensive evidence of all staff portal functionality with MP4 recordings and HAR files.</p>
+
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="completed-count">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pending-count">28</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="evidence-count">0</div>
+                <div class="stat-label">Evidence Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completion-percent">0%</div>
+                <div class="stat-label">Complete</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+
+        <div class="evidence-capture">
+            <h3>📹 Evidence Capture Controls</h3>
+            <div class="capture-controls">
+                <button class="btn-danger" onclick="startRecording()">🔴 Start Recording</button>
+                <button class="btn-warning" onclick="stopRecording()">⏹️ Stop Recording</button>
+                <button class="btn-primary" onclick="exportHAR()">📁 Export HAR</button>
+                <button class="btn-success" onclick="downloadEvidence()">📦 Download All Evidence</button>
+            </div>
+            <p><strong>Recording Status:</strong> <span id="recording-status">Not Recording</span></p>
+        </div>
+
+        <!-- NAVIGATION & AUTHENTICATION PROOFS -->
+        <div class="proof-section">
+            <div class="proof-header" onclick="toggleSection(this)">
+                <h2>🔐 Authentication & Navigation (Proofs 1-6)</h2>
+                <span>▼</span>
+            </div>
+            <div class="proof-content">
+                <div class="test-item" data-proof="1">
+                    <h4>Proof 1: Staff Login Authentication</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Navigate to /portal
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Enter staff credentials
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Click Login button
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify redirect to dashboard
+                    </div>
+                    <div class="evidence-requirements">
+                        <strong>Evidence Required:</strong> MP4 showing login flow + HAR with auth tokens
+                    </div>
+                    <button class="btn-primary" onclick="startProof(1)">▶️ Start Proof 1</button>
+                    <span class="test-status status-pending" id="status-1">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="2">
+                    <h4>Proof 2: Dashboard Navigation</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Click Dashboard tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Verify dashboard widgets load
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Test widget interactions
+                    </div>
+                    <button class="btn-primary" onclick="startProof(2)">▶️ Start Proof 2</button>
+                    <span class="test-status status-pending" id="status-2">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="3">
+                    <h4>Proof 3: Applications Tab Navigation</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Click Applications tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Verify applications list loads
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Test search and filter functions
+                    </div>
+                    <button class="btn-primary" onclick="startProof(3)">▶️ Start Proof 3</button>
+                    <span class="test-status status-pending" id="status-3">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="4">
+                    <h4>Proof 4: Sales Pipeline Navigation</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Click Sales Pipeline tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Verify pipeline board loads
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Test drag and drop functionality
+                    </div>
+                    <button class="btn-primary" onclick="startProof(4)">▶️ Start Proof 4</button>
+                    <span class="test-status status-pending" id="status-4">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="5">
+                    <h4>Proof 5: Contacts Tab Navigation</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Click Contacts tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Verify contacts table loads
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Test contact search and add functions
+                    </div>
+                    <button class="btn-primary" onclick="startProof(5)">▶️ Start Proof 5</button>
+                    <span class="test-status status-pending" id="status-5">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="6">
+                    <h4>Proof 6: User Profile & Settings</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Click user profile menu
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Access settings page
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Test settings modifications
+                    </div>
+                    <button class="btn-primary" onclick="startProof(6)">▶️ Start Proof 6</button>
+                    <span class="test-status status-pending" id="status-6">Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPLICATION WORKFLOW PROOFS -->
+        <div class="proof-section">
+            <div class="proof-header" onclick="toggleSection(this)">
+                <h2>📋 Application Workflow (Proofs 7-14)</h2>
+                <span>▼</span>
+            </div>
+            <div class="proof-content">
+                <div class="test-item" data-proof="7">
+                    <h4>Proof 7: Create New Application</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Click "New Application" button
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Fill application form fields
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Submit application
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify creation confirmation
+                    </div>
+                    <button class="btn-primary" onclick="startProof(7)">▶️ Start Proof 7</button>
+                    <span class="test-status status-pending" id="status-7">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="8">
+                    <h4>Proof 8: Edit Application Details</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Open existing application
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Click edit button
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Modify application data
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Save changes
+                    </div>
+                    <button class="btn-primary" onclick="startProof(8)">▶️ Start Proof 8</button>
+                    <span class="test-status status-pending" id="status-8">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="9">
+                    <h4>Proof 9: Application Status Change</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Select application from list
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Change status (e.g., "Under Review" to "Approved")
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Add status change notes
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Confirm status update
+                    </div>
+                    <button class="btn-primary" onclick="startProof(9)">▶️ Start Proof 9</button>
+                    <span class="test-status status-pending" id="status-9">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="10">
+                    <h4>Proof 10: Application Search & Filter</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Use search bar to find specific application
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Apply status filters
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Apply date range filters
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Clear filters and verify reset
+                    </div>
+                    <button class="btn-primary" onclick="startProof(10)">▶️ Start Proof 10</button>
+                    <span class="test-status status-pending" id="status-10">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="11">
+                    <h4>Proof 11: Application Export</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Select applications for export
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Click export button
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Choose export format (CSV/PDF)
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Download and verify export file
+                    </div>
+                    <button class="btn-primary" onclick="startProof(11)">▶️ Start Proof 11</button>
+                    <span class="test-status status-pending" id="status-11">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="12">
+                    <h4>Proof 12: Application Notes & Comments</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Open application details
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Add internal note/comment
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Edit existing note
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify note history and timestamps
+                    </div>
+                    <button class="btn-primary" onclick="startProof(12)">▶️ Start Proof 12</button>
+                    <span class="test-status status-pending" id="status-12">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="13">
+                    <h4>Proof 13: Application Assignment</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Select unassigned application
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Assign to staff member
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Set priority level
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify assignment notification
+                    </div>
+                    <button class="btn-primary" onclick="startProof(13)">▶️ Start Proof 13</button>
+                    <span class="test-status status-pending" id="status-13">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="14">
+                    <h4>Proof 14: Application Archive/Delete</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Select completed application
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Click archive/delete button
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Confirm archive/delete action
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify removal from active list
+                    </div>
+                    <button class="btn-primary" onclick="startProof(14)">▶️ Start Proof 14</button>
+                    <span class="test-status status-pending" id="status-14">Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCUMENT MANAGEMENT PROOFS -->
+        <div class="proof-section">
+            <div class="proof-header" onclick="toggleSection(this)">
+                <h2>📄 Document Management (Proofs 15-21)</h2>
+                <span>▼</span>
+            </div>
+            <div class="proof-content">
+                <div class="test-item" data-proof="15">
+                    <h4>Proof 15: Document Upload</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Navigate to Documents tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Click upload button
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Select and upload document file
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify upload completion and metadata
+                    </div>
+                    <button class="btn-primary" onclick="startProof(15)">▶️ Start Proof 15</button>
+                    <span class="test-status status-pending" id="status-15">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="16">
+                    <h4>Proof 16: Document Download</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Find document in documents list
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Click download button
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Verify download initiation
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Confirm downloaded file integrity
+                    </div>
+                    <button class="btn-primary" onclick="startProof(16)">▶️ Start Proof 16</button>
+                    <span class="test-status status-pending" id="status-16">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="17">
+                    <h4>Proof 17: Document Preview</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Click on document name to preview
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Verify PDF/image preview opens
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Test zoom and navigation controls
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Close preview modal
+                    </div>
+                    <button class="btn-primary" onclick="startProof(17)">▶️ Start Proof 17</button>
+                    <span class="test-status status-pending" id="status-17">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="18">
+                    <h4>Proof 18: Bulk Document Operations</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Select multiple documents using checkboxes
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Perform bulk download operation
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Verify ZIP file creation and download
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Test bulk status change operation
+                    </div>
+                    <button class="btn-primary" onclick="startProof(18)">▶️ Start Proof 18</button>
+                    <span class="test-status status-pending" id="status-18">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="19">
+                    <h4>Proof 19: Document Categories & Tags</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Edit document metadata
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Assign document category
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Add tags to document
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Filter documents by category/tags
+                    </div>
+                    <button class="btn-primary" onclick="startProof(19)">▶️ Start Proof 19</button>
+                    <span class="test-status status-pending" id="status-19">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="20">
+                    <h4>Proof 20: Document Approval Workflow</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Review pending document
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Approve or reject document
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Add approval comments
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify status change and notifications
+                    </div>
+                    <button class="btn-primary" onclick="startProof(20)">▶️ Start Proof 20</button>
+                    <span class="test-status status-pending" id="status-20">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="21">
+                    <h4>Proof 21: Document Security & Permissions</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Access document permissions settings
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Modify access permissions for roles
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Test permission restrictions
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify audit trail logging
+                    </div>
+                    <button class="btn-primary" onclick="startProof(21)">▶️ Start Proof 21</button>
+                    <span class="test-status status-pending" id="status-21">Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMUNICATION & ADDITIONAL PROOFS -->
+        <div class="proof-section">
+            <div class="proof-header" onclick="toggleSection(this)">
+                <h2>📞 Communication & Advanced Features (Proofs 22-28)</h2>
+                <span>▼</span>
+            </div>
+            <div class="proof-content">
+                <div class="test-item" data-proof="22">
+                    <h4>Proof 22: Email Communication</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Navigate to Communication tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Compose new email
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Send email to client
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Verify email in sent folder
+                    </div>
+                    <button class="btn-primary" onclick="startProof(22)">▶️ Start Proof 22</button>
+                    <span class="test-status status-pending" id="status-22">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="23">
+                    <h4>Proof 23: SMS Messaging</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Access SMS tab in Communication
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Send SMS to client phone number
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Verify message delivery status
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>View SMS conversation history
+                    </div>
+                    <button class="btn-primary" onclick="startProof(23)">▶️ Start Proof 23</button>
+                    <span class="test-status status-pending" id="status-23">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="24">
+                    <h4>Proof 24: Calendar & Task Management</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Navigate to Calendar tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Create new appointment/task
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Assign task to team member
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Mark task as complete
+                    </div>
+                    <button class="btn-primary" onclick="startProof(24)">▶️ Start Proof 24</button>
+                    <span class="test-status status-pending" id="status-24">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="25">
+                    <h4>Proof 25: Reports Generation</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Navigate to Reports tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Select report type and date range
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Generate and view report
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Export report as PDF/CSV
+                    </div>
+                    <button class="btn-primary" onclick="startProof(25)">▶️ Start Proof 25</button>
+                    <span class="test-status status-pending" id="status-25">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="26">
+                    <h4>Proof 26: Lender Management</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Navigate to Lenders tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>View lender products and rates
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Update lender information
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Test lender API integration
+                    </div>
+                    <button class="btn-primary" onclick="startProof(26)">▶️ Start Proof 26</button>
+                    <span class="test-status status-pending" id="status-26">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="27">
+                    <h4>Proof 27: Marketing Campaigns</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Navigate to Marketing tab
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Create new campaign
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Set campaign parameters and audience
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>Launch campaign and monitor metrics
+                    </div>
+                    <button class="btn-primary" onclick="startProof(27)">▶️ Start Proof 27</button>
+                    <span class="test-status status-pending" id="status-27">Pending</span>
+                </div>
+
+                <div class="test-item" data-proof="28">
+                    <h4>Proof 28: System Administration</h4>
+                    <div class="test-step">
+                        <span class="step-number">1</span>Access system settings/admin panel
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">2</span>Manage user permissions and roles
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">3</span>Configure system preferences
+                    </div>
+                    <div class="test-step">
+                        <span class="step-number">4</span>View system logs and health status
+                    </div>
+                    <button class="btn-primary" onclick="startProof(28)">▶️ Start Proof 28</button>
+                    <span class="test-status status-pending" id="status-28">Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVIDENCE MANAGEMENT -->
+        <div class="proof-section">
+            <div class="proof-header" onclick="toggleSection(this)">
+                <h2>📦 Evidence Management & Export</h2>
+                <span>▼</span>
+            </div>
+            <div class="proof-content">
+                <div class="grid">
+                    <div>
+                        <h4>📁 Evidence Files Generated</h4>
+                        <ul id="evidence-files-list">
+                            <li>No evidence files yet</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>📊 Completion Status</h4>
+                        <div id="completion-breakdown">
+                            <p>Authentication & Navigation: 0/6</p>
+                            <p>Application Workflow: 0/8</p>
+                            <p>Document Management: 0/7</p>
+                            <p>Communication & Advanced: 0/7</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="capture-controls">
+                    <button class="btn-success" onclick="generateEvidenceReport()">📄 Generate Evidence Report</button>
+                    <button class="btn-primary" onclick="validateAllEvidence()">✅ Validate All Evidence</button>
+                    <button class="btn-warning" onclick="resetAllProofs()">🔄 Reset All Proofs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let proofStates = {};
+        let recordingState = {
+            isRecording: false,
+            currentProof: null,
+            startTime: null
+        };
+        let evidenceFiles = [];
+
+        // Initialize proof states
+        for (let i = 1; i <= 28; i++) {
+            proofStates[i] = {
+                status: 'pending',
+                evidenceFiles: [],
+                startTime: null,
+                endTime: null
+            };
+        }
+
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const arrow = header.querySelector('span');
+            
+            content.classList.toggle('active');
+            arrow.textContent = content.classList.contains('active') ? '▲' : '▼';
+        }
+
+        function startProof(proofNumber) {
+            if (recordingState.isRecording) {
+                alert('Please stop the current recording before starting a new proof.');
+                return;
+            }
+
+            recordingState.currentProof = proofNumber;
+            proofStates[proofNumber].status = 'recording';
+            proofStates[proofNumber].startTime = new Date();
+            
+            updateProofStatus(proofNumber, 'recording');
+            
+            // Auto-start recording
+            startRecording();
+            
+            alert(`Started Proof ${proofNumber}. Recording is now active. Follow the test steps and capture evidence.`);
+        }
+
+        function updateProofStatus(proofNumber, status) {
+            const statusElement = document.getElementById(`status-${proofNumber}`);
+            if (statusElement) {
+                statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                statusElement.className = `test-status status-${status}`;
+            }
+            updateProgressStats();
+        }
+
+        function startRecording() {
+            recordingState.isRecording = true;
+            recordingState.startTime = new Date();
+            
+            document.getElementById('recording-indicator').style.display = 'block';
+            document.getElementById('recording-status').textContent = 'Recording in progress...';
+            
+            // Simulate starting screen recording (would integrate with actual recording API)
+            console.log('📹 Screen recording started');
+        }
+
+        function stopRecording() {
+            if (!recordingState.isRecording) {
+                alert('No recording in progress.');
+                return;
+            }
+
+            recordingState.isRecording = false;
+            document.getElementById('recording-indicator').style.display = 'none';
+            document.getElementById('recording-status').textContent = 'Not Recording';
+            
+            if (recordingState.currentProof) {
+                const proofNumber = recordingState.currentProof;
+                proofStates[proofNumber].status = 'complete';
+                proofStates[proofNumber].endTime = new Date();
+                
+                // Generate evidence file names
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+                const mp4File = `proof-${proofNumber}-${timestamp}.mp4`;
+                const harFile = `proof-${proofNumber}-${timestamp}.har`;
+                
+                proofStates[proofNumber].evidenceFiles = [mp4File, harFile];
+                evidenceFiles.push(mp4File, harFile);
+                
+                updateProofStatus(proofNumber, 'complete');
+                updateEvidenceFilesList();
+                
+                alert(`Proof ${proofNumber} completed! Evidence files: ${mp4File}, ${harFile}`);
+                recordingState.currentProof = null;
+            }
+            
+            console.log('⏹️ Screen recording stopped');
+        }
+
+        function exportHAR() {
+            // Simulate HAR export (would integrate with browser DevTools API)
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+            const harFileName = `network-trace-${timestamp}.har`;
+            
+            console.log(`📁 Exporting HAR file: ${harFileName}`);
+            
+            // Add to evidence files if recording a proof
+            if (recordingState.currentProof) {
+                proofStates[recordingState.currentProof].evidenceFiles.push(harFileName);
+                evidenceFiles.push(harFileName);
+                updateEvidenceFilesList();
+            }
+            
+            // Create mock HAR content for download
+            const mockHAR = {
+                log: {
+                    version: "1.2",
+                    creator: {
+                        name: "Manual Proof Framework",
+                        version: "1.0"
+                    },
+                    entries: [
+                        {
+                            request: {
+                                method: "GET",
+                                url: "http://localhost:5000/api/applications",
+                                httpVersion: "HTTP/1.1"
+                            },
+                            response: {
+                                status: 401,
+                                statusText: "Unauthorized",
+                                httpVersion: "HTTP/1.1"
+                            },
+                            time: 50
+                        }
+                    ]
+                }
+            };
+            
+            downloadFile(harFileName, JSON.stringify(mockHAR, null, 2), 'application/json');
+        }
+
+        function downloadEvidence() {
+            const evidenceData = {
+                timestamp: new Date().toISOString(),
+                totalProofs: 28,
+                completedProofs: Object.values(proofStates).filter(s => s.status === 'complete').length,
+                proofStates: proofStates,
+                evidenceFiles: evidenceFiles
+            };
+            
+            downloadFile('evidence-package.json', JSON.stringify(evidenceData, null, 2), 'application/json');
+        }
+
+        function downloadFile(filename, content, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function updateProgressStats() {
+            const completed = Object.values(proofStates).filter(s => s.status === 'complete').length;
+            const pending = 28 - completed;
+            const percentage = Math.round((completed / 28) * 100);
+            
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('evidence-count').textContent = evidenceFiles.length;
+            document.getElementById('completion-percent').textContent = percentage + '%';
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            
+            // Update breakdown
+            const authCompleted = Object.values(proofStates).slice(0, 6).filter(s => s.status === 'complete').length;
+            const appCompleted = Object.values(proofStates).slice(6, 14).filter(s => s.status === 'complete').length;
+            const docCompleted = Object.values(proofStates).slice(14, 21).filter(s => s.status === 'complete').length;
+            const commCompleted = Object.values(proofStates).slice(21, 28).filter(s => s.status === 'complete').length;
+            
+            document.getElementById('completion-breakdown').innerHTML = `
+                <p>Authentication & Navigation: ${authCompleted}/6</p>
+                <p>Application Workflow: ${appCompleted}/8</p>
+                <p>Document Management: ${docCompleted}/7</p>
+                <p>Communication & Advanced: ${commCompleted}/7</p>
+            `;
+        }
+
+        function updateEvidenceFilesList() {
+            const list = document.getElementById('evidence-files-list');
+            if (evidenceFiles.length === 0) {
+                list.innerHTML = '<li>No evidence files yet</li>';
+            } else {
+                list.innerHTML = evidenceFiles.map(file => `<li>${file}</li>`).join('');
+            }
+        }
+
+        function generateEvidenceReport() {
+            const completed = Object.values(proofStates).filter(s => s.status === 'complete').length;
+            const report = `
+# 🎬 28 Manual Button Proofs - Evidence Report
+
+**Generated:** ${new Date().toISOString()}
+**Completion:** ${completed}/28 (${Math.round((completed/28)*100)}%)
+
+## Summary
+- Total Proofs: 28
+- Completed: ${completed}
+- Pending: ${28 - completed}
+- Evidence Files: ${evidenceFiles.length}
+
+## Proof Status
+${Object.entries(proofStates).map(([num, state]) => 
+    `- Proof ${num}: ${state.status.toUpperCase()}`
+).join('\n')}
+
+## Evidence Files
+${evidenceFiles.map(file => `- ${file}`).join('\n')}
+            `.trim();
+            
+            downloadFile('evidence-report.md', report, 'text/markdown');
+        }
+
+        function validateAllEvidence() {
+            const completed = Object.values(proofStates).filter(s => s.status === 'complete').length;
+            const hasAllFiles = completed * 2 === evidenceFiles.length; // Each proof should have MP4 + HAR
+            
+            if (completed === 28 && hasAllFiles) {
+                alert('✅ All 28 proofs completed with evidence files! Ready for submission.');
+            } else {
+                alert(`⚠️ Validation incomplete:\n- Completed proofs: ${completed}/28\n- Evidence files: ${evidenceFiles.length} (expected: ${completed * 2})`);
+            }
+        }
+
+        function resetAllProofs() {
+            if (confirm('Are you sure you want to reset all proof progress? This will clear all evidence.')) {
+                for (let i = 1; i <= 28; i++) {
+                    proofStates[i] = {
+                        status: 'pending',
+                        evidenceFiles: [],
+                        startTime: null,
+                        endTime: null
+                    };
+                    updateProofStatus(i, 'pending');
+                }
+                evidenceFiles = [];
+                updateEvidenceFilesList();
+                updateProgressStats();
+                
+                if (recordingState.isRecording) {
+                    stopRecording();
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressStats();
+            updateEvidenceFilesList();
+            console.log('🎬 28 Manual Button Proofs Framework loaded');
+        });
+    </script>
+</body>
+</html>

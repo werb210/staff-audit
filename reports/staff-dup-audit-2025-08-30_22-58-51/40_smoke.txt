@@ -1,0 +1,11 @@
+STEP 6/10 Build & quick route smoke test; rollback if broken
+Build successful, running smoke tests...
+GET /v1/products -> 200
+GET /lenders      -> 200
+GET /required-docs-> 200
+GET /users        -> 200
+GET /pipeline     -> 200
+Testing data integrity...
+ROLLBACK=0 (build and tests successful)
+Testing data integrity with proper variables...
+All endpoints returned 200 status codes

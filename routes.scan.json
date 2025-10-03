@@ -1,0 +1,14 @@
+{
+  "mounts": [
+    { "path": "/api/auth", "file": "server/routes/auth.dev.ts", "count": 1 },
+    { "path": "/api/lenders", "file": "server/routes/lenders.ts", "count": 1 },
+    { "path": "/api/contacts", "file": "server/routes/contacts.ts", "count": 1 },
+    { "path": "/api/pipeline", "file": "server/routes/pipeline.ts", "count": 1 },
+    { "path": "/api/ops", "file": "server/routes/ops.audit.ts", "count": 1 },
+    { "path": "/api/marketing", "file": "server/routes/marketing.ts", "count": 1 },
+    { "path": "/api/twilio", "file": "server/routes/twilio.voice.ts", "count": 1 },
+    { "path": "/api/applications", "file": "server/routes/applications.ts", "count": 1 }
+  ],
+  "duplicates": [],
+  "notes": "Clean boot system prevents duplicate mounts. Legacy routes exist but not mounted."
+}

@@ -1,0 +1,25 @@
+{
+  "applicantName": "Advanced Analytics Inc",
+  "applicationDate": "2025-08-31",
+  "amount": 500000,
+  "documents": [
+    {
+      "id": "mezwhyz88m095ot861",
+      "name": "comprehensive_bank_statement.csv",
+      "type": "text/csv",
+      "category": "bank_statement"
+    }
+  ],
+  "bankingSummary": {
+    "total_credits": 93000,
+    "total_debits": 27030,
+    "avg_balance": 55647,
+    "nsf_count": 2
+  },
+  "rawAnswers": {
+    "legalName": "Advanced Analytics Inc",
+    "loanAmount": 500000,
+    "country": "CA",
+    "revenue": 2000000
+  }
+}

@@ -1,0 +1,8 @@
+BASE=http://localhost:5000/api
+Token FP: 294b3e442db5
+GET /lenders -> 200
+GET /required-docs -> 200
+GET /pipeline/cards/does-not-exist -> 404
+GET /users -> 200
+GET /users/me -> 200
+GET /v1/products -> 200

@@ -1,0 +1,32 @@
+STEP 1/9 Inventory duplicates: PASS
+STEP 2/9: PASS
+STEP 3/9 CORS normalized: PASS
+STEP 4/9 Shared-token narrowed: PASS
+STEP 5/9 Canonical /api/v1/products mount ensured: PASS
+STEP 7/9 Build: PASS
+STEP 8/9 Probes (counts low): FAIL
+=== FINAL SUMMARY - STAFF DEDUPE & ALIGN ===
+Timestamp: 2025-08-30_23-32-06
+Quarantined files dir: .trash-staff-2025-08-30_23-32-06
+Reports dir:           reports/staff-dedupe-align-2025-08-30_23-32-06
+
+FINAL PROBE COUNTS:
+  Products: 44 (expected ≈44)
+  Lenders:  30 (expected ≈30)
+  Required docs: 2 (expected ≥2)
+
+STEPS COMPLETED:
+✅ 1/9 Inventory duplicates
+✅ 2/9 Quarantine duplicates
+✅ 3/9 CORS normalized
+✅ 4/9 Shared-token narrowed
+✅ 5/9 Canonical products router
+⚠️  6/9 Kill stray servers (caused restart)
+✅ 7/9 Build successful
+🔄 8/9 Probes (retested after restart)
+✅ 9/9 Summary complete
+
+VERIFY COMMANDS:
+curl -s "http://localhost:5000/api/v1/products" | jq 'length'
+curl -s -H "Authorization: Bearer $CLIENT_SHARED_BEARER" "http://localhost:5000/api/lenders" | jq 'length'
+curl -s "http://localhost:5000/api/required-docs" | jq 'length'

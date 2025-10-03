@@ -1,0 +1,77 @@
+{
+  "apps": [
+    {
+      "id": "A1001",
+      "applicant": "John Duan",
+      "amount": 572.13,
+      "stage": "new",
+      "docs": {
+        "required": 3,
+        "provided": 1,
+        "accepted": 0
+      },
+      "createdAt": "2025-08-16T02:07:22.005Z"
+    },
+    {
+      "id": "A1002",
+      "applicant": "Test Reeck",
+      "amount": 1732.51,
+      "stage": "requires_docs",
+      "docs": {
+        "required": 4,
+        "provided": 2,
+        "accepted": 1
+      },
+      "createdAt": "2025-08-16T02:07:22.005Z"
+    },
+    {
+      "id": "A1003",
+      "applicant": "Mark Stone",
+      "amount": 110.2,
+      "stage": "in_review",
+      "docs": {
+        "required": 2,
+        "provided": 2,
+        "accepted": 2
+      },
+      "createdAt": "2025-08-16T02:07:22.005Z"
+    },
+    {
+      "id": "A1004",
+      "applicant": "Test Biz",
+      "amount": 35.53,
+      "stage": "lender",
+      "docs": {
+        "required": 3,
+        "provided": 3,
+        "accepted": 3
+      },
+      "createdAt": "2025-08-16T02:07:22.005Z"
+    },
+    {
+      "id": "A1005",
+      "applicant": "Acme LLC",
+      "amount": 250,
+      "stage": "accepted",
+      "docs": {
+        "required": 2,
+        "provided": 2,
+        "accepted": 2
+      },
+      "createdAt": "2025-08-16T02:07:22.005Z"
+    },
+    {
+      "id": "A1006",
+      "applicant": "Bad Fit Co",
+      "amount": 75,
+      "stage": "declined",
+      "docs": {
+        "required": 1,
+        "provided": 1,
+        "accepted": 0
+      },
+      "createdAt": "2025-08-16T02:07:22.005Z"
+    }
+  ],
+  "audit": []
+}

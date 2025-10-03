@@ -1,0 +1,80 @@
+[
+  {
+    "path": "/api/auth/dev-login",
+    "status": 200,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":true,\"token\":\"TEST_AUTH_TOKEN_PLACEHOLDER\"}"
+  },
+  {
+    "path": "/api/lenders",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":false,\"error\":\"NO_TOKEN\"}"
+  },
+  {
+    "path": "/api/lenders/products",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":false,\"error\":\"NO_TOKEN\"}"
+  },
+  {
+    "path": "/api/contacts",
+    "status": 401,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":false,\"error\":\"NO_TOKEN\"}"
+  },
+  {
+    "path": "/api/pipeline",
+    "status": 404,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":false,\"error\":\"API_NOT_FOUND\"}"
+  },
+  {
+    "path": "/api/documents",
+    "status": 404,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":false,\"error\":\"API_NOT_FOUND\"}"
+  },
+  {
+    "path": "/api/marketing/audiences",
+    "status": 200,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":true,\"audiences\":[]}"
+  },
+  {
+    "path": "/api/marketing/experiments",
+    "status": 200,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":true,\"experiments\":[]}"
+  },
+  {
+    "path": "/api/marketing/sequences",
+    "status": 200,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":true,\"sequences\":[]}"
+  },
+  {
+    "path": "/api/twilio/voice/token",
+    "status": 200,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":true,\"identity\":\"staff-user\",\"token\":\"TEST_TWILIO_TOKEN_PLACEHOLDER\"}"
+  },
+  {
+    "path": "/api/o365/profile",
+    "status": 404,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":false,\"error\":\"API_NOT_FOUND\"}"
+  },
+  {
+    "path": "/api/ops/ping",
+    "status": 200,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":true,\"timestamp\":\"2025-08-18T21:47:18.375Z\"}"
+  },
+  {
+    "path": "/api/ops/spa-fingerprint",
+    "status": 200,
+    "ct": "application/json; charset=utf-8",
+    "body": "{\"ok\":true,\"indexHash\":\"4d06de39\",\"fullHash\":\"4d06de39daeb8e77a730aef2fb9283143e2ff4222a2cec6851d1fd4dfefcf82e\",\"servedFrom\":\"/home/runner/workspace/client/dist\",\"fileSize\":1693,\"timestamp\":1755553638"
+  }
+]

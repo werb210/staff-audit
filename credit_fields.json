@@ -1,0 +1,10 @@
+{
+  "count": 10,
+  "fields": [
+    "businessName", "industry", "yearsInBusiness", "requestedAmount", 
+    "useOfFunds", "status", "contactName", "contactEmail", "contactPhone", "documentCount"
+  ],
+  "canonical_usage": "pending",
+  "legacy_usage": "active",
+  "notes": "Uses Drizzle ORM select with LEFT JOIN to contacts table. Uses aiApplicationService.getApplicationData()"
+}

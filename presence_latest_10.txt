@@ -1,0 +1,39 @@
+✅ Database connection established
+
+[b0d56f0f-32c8-47ea-945b-780b99e20201] v=undefined fields=undefined
+  AcceptedViaAPI: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, business.country, product.selectedCategory, applicant.email]
+  PipelineCard: 0/4 (0%) missing=[business.businessName, financial.requestedAmount, business.industry, status]
+  PDFGenerator: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, applicant.email, applicant.phone]
+  CreditSummary: 0/6 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, business.yearsInBusiness, business.country, fundsPurpose]
+  LenderExport: 0/5 (0%) missing=[applicant.email, business.businessName, financial.requestedAmount, product.selectedCategory, business.country]
+
+[a1381940-6cbc-4ca4-bd87-5dc8c40017a1] v=undefined fields=undefined
+  AcceptedViaAPI: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, business.country, product.selectedCategory, applicant.email]
+  PipelineCard: 0/4 (0%) missing=[business.businessName, financial.requestedAmount, business.industry, status]
+  PDFGenerator: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, applicant.email, applicant.phone]
+  CreditSummary: 0/6 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, business.yearsInBusiness, business.country, fundsPurpose]
+  LenderExport: 0/5 (0%) missing=[applicant.email, business.businessName, financial.requestedAmount, product.selectedCategory, business.country]
+
+[1d5edc2b-825d-4c5e-8aac-6183f1105cf6] v=undefined fields=undefined
+  AcceptedViaAPI: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, business.country, product.selectedCategory, applicant.email]
+  PipelineCard: 0/4 (0%) missing=[business.businessName, financial.requestedAmount, business.industry, status]
+  PDFGenerator: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, applicant.email, applicant.phone]
+  CreditSummary: 0/6 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, business.yearsInBusiness, business.country, fundsPurpose]
+  LenderExport: 0/5 (0%) missing=[applicant.email, business.businessName, financial.requestedAmount, product.selectedCategory, business.country]
+
+[e9c27970-e76d-4b38-ae70-c4a820318843] v=undefined fields=undefined
+  AcceptedViaAPI: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, business.country, product.selectedCategory, applicant.email]
+  PipelineCard: 0/4 (0%) missing=[business.businessName, financial.requestedAmount, business.industry, status]
+  PDFGenerator: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, applicant.email, applicant.phone]
+  CreditSummary: 0/6 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, business.yearsInBusiness, business.country, fundsPurpose]
+  LenderExport: 0/5 (0%) missing=[applicant.email, business.businessName, financial.requestedAmount, product.selectedCategory, business.country]
+
+[1c158148-dc9a-4fa6-9995-79537556528d] v=undefined fields=undefined
+  AcceptedViaAPI: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, business.country, product.selectedCategory, applicant.email]
+  PipelineCard: 0/4 (0%) missing=[business.businessName, financial.requestedAmount, business.industry, status]
+  PDFGenerator: 0/5 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, applicant.email, applicant.phone]
+  CreditSummary: 0/6 (0%) missing=[business.businessName, financial.requestedAmount, financial.annualRevenue, business.yearsInBusiness, business.country, fundsPurpose]
+  LenderExport: 0/5 (0%) missing=[applicant.email, business.businessName, financial.requestedAmount, product.selectedCategory, business.country]
+
+[73850fdf-e824-4b72-b8e8-2a1a3b215efb] v=undefined fields=undefined
+  AcceptedViaAPI: 0/5 (0%) missing=[business.businessName, financial.request

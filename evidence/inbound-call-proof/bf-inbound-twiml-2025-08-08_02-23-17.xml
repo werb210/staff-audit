@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Hello, you have reached Boreal Financial. Please leave a message after the beep.</Say><Record timeout="5" maxLength="30" action="/api/twilio/voice/recording" method="POST"/><Say>Thank you for your message. Goodbye!</Say></Response>

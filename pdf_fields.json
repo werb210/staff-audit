@@ -1,0 +1,11 @@
+{
+  "count": 12,
+  "fields": [
+    "business_name", "business_type", "requested_amount", "use_of_funds",
+    "first_name", "last_name", "email", "phone", "legal_business_name",
+    "form_data", "applicationId", "createdAt"
+  ],
+  "canonical_usage": "enhanced",
+  "legacy_usage": "active",
+  "notes": "Uses SQL query with LEFT JOINs to businesses and users tables, plus form_data JSON parsing. Enhanced with canonical field builders."
+}

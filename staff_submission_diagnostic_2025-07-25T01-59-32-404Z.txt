@@ -1,0 +1,17 @@
+📋 STAFF SUBMISSION DIAGNOSTIC START
+Target Application: d59e4962-d99c-4eba-b34c-a9be6035490d
+Test Date: 2025-07-25T01:59:32.275Z
+
+❌ FAIL - Upload Guard → Request failed
+❌ FAIL - Hybrid Data Display → Missing data fields
+❌ FAIL - Document Ownership → Document count: 0
+❌ FAIL - Recovery Systems → Recovery API status: unavailable
+❌ FAIL - Pipeline UI → Application status: not found
+❌ FAIL - Stage Assignment → Status: undefined, Created: undefined
+❌ FAIL - Dev Bypass → Response: undefined, Docs accessible: false
+❌ FAIL - Admin Tools → Reassignment API status: unavailable
+✅ PASS - Backup System → Database backup tables created successfully
+
+============================================
+🔚 FINAL RESULTS: 1/8 PASSED (12.5%)
+============================================

@@ -1,0 +1,12 @@
+{
+  "count": 17,
+  "fields": [
+    "name", "status", "company", "email", "contactPhone", "industry", 
+    "businessType", "annualRevenue", "yearsInBusiness", "numberOfEmployees", 
+    "businessAddress", "website", "useOfFunds", "amount", "createdAt",
+    "documentsCount", "recentDocuments"
+  ],
+  "canonical_usage": "pending_integration",
+  "legacy_usage": "active",
+  "notes": "Uses direct object properties from card data (c.name, c.company, etc.)"
+}

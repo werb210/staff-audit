@@ -1,0 +1,42 @@
+{
+  "inbound_total": 10,
+  "card_total": 8,
+  "pdf_total": 13,
+  "lender_total": 14,
+  "missing_in_card": [
+    "legalName",
+    "businessName",
+    "loanAmount",
+    "country",
+    "province",
+    "revenue",
+    "timeInBusiness",
+    "industry",
+    "email",
+    "phone"
+  ],
+  "missing_in_pdf": [
+    "legalName",
+    "businessName",
+    "loanAmount",
+    "country",
+    "province",
+    "revenue",
+    "timeInBusiness",
+    "industry",
+    "email",
+    "phone"
+  ],
+  "missing_in_lender": [
+    "legalName",
+    "businessName",
+    "loanAmount",
+    "country",
+    "province",
+    "revenue",
+    "timeInBusiness",
+    "industry",
+    "email",
+    "phone"
+  ]
+}

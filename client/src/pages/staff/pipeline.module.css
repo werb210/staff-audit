@@ -1,0 +1,17 @@
+.board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 16px; }
+.stage { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; display:flex; flex-direction:column; max-height:calc(100vh - 96px); }
+.stageHeader { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid #f0f2f5; font-weight:600; }
+.stageBody { overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
+.card { text-align:left; background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:10px; cursor:pointer; }
+.card:hover { border-color:#3b82f6; box-shadow:0 0 0 2px rgba(59,130,246,.15); }
+.cardActive { border-color:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,.18); }
+.cardTitle { font-weight:600; margin-bottom:4px; }
+.cardMeta { font-size:12px; display:flex; gap:8px; color:#475569; }
+
+.drawer { position:fixed; top:0; right:0; width:440px; height:100vh; background:#fff; border-left:1px solid #e5e7eb; box-shadow:-8px 0 24px rgba(0,0,0,.06); padding:12px 14px; overflow:auto; z-index:50; }
+.drawerHeader { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.tabs { display:flex; gap:10px; border-bottom:1px solid #f0f2f5; padding-bottom:8px; margin-bottom:12px; }
+.tabs a { font-size:13px; color:#334155; }
+.grid { display:grid; grid-template-columns:120px 1fr; gap:6px 12px; }
+.center { display:grid; place-items:center; height:50vh; color:#64748b; }
+.error { color:#b91c1c; background:#fee2e2; border:1px solid #fecaca; padding:8px 10px; border-radius:8px; }

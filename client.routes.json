@@ -1,0 +1,20 @@
+{
+  "routes": [
+    "/",
+    "/dashboard", 
+    "/contacts",
+    "/lenders",
+    "/sales-pipeline",
+    "/communication",
+    "/settings"
+  ],
+  "components": {
+    "/": "ContactsHubspot.tsx",
+    "/contacts": "ContactsHubspot.tsx",
+    "/lenders": "LendersDirectory.tsx", 
+    "/sales-pipeline": "PipelineBoard.tsx",
+    "/communication": "CommsHubV2.tsx",
+    "/settings": "Settings.tsx"
+  },
+  "notes": "Clean v2 routes only. Legacy pages exist but not referenced."
+}

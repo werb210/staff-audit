@@ -1,0 +1,10 @@
+75:      const contactEmail = legacy.step4?.email || "";
+90:        const first = legacy.step4?.firstName ?? "";
+91:        const last  = legacy.step4?.lastName ?? "";
+92:        const phone = legacy.step4?.phone ?? legacy.step3?.businessPhone ?? "000-000-0000";
+103:      const reqAmt = parseFloat(legacy.step1?.requestedAmount?.replace(/[^0-9.]/g, '') || "0") || 0;
+104:      const useOfFunds = legacy.step1?.useOfFunds || "working capital";
+105:      const businessName = legacy.step3?.businessName;
+136:    if (existingBackup.length > 0) {
+204:  createMonthlyBackup.start();
+218:  createMonthlyBackup.stop();

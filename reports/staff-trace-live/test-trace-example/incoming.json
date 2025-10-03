@@ -1,0 +1,19 @@
+{
+  "at": 1693363200000,
+  "headers": {
+    "x-trace-id": "test-trace-example",
+    "content-type": "application/json"
+  },
+  "fields": [
+    "businessName",
+    "requestedAmount", 
+    "contactEmail",
+    "contactPhone"
+  ],
+  "body": {
+    "businessName": "Acme Corp",
+    "requestedAmount": 500000,
+    "contactEmail": "john@acme.com",
+    "contactPhone": "555-0123"
+  }
+}

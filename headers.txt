@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Vary: Origin
+X-Auth-Source: canonical-auth
+Content-Type: application/json; charset=utf-8
+Content-Length: 35
+ETag: W/"23-aTMoWRK2tOkisCnoBf5brprAFb0"
+Date: Wed, 13 Aug 2025 15:53:21 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

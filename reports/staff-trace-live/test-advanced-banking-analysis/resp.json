@@ -1,0 +1,41 @@
+{
+  "at": 1756657465237,
+  "method": "POST",
+  "path": "/submit",
+  "data": {
+    "ok": true,
+    "traceId": "test-advanced-banking-analysis",
+    "coverage": {
+      "inbound_total": 4,
+      "card_total": 11,
+      "pdf_total": 14,
+      "lender_total": 15,
+      "missing_in_card": [
+        "legalName",
+        "loanAmount",
+        "country",
+        "revenue"
+      ],
+      "missing_in_pdf": [
+        "legalName",
+        "loanAmount",
+        "country",
+        "revenue"
+      ],
+      "missing_in_lender": [
+        "legalName",
+        "loanAmount",
+        "country",
+        "revenue"
+      ]
+    },
+    "files": {
+      "index": "reports/staff-docs-e2e-live/test-advanced-banking-analysis/index.json",
+      "analysis": "reports/staff-docs-e2e-live/test-advanced-banking-analysis/analysis.json",
+      "card": "reports/staff-docs-e2e-live/test-advanced-banking-analysis/card.json",
+      "pdf": "reports/staff-docs-e2e-live/test-advanced-banking-analysis/pdf.json",
+      "lender": "reports/staff-docs-e2e-live/test-advanced-banking-analysis/lender.json",
+      "coverageFile": "reports/staff-docs-e2e-live/test-advanced-banking-analysis/coverage.json"
+    }
+  }
+}

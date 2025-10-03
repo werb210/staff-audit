@@ -1,0 +1,83 @@
+table_name,ordinal_position,column_name,data_type,udt_name,is_nullable,column_default
+lender_products,1,id,character varying,varchar,NO,
+lender_products,2,name,character varying,varchar,NO,
+lender_products,3,country,USER-DEFINED,lender_country,NO,
+lender_products,4,category,USER-DEFINED,lender_category,NO,
+lender_products,5,doc_requirements,ARRAY,_varchar,YES,(ARRAY[]::character varying[])::character varying(100)[]
+lender_products,6,tenant_id,uuid,uuid,NO,
+lender_products,7,product_name,character varying,varchar,YES,
+lender_products,8,lender_name,character varying,varchar,YES,
+lender_products,9,product_type,USER-DEFINED,product_type,YES,
+lender_products,10,geography,ARRAY,_geography,YES,
+lender_products,11,industries,ARRAY,_varchar,YES,
+lender_products,12,description,text,text,YES,
+lender_products,13,video_url,character varying,varchar,YES,
+lender_products,14,is_active,boolean,bool,YES,true
+lender_products,15,created_at,timestamp without time zone,timestamp,YES,CURRENT_TIMESTAMP
+lender_products,16,updated_at,timestamp without time zone,timestamp,YES,CURRENT_TIMESTAMP
+lender_products,17,deleted_at,timestamp without time zone,timestamp,YES,
+lender_products,18,interest_rate_min,double precision,float8,YES,
+lender_products,19,interest_rate_max,double precision,float8,YES,
+lender_products,20,term_min,integer,int4,YES,
+lender_products,21,term_max,integer,int4,YES,
+lender_products,22,rate_type,character varying,varchar,YES,
+lender_products,23,rate_frequency,character varying,varchar,YES,
+lender_products,24,min_credit_score,integer,int4,YES,
+lender_products,25,lender_id,uuid,uuid,YES,
+lender_products,26,amount_min,integer,int4,YES,0
+lender_products,27,amount_max,integer,int4,YES,
+lender_products,28,revenue_min,integer,int4,YES,0
+lender_products,29,schema_version,numeric,numeric,YES,1.0
+lender_products,30,raw_doc_requirements,ARRAY,_text,YES,
+lender_products,31,knobs,jsonb,jsonb,YES,
+lender_products,32,country_offered,text,text,YES,'CA'::text
+lender_products,33,created_by,text,text,YES,'system'::text
+lender_products,34,product_category,text,text,YES,
+lender_products,35,minimum_lending_amount,integer,int4,YES,
+lender_products,36,maximum_lending_amount,integer,int4,YES,
+lender_products,37,interest_rate_minimum,real,float4,YES,
+lender_products,38,interest_rate_maximum,real,float4,YES,
+lender_products,39,term_minimum,integer,int4,YES,
+lender_products,40,term_maximum,integer,int4,YES,
+lender_products,41,documents_required,ARRAY,_text,YES,
+lender_products,42,external_id,text,text,YES,
+lender_products,43,index,text,text,YES,
+lenders,1,id,uuid,uuid,NO,gen_random_uuid()
+lenders,2,company_name,character varying,varchar,YES,
+lenders,3,contact_name,character varying,varchar,YES,
+lenders,4,email,character varying,varchar,YES,
+lenders,5,phone,character varying,varchar,YES,
+lenders,6,website,character varying,varchar,YES,
+lenders,7,description,text,text,YES,
+lenders,8,lending_categories,ARRAY,_text,YES,
+lenders,9,min_loan_amount,integer,int4,YES,
+lenders,10,max_loan_amount,integer,int4,YES,
+lenders,11,interest_rate_range,character varying,varchar,YES,
+lenders,12,geographic_focus,ARRAY,_text,YES,
+lenders,13,preferred_industries,ARRAY,_text,YES,
+lenders,14,notification_preferences,jsonb,jsonb,YES,'{}'::jsonb
+lenders,15,api_settings,jsonb,jsonb,YES,'{}'::jsonb
+lenders,16,is_active,boolean,bool,YES,true
+lenders,17,created_at,timestamp without time zone,timestamp,YES,CURRENT_TIMESTAMP
+lenders,18,updated_at,timestamp without time zone,timestamp,YES,CURRENT_TIMESTAMP
+lenders,19,mobile_phone,character varying,varchar,YES,
+lenders,20,report_emails,ARRAY,_text,YES,ARRAY[]::text[]
+lenders,21,tenant,character varying,varchar,NO,'bf'::character varying
+lenders,22,name,character varying,varchar,YES,
+lenders,23,country,character varying,varchar,YES,'United States'::character varying
+lenders,24,contact_mobile_phone,character varying,varchar,YES,
+lenders,25,contact_email,character varying,varchar,YES,
+lenders,26,business_phone_number,character varying,varchar,YES,
+lenders,27,company_bio,text,text,YES,
+lenders,28,legal_name,text,text,YES,
+lenders,29,display_name,character varying,varchar,YES,
+lenders,30,notes,text,text,YES,
+lenders,31,reporting_emails,text,text,YES,
+lenders,32,application_url,text,text,YES,
+lenders,33,portal_url,text,text,YES,
+lenders,34,regions,jsonb,jsonb,YES,'[]'::jsonb
+lenders,35,min_amount,integer,int4,YES,
+lenders,36,max_amount,integer,int4,YES,
+lenders,37,min_credit_score,integer,int4,YES,
+lenders,38,min_time_in_business_months,integer,int4,YES,
+lenders,39,industries,jsonb,jsonb,YES,'[]'::jsonb

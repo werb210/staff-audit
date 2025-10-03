@@ -1,0 +1,59 @@
+{
+  "at": 1756657442040,
+  "method": "POST",
+  "path": "/submit",
+  "data": {
+    "ok": true,
+    "traceId": "test-docs-submit-001",
+    "coverage": {
+      "inbound_total": 10,
+      "card_total": 8,
+      "pdf_total": 13,
+      "lender_total": 14,
+      "missing_in_card": [
+        "legalName",
+        "businessName",
+        "loanAmount",
+        "country",
+        "province",
+        "revenue",
+        "timeInBusiness",
+        "industry",
+        "email",
+        "phone"
+      ],
+      "missing_in_pdf": [
+        "legalName",
+        "businessName",
+        "loanAmount",
+        "country",
+        "province",
+        "revenue",
+        "timeInBusiness",
+        "industry",
+        "email",
+        "phone"
+      ],
+      "missing_in_lender": [
+        "legalName",
+        "businessName",
+        "loanAmount",
+        "country",
+        "province",
+        "revenue",
+        "timeInBusiness",
+        "industry",
+        "email",
+        "phone"
+      ]
+    },
+    "files": {
+      "index": "reports/staff-docs-e2e-live/test-docs-submit-001/index.json",
+      "analysis": "reports/staff-docs-e2e-live/test-docs-submit-001/analysis.json",
+      "card": "reports/staff-docs-e2e-live/test-docs-submit-001/card.json",
+      "pdf": "reports/staff-docs-e2e-live/test-docs-submit-001/pdf.json",
+      "lender": "reports/staff-docs-e2e-live/test-docs-submit-001/lender.json",
+      "coverageFile": "reports/staff-docs-e2e-live/test-docs-submit-001/coverage.json"
+    }
+  }
+}

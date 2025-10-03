@@ -1,0 +1,105 @@
+import React from "react";
+import { isAllowedTab, getVisibleTabs } from "../../lib/rbac";
+import { isAuthed, getRoles } from "../../lib/auth";
+import LoginVerify from "../LoginVerify";
+import SettingsUsers from "./sections/SettingsUsers";
+import SalesPipeline from "./sections/SalesPipeline";
+import CompleteSalesPipeline from "./sections/CompleteSalesPipeline";
+import ContactsHub from "./sections/contacts/ContactsHub";
+import ContactCRMHubspot from "../Contacts/ContactCRMHubspot";
+import CommunicationCenter from "./sections/CommunicationCenter";
+import MarketingHub from "./sections/marketing/MarketingHub";
+import EnhancedMarketingHub from "./sections/marketing/EnhancedMarketingHub";
+import LendersHub from "./sections/lenders/LendersHub";
+import Settings from "./sections/settings/Settings";
+import DialerSlidein from "./components/DialerSlidein";
+import DocsSearchPage from "../Training/DocsSearchPage";
+
+type TabKey = "dashboard" | "pipeline" | "contacts" | "comms" | "marketing" | "training" | "lenders" | "settings";
+
+// Get visible tabs based on RBAC
+function getTabsForRender() {
+  const visibleTabs = getVisibleTabs();
+  console.log('[RBAC DEBUG] Visible tabs:', visibleTabs);
+  return visibleTabs;
+}
+
+export default function TopTabsDashboard() {
+  if(!isAuthed()) return <LoginVerify />;
+  
+  const [tab, setTab] = React.useState<TabKey>("dashboard");
+  const [visibleTabs, setVisibleTabs] = React.useState(getTabsForRender());
+  
+  // Initialize localStorage for debugging - admin sees all tabs
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Force admin roles for this session (dev override)
+      localStorage.setItem('roles','admin,user,marketing,underwriter,staff');
+      
+      // Turn feature flags back on (UI-side cache)
+      localStorage.setItem('flag:COMMS_ENABLED','1');
+      localStorage.setItem('flag:MARKETING_ENABLED','1');
+      localStorage.setItem('flag:LENDERS_ENABLED','1');
+      localStorage.setItem('flag:SETTINGS_ENABLED','1');
+      
+      console.log('[DEBUG] Initialized admin roles and flags:', localStorage.getItem('roles'));
+      setVisibleTabs(getTabsForRender());
+    }
+  }, []);
+
+  return (
+    <div className="lm-container">
+      
+      <div className="lm-card">
+        <div className="lm-toolbar">
+          <div className="lm-title">Staff Dashboard</div>
+          <nav className="lm-nav">
+            {visibleTabs.map(t => (
+              <button
+                key={t.key}
+                className={`lm-pill ${tab === t.key ? 'active' : ''}`}
+                onClick={() => setTab(t.key as TabKey)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        <div className="lm-content">
+          {tab === "dashboard" && (
+            <div>
+              <div className="lm-title">Dashboard Overview</div>
+              <div style={{display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16, marginTop: 16}}>
+                <div className="lm-card">
+                  <h3>Applications</h3>
+                  <div style={{fontSize: "2rem", fontWeight: "bold", color: "var(--accent)"}}>42</div>
+                  <div className="t2">This month</div>
+                </div>
+                <div className="lm-card">
+                  <h3>Pipeline Value</h3>
+                  <div style={{fontSize: "2rem", fontWeight: "bold", color: "var(--accent)"}}>$2.1M</div>
+                  <div className="t2">Active deals</div>
+                </div>
+                <div className="lm-card">
+                  <h3>Conversion Rate</h3>
+                  <div style={{fontSize: "2rem", fontWeight: "bold", color: "var(--accent)"}}>18%</div>
+                  <div className="t2">Last 30 days</div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {tab === "pipeline" && <SalesPipeline />}
+          {tab === "contacts" && <ContactCRMHubspot />}
+          {tab === "comms" && <CommunicationCenter />}
+          {tab === "marketing" && <EnhancedMarketingHub />}
+          {tab === "training" && <DocsSearchPage />}
+          {tab === "lenders" && isAllowedTab("lenders") && <LendersHub />}
+          {tab === "settings" && isAllowedTab("settings") && <Settings />}
+        </div>
+      </div>
+      <DialerSlidein />
+    </div>
+  );
+}

@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running comprehensive architecture validation..."
+
+# Step 1: Enhanced route duplicate detection
+echo "1/3 Checking route duplicates..."
+node scripts/check-routes-enhanced.cjs
+if [ $? -ne 0 ]; then
+  echo "❌ Route duplicate check failed - commit blocked"
+  exit 1
+fi
+
+# Step 2: Comprehensive duplicate prevention
+echo "2/3 Checking file duplicates..."
+node scripts/prevent-duplicates.js
+if [ $? -ne 0 ]; then
+  echo "❌ Duplicate files detected - commit blocked"
+  echo "💡 Run 'node scripts/fix-duplicates.js' to see issues"
+  exit 1
+fi
+
+# Step 3: Verify critical files exist
+echo "3/3 Verifying critical files..."
+if [ ! -f "client/src/app/routes.tsx" ]; then
+  echo "❌ Critical file missing: routes.tsx"
+  exit 1
+fi
+
+echo "✅ All architecture checks passed - commit allowed"

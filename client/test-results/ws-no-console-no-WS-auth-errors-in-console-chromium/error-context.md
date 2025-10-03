@@ -1,0 +1,210 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - strong [ref=e7]: 🤖 AI Actions
+        - generic [ref=e8]:
+          - button "Lender Match" [ref=e9] [cursor=pointer]
+          - button "Doc IQ" [ref=e10] [cursor=pointer]
+          - button "Risk Score" [ref=e11] [cursor=pointer]
+          - button "Smart Reply" [ref=e12] [cursor=pointer]
+          - button "Next Steps" [ref=e13] [cursor=pointer]
+        - generic [ref=e14]: No context
+      - generic [ref=e15]:
+        - complementary [ref=e16]:
+          - generic [ref=e17]:
+            - button "Toggle navigation" [ref=e18] [cursor=pointer]: «
+            - generic [ref=e19]: Boreal Financial
+          - navigation [ref=e20]:
+            - link "Pipeline" [ref=e21] [cursor=pointer]:
+              - /url: /staff/pipeline
+            - link "Contacts" [ref=e22] [cursor=pointer]:
+              - /url: /staff/contacts
+            - link "Communications" [ref=e23] [cursor=pointer]:
+              - /url: /staff/communication
+            - link "Tasks & Calendar" [ref=e24] [cursor=pointer]:
+              - /url: /staff/tasks-calendar
+            - link "Reports" [ref=e25] [cursor=pointer]:
+              - /url: /staff/reports
+            - link "Marketing" [ref=e26] [cursor=pointer]:
+              - /url: /staff/marketing
+            - link "Lenders" [ref=e27] [cursor=pointer]:
+              - /url: /staff/lenders
+            - link "Settings" [ref=e28] [cursor=pointer]:
+              - /url: /staff/settings
+        - generic [ref=e29]:
+          - banner [ref=e30]:
+            - generic [ref=e31]:
+              - generic [ref=e32]: Pipeline
+              - generic [ref=e33]:
+                - generic [ref=e34]:
+                  - textbox "Search… (g p = Pipeline)" [ref=e35]
+                  - button "Search" [ref=e36] [cursor=pointer]
+                - generic [ref=e37]:
+                  - generic [ref=e38]: "Silo:"
+                  - button "BF" [ref=e39] [cursor=pointer]
+                  - button "SLF" [ref=e40] [cursor=pointer]
+          - region "Boreal Global Banner" [ref=e41]:
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]: BF
+                - generic [ref=e45]:
+                  - generic [ref=e46]: Boreal Financial Portal
+                  - generic [ref=e47]: Full-Service Financial Platform
+              - generic [ref=e48]: Empowering brokers & clients
+          - main [ref=e49]:
+            - generic [ref=e50]:
+              - generic [ref=e51]:
+                - heading "Sales Pipeline" [level=1] [ref=e52]
+                - button "Refresh" [ref=e53] [cursor=pointer]
+              - generic [ref=e54]:
+                - generic [ref=e55]:
+                  - generic [ref=e56]: Applications
+                  - generic [ref=e57]: "18"
+                - generic [ref=e58]:
+                  - generic [ref=e59]: Pipeline Value
+                  - generic [ref=e60]: $128,275,000.00
+                - generic [ref=e61]:
+                  - generic [ref=e62]: Conversion (30d)
+                  - generic [ref=e63]: 0%
+                - generic [ref=e64]:
+                  - generic [ref=e65]: Avg Cycle (d)
+                  - generic [ref=e66]: —
+              - textbox "Search by name, email, amount…" [ref=e67]
+              - generic [ref=e68]:
+                - generic [ref=e69]:
+                  - generic [ref=e70]:
+                    - generic [ref=e71]: New
+                    - generic [ref=e72]: 17 cards • $113,275,000
+                    - generic [ref=e73]: "WIP: 17/8"
+                  - generic [ref=e74]:
+                    - generic [ref=e75]:
+                      - generic [ref=e76]: Untitled
+                      - generic [ref=e77]: $2,000,000
+                      - generic [ref=e78]: —
+                      - button "Open" [ref=e80] [cursor=pointer]
+                    - generic [ref=e81]:
+                      - generic [ref=e82]: Untitled
+                      - generic [ref=e83]: $2,000,000
+                      - generic [ref=e84]: —
+                      - button "Open" [ref=e86] [cursor=pointer]
+                    - generic [ref=e87]:
+                      - generic [ref=e88]: Untitled
+                      - generic [ref=e89]: $75,000
+                      - generic [ref=e90]: —
+                      - button "Open" [ref=e92] [cursor=pointer]
+                    - generic [ref=e93]:
+                      - generic [ref=e94]: Untitled
+                      - generic [ref=e95]: $100,000
+                      - generic [ref=e96]: —
+                      - button "Open" [ref=e98] [cursor=pointer]
+                    - generic [ref=e99]:
+                      - generic [ref=e100]: Untitled
+                      - generic [ref=e101]: $0
+                      - generic [ref=e102]: —
+                      - button "Open" [ref=e104] [cursor=pointer]
+                    - generic [ref=e105]:
+                      - generic [ref=e106]: Untitled
+                      - generic [ref=e107]: $100,000
+                      - generic [ref=e108]: —
+                      - button "Open" [ref=e110] [cursor=pointer]
+                    - generic [ref=e111]:
+                      - generic [ref=e112]: Metro Commercial Holdings Ltd.
+                      - generic [ref=e113]: $100,000,000
+                      - generic [ref=e114]: —
+                      - button "Open" [ref=e116] [cursor=pointer]
+                    - generic [ref=e117]:
+                      - generic [ref=e118]: Precision Fabrication & Manufacturing Ltd.
+                      - generic [ref=e119]: $0
+                      - generic [ref=e120]: —
+                      - button "Open" [ref=e122] [cursor=pointer]
+                    - generic [ref=e123]:
+                      - generic [ref=e124]: Northern Construction & Development Ltd.
+                      - generic [ref=e125]: $0
+                      - generic [ref=e126]: —
+                      - button "Open" [ref=e128] [cursor=pointer]
+                    - generic [ref=e129]:
+                      - generic [ref=e130]: TechFlow Solutions Inc.
+                      - generic [ref=e131]: $250,000
+                      - generic [ref=e132]: —
+                      - button "Open" [ref=e134] [cursor=pointer]
+                    - generic [ref=e135]:
+                      - generic [ref=e136]: PRO-PIPE SERVICE & SALES LTD.
+                      - generic [ref=e137]: $0
+                      - generic [ref=e138]: —
+                      - button "Open" [ref=e140] [cursor=pointer]
+                    - generic [ref=e141]:
+                      - generic [ref=e142]: SITE ENGINEERING TECHNOLOGY INC.
+                      - generic [ref=e143]: $200,000
+                      - generic [ref=e144]: (403) 555-0189
+                      - button "Open" [ref=e146] [cursor=pointer]
+                    - generic [ref=e147]:
+                      - generic [ref=e148]: Northern Manufacturing Ltd.
+                      - generic [ref=e149]: $500,000
+                      - generic [ref=e150]: —
+                      - button "Open" [ref=e152] [cursor=pointer]
+                    - generic [ref=e153]:
+                      - generic [ref=e154]: Coastal Consulting Group
+                      - generic [ref=e155]: $7,500,000
+                      - generic [ref=e156]: —
+                      - button "Open" [ref=e158] [cursor=pointer]
+                    - generic [ref=e159]:
+                      - generic [ref=e160]: Demo Company 7ab94d
+                      - generic [ref=e161]: $250,000
+                      - generic [ref=e162]: —
+                      - button "Open" [ref=e164] [cursor=pointer]
+                    - generic [ref=e165]:
+                      - generic [ref=e166]: Demo Company 7c054a
+                      - generic [ref=e167]: $250,000
+                      - generic [ref=e168]: —
+                      - button "Open" [ref=e170] [cursor=pointer]
+                    - generic [ref=e171]:
+                      - generic [ref=e172]: Demo Company 814f2d
+                      - generic [ref=e173]: $50,000
+                      - generic [ref=e174]: —
+                      - button "Open" [ref=e176] [cursor=pointer]
+                - generic [ref=e177]:
+                  - generic [ref=e178]:
+                    - generic [ref=e179]: Requires Docs
+                    - generic [ref=e180]: 0 cards • $0
+                    - generic [ref=e181]: "WIP: 0/10"
+                  - generic [ref=e183]: No cards
+                - generic [ref=e184]:
+                  - generic [ref=e185]:
+                    - generic [ref=e186]: In Review
+                    - generic [ref=e187]: 0 cards • $0
+                    - generic [ref=e188]: "WIP: 0/10"
+                  - generic [ref=e190]: No cards
+                - generic [ref=e191]:
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: With Lender
+                    - generic [ref=e194]: 0 cards • $0
+                    - generic [ref=e195]: "WIP: 0/12"
+                  - generic [ref=e197]: No cards
+                - generic [ref=e198]:
+                  - generic [ref=e199]:
+                    - generic [ref=e200]: Accepted
+                    - generic [ref=e201]: 0 cards • $0
+                    - generic [ref=e202]: "WIP: 0/999"
+                  - generic [ref=e204]: No cards
+                - generic [ref=e205]:
+                  - generic [ref=e206]:
+                    - generic [ref=e207]: Declined
+                    - generic [ref=e208]: 0 cards • $0
+                    - generic [ref=e209]: "WIP: 0/999"
+                  - generic [ref=e211]: No cards
+        - complementary:
+          - generic:
+            - generic: Dialer
+            - button "✕"
+          - generic:
+            - textbox "Enter phone number"
+            - button "Call" [disabled]
+    - generic [ref=e212]: "build: 2025-08-25T19:42:56.485Z"
+    - generic [ref=e213]: srv:? @?? · pid:? · host:localhost:5000
+    - generic [ref=e214]: staff@2025-08-25T19:42:56.600Z
+  - button "Open Dialer" [ref=e215] [cursor=pointer]: 📞
+```

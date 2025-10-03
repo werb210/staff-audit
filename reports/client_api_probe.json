@@ -1,0 +1,8 @@
+[
+  {"url":"http://localhost:5000/api/v1/products","method":"GET"},
+  {"url":"http://localhost:5000/api/lenders","method":"GET"},
+  {"url":"http://localhost:5000/api/required-docs","method":"GET"},
+  {"url":"http://localhost:5000/api/applications/validate-intake","method":"POST"},
+  {"url":"http://localhost:5000/api/applications","method":"POST"},
+  {"url":"http://localhost:5000/api/uploads","method":"POST"}
+]

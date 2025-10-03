@@ -1,0 +1,24 @@
+{
+  "id": "test-e2e-auth-fixed",
+  "title": "Tech Solutions Inc",
+  "subtitle": "Applied 2025-08-31",
+  "metrics": {
+    "loanAmount": 750000,
+    "country": "CA",
+    "province": "ON",
+    "revenue": 2500000,
+    "timeInBusiness": "3 years"
+  },
+  "answersPreview": {
+    "loanAmount": 750000,
+    "country": "CA",
+    "province": "ON",
+    "revenue": 2500000,
+    "timeInBusiness": "3 years",
+    "industry": "Technology",
+    "employees": 25,
+    "email": "finance@techsolutions.ca",
+    "phone": "416-555-0123",
+    "useOfFunds": "Equipment and expansion"
+  }
+}

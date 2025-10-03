@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BankingAnalysis",
+  "type": "object",
+  "required": ["applicationId", "periodStart", "periodEnd", "nsf"],
+  "properties": {
+    "applicationId": { "type": "string" },
+    "periodStart": { "type": "string", "format": "date" },
+    "periodEnd": { "type": "string", "format": "date" },
+
+    "nsf": {
+      "type": "object",
+      "required": ["total", "byMonth", "trend"],
+      "properties": {
+        "total": { "type": "integer" },
+        "byMonth": {
+          "type": "array",
+          "items": { "type": "object", "required": ["month", "count"], "properties": {
+            "month": { "type": "string", "description": "YYYY-MM" },
+            "count": { "type": "integer" }
+          } }
+        },
+        "trend": { "type": "string", "enum": ["up", "down", "flat"] }
+      }
+    },
+
+    "personalUse": {
+      "type": "object",
+      "required": ["monthlyTotal", "annualizedTotal", "transactions"],
+      "properties": {
+        "monthlyTotal": { "type": "number" },
+        "annualizedTotal": { "type": "number" },
+        "transactions": {
+          "type": "array",
+          "items": { "type": "object", "required": ["date","amount","description"], "properties": {
+            "date": { "type": "string", "format": "date" },
+            "amount": { "type": "number" },
+            "description": { "type": "string" }
+          } }
+        }
+      }
+    },
+
+    "recurringPayments": {
+      "type": "array",
+      "items": { "type": "object", "required": [
+        "name","category","paymentAmount","frequency","monthlyTotal","annualTotal","startDate","sampleTransactions"
+      ], "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["Loan Payment","Lease","Subscription","Utilities","Insurance","Other Recurring"] },
+        "paymentAmount": { "type": "number" },
+        "frequency": { "type": "string", "enum": ["Weekly","Biweekly","Semimonthly","Monthly","Quarterly","Annual","Irregular"] },
+        "monthlyTotal": { "type": "number" },
+        "annualTotal": { "type": "number" },
+        "startDate": { "type": "string", "format": "date" },
+        "sampleTransactions": {
+          "type": "array",
+          "items": { "type": "object", "required": ["date","amount","description"], "properties": {
+            "date": { "type": "string", "format": "date" },
+            "amount": { "type": "number" },
+            "description": { "type": "string" }
+          } }
+        }
+      } }
+    },
+
+    "businessAddressFromStatements": {
+      "type": "object",
+      "required": ["lines","detectedAddress"],
+      "properties": {
+        "lines": { "type": "array", "items": { "type": "string" } },
+        "detectedAddress": { "type": "string" }
+      }
+    }
+  }
+}

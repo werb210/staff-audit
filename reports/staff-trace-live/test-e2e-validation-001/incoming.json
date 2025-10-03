@@ -1,0 +1,8 @@
+{
+  "at": 1756656984550,
+  "headers": {
+    "x-trace-id": "test-e2e-validation-001",
+    "content-type": "application/json"
+  },
+  "fields": []
+}

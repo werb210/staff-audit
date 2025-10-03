@@ -1,0 +1,5 @@
+=== STAFF CARDS FUNCTIONALITY CHECK @ 2025-08-31_01-23-47 ===
+ENDPOINT VERIFICATION:
+---------------------
+List endpoint: /pipeline/cards -> 200
+List count: 2 applications

@@ -1,0 +1,809 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/bootstrap/X-Bootstrap-Token",
+    "bucket": "Other",
+    "source": "server/routes/bootstrap/seed.ts",
+    "url": "http://localhost:5000/api/bootstrap/X-Bootstrap-Token",
+    "status": 404,
+    "ok": false
+  },
+  {
+    "method": "GET",
+    "path": "/api/auth/must-change",
+    "bucket": "Other",
+    "source": "server/routes/auth/must_change.ts",
+    "url": "http://localhost:5000/api/auth/must-change",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "method": "GET",
+    "path": "/api/auth/me",
+    "bucket": "Other",
+    "source": "server/routes/auth/session.ts",
+    "url": "http://localhost:5000/api/auth/me",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/contacts",
+    "bucket": "Other",
+    "source": "server/routes/admin/lists.ts",
+    "url": "http://localhost:5000/api/admin/contacts",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/applications",
+    "bucket": "Other",
+    "source": "server/routes/admin/lists.ts",
+    "url": "http://localhost:5000/api/admin/applications",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/search",
+    "bucket": "Other",
+    "source": "server/routes/admin/lists.ts",
+    "url": "http://localhost:5000/api/admin/search",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/apps/",
+    "bucket": "Other",
+    "source": "server/routes/apps.ts",
+    "url": "http://localhost:5000/api/apps/",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/apps/:id",
+    "bucket": "Other",
+    "source": "server/routes/apps.ts",
+    "url": "http://localhost:5000/api/apps/:id",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/recs/:appId",
+    "bucket": "Other",
+    "source": "server/routes/recs.ts",
+    "url": "http://localhost:5000/api/recs/:appId",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/recs/:appId/pdf",
+    "bucket": "Other",
+    "source": "server/routes/recs.ts",
+    "url": "http://localhost:5000/api/recs/:appId/pdf",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/pipeline/board",
+    "bucket": "Sales Pipeline",
+    "source": "server/routes/pipeline.ts",
+    "url": "http://localhost:5000/api/pipeline/board",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/pipeline/cards/:id",
+    "bucket": "Sales Pipeline",
+    "source": "server/routes/pipeline.ts",
+    "url": "http://localhost:5000/api/pipeline/cards/:id",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/pipeline/cards/:id/docs.zip",
+    "bucket": "Sales Pipeline",
+    "source": "server/routes/pipeline.ts",
+    "url": "http://localhost:5000/api/pipeline/cards/:id/docs.zip",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/voice/twiml/outbound",
+    "bucket": "Communication Hub",
+    "source": "server/routes/voice.ts",
+    "url": "http://localhost:5000/api/voice/twiml/outbound",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bulletproof-auth/me",
+    "bucket": "Other",
+    "source": "server/routes/bulletproofAuth.ts",
+    "url": "http://localhost:5000/api/bulletproof-auth/me",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bulletproof-auth/status",
+    "bucket": "Other",
+    "source": "server/routes/bulletproofAuth.ts",
+    "url": "http://localhost:5000/api/bulletproof-auth/status",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/unified-auth/me",
+    "bucket": "Other",
+    "source": "server/routes/unifiedAuth.ts",
+    "url": "http://localhost:5000/api/unified-auth/me",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/unified-auth/status",
+    "bucket": "Other",
+    "source": "server/routes/unifiedAuth.ts",
+    "url": "http://localhost:5000/api/unified-auth/status",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/unified-auth/debug",
+    "bucket": "Other",
+    "source": "server/routes/unifiedAuth.ts",
+    "url": "http://localhost:5000/api/unified-auth/debug",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/me",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/me",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/User-Agent",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/User-Agent",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/User-Agent",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/User-Agent",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/User-Agent",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/User-Agent",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/User-Agent",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/User-Agent",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/me",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/me",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/users",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/users",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/rbac/auth/test-debug",
+    "bucket": "Other",
+    "source": "server/routes/rbacAuth.ts",
+    "url": "http://localhost:5000/api/rbac/auth/test-debug",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/flags/flags",
+    "bucket": "Other",
+    "source": "server/routes/flags/admin.ts",
+    "url": "http://localhost:5000/api/flags/flags",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/flags/flags/:key/eval",
+    "bucket": "Other",
+    "source": "server/routes/flags/admin.ts",
+    "url": "http://localhost:5000/api/flags/flags/:key/eval",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/flags/experiments",
+    "bucket": "Other",
+    "source": "server/routes/flags/admin.ts",
+    "url": "http://localhost:5000/api/flags/experiments",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/flags/experiments/:key/assign",
+    "bucket": "Other",
+    "source": "server/routes/flags/admin.ts",
+    "url": "http://localhost:5000/api/flags/experiments/:key/assign",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/perf/latest",
+    "bucket": "Other",
+    "source": "server/routes/perf/vitals.ts",
+    "url": "http://localhost:5000/api/perf/latest",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/releases/",
+    "bucket": "Other",
+    "source": "server/routes/releases/admin.ts",
+    "url": "http://localhost:5000/api/releases/",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/releases/:id/tasks",
+    "bucket": "Other",
+    "source": "server/routes/releases/admin.ts",
+    "url": "http://localhost:5000/api/releases/:id/tasks",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/releases/whatsnew",
+    "bucket": "Other",
+    "source": "server/routes/releases/admin.ts",
+    "url": "http://localhost:5000/api/releases/whatsnew",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/releases/changelog",
+    "bucket": "Other",
+    "source": "server/routes/releases/admin.ts",
+    "url": "http://localhost:5000/api/releases/changelog",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/ops/queues/status",
+    "bucket": "Other",
+    "source": "server/routes/ops/queues.ts",
+    "url": "http://localhost:5000/api/ops/queues/status",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/ops/queues/:name/jobs",
+    "bucket": "Other",
+    "source": "server/routes/ops/queues.ts",
+    "url": "http://localhost:5000/api/ops/queues/:name/jobs",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/auth/me",
+    "bucket": "Other",
+    "source": "server/routes/auth/session.ts",
+    "url": "http://localhost:5000/auth/me",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/ops/overview",
+    "bucket": "Other",
+    "source": "server/routes/ops/overview.ts",
+    "url": "http://localhost:5000/api/ops/overview",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/security/keys",
+    "bucket": "Other",
+    "source": "server/routes/security/controls.ts",
+    "url": "http://localhost:5000/api/security/keys",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/security/ping",
+    "bucket": "Other",
+    "source": "server/routes/security/controls.ts",
+    "url": "http://localhost:5000/api/security/ping",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/security/ip-rules",
+    "bucket": "Other",
+    "source": "server/routes/security/controls.ts",
+    "url": "http://localhost:5000/api/security/ip-rules",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/security/maintenance",
+    "bucket": "Other",
+    "source": "server/routes/security/controls.ts",
+    "url": "http://localhost:5000/api/security/maintenance",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/health",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/health",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/auth/__probe",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/auth/__probe",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/lenders-fallback",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/lenders-fallback",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/_echo",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/_echo",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/clear-cookies",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/clear-cookies",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/lenders-cached",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/lenders-cached",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/version",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/version",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/_health",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/_health",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/_routes",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/_routes",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/health",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/health",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/lender-auth-test",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/lender-auth-test",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/document-audit",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/document-audit",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/lenders",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/lenders",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/lender-products-simple",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/lender-products-simple",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/lender-products-real",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/lender-products-real",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/lender-products-real/counts",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/lender-products-real/counts",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/lender-directory",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/lender-directory",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/conflicts-direct/demo",
+    "bucket": "Conflicts",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/conflicts-direct/demo",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/test-s3",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/test-s3",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/bulletproof/health",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/bulletproof/health",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/upload-test",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/upload-test",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/download-all/:applicationId",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/download-all/:applicationId",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/contacts",
+    "bucket": "Contacts",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/contacts",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/s3-access/:documentId",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/s3-access/:documentId",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/s3-security-check",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/s3-security-check",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/routes",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/routes",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/public/upload-health",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/public/upload-health",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/s3-debug-direct",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/s3-debug-direct",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/s3-test-access/:storageKey",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/s3-test-access/:storageKey",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/applications",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/applications",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/applications",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/applications",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/applications/:id",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/applications/:id",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/test-s3-upload",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/test-s3-upload",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/system-validation/status",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/system-validation/status",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/applications",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/applications",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/lenders",
+    "bucket": "Lenders",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/lenders",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  },
+  {
+    "method": "GET",
+    "path": "/api/changelog",
+    "bucket": "Other",
+    "source": "server/index.ts (direct)",
+    "url": "http://localhost:5000/api/changelog",
+    "status": 0,
+    "ok": false,
+    "err": "TypeError: fetch failed"
+  }
+]

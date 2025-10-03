@@ -1,0 +1,6 @@
+{
+  "step1": { "fundingAmount": 250000, "fundsPurpose": "working_capital", "country": "CA", "currency": "CAD" },
+  "step3": { "businessName": "Golden Maple Manufacturing Inc.", "businessStructure": "corporation", "businessPhone": "+1-416-555-0100", "businessEmail": "finance@goldenmaple.ca", "industry": "manufacturing", "yearsInBusiness": 7, "revenueRange": "1M-5M" },
+  "step4": { "firstName": "Ava", "lastName": "Nguyen", "email": "ava.nguyen@goldenmaple.ca", "phone": "+1-416-555-0133", "ownershipPercentage": 85 },
+  "consents": { "termsAccepted": true, "privacyAccepted": true }
+}

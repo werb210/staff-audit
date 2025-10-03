@@ -1,0 +1,21 @@
+COMMUNICATION HUB — server-side routes this UI will call (any one per group works):
+SMS
+  • List threads:      GET /api/chat/threads | /api/messages/threads | /api/conversations/threads | /api/sms/threads
+  • Thread messages:   GET /api/chat/threads/:id | /api/messages/:id | /api/conversations/:id/messages
+  • Send message:      POST /api/chat/send | /api/messages/send | POST /api/conversations/:id/send
+  • Send template:     POST /api/messages/send-template | POST /api/twilio/content/send
+
+Calls (Twilio)
+  • Logs:              GET /api/voice/calls | /api/calls/logs
+  • Start call:        POST /api/voice/twiml/client-outgoing | POST /api/voice/call
+
+Email (Microsoft 365 preferred)
+  • Inbox:             GET /api/o365/email/inbox | /api/email/inbox
+  • Send:              POST /api/o365/email/send | /api/email/send
+
+Templates
+  • List:              GET /api/templates?kind=sms|email | GET /api/messages/templates?kind=sms|email
+  • Upsert:            POST /api/templates | POST /api/messages/templates
+
+Auth
+  • Bearer token expected via Authorization header; UI reads localStorage.apiToken

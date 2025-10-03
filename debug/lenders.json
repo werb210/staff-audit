@@ -1,0 +1,55 @@
+{
+  "exportInfo": {
+    "title": "Lender Products Export",
+    "exportedAt": "2025-07-21T18:53:00.000Z",
+    "totalProducts": 38,
+    "exportedBy": "STAFF APPLICATION TASK",
+    "sqlQuery": "SELECT id, name, product_name, lender_name, category, country, geography, min_amount, max_amount, min_revenue, doc_requirements, product_type, industries, description, interest_rate_min, interest_rate_max, term_min, term_max, min_credit_score, is_active FROM lender_products WHERE deleted_at IS NULL ORDER BY lender_name, product_name"
+  },
+  "lenderProducts": [
+    {
+      "id": "accord-accordaccess-36",
+      "name": "Accord Access",
+      "productName": "Accord Access",
+      "lenderName": "Accord Financial Corp.",
+      "category": "Working Capital",
+      "country": "CA",
+      "geography": ["CA"],
+      "minAmount": 10000,
+      "maxAmount": 50000,
+      "minRevenue": 10000,
+      "docRequirements": ["Bank Statements"],
+      "productType": "line_of_credit",
+      "industries": ["general"],
+      "description": null,
+      "interestRateMin": 19.99,
+      "interestRateMax": 49.99,
+      "termMin": 6,
+      "termMax": 24,
+      "minCreditScore": 650,
+      "isActive": true
+    },
+    {
+      "id": "accord-financial-corp--equipment-finance-39",
+      "name": "Equipment Finance",
+      "productName": "Equipment Finance",
+      "lenderName": "Accord Financial Corp.",
+      "category": "Equipment Financing",
+      "country": "CA",
+      "geography": ["CA"],
+      "minAmount": 25000,
+      "maxAmount": 20000000,
+      "minRevenue": 10000,
+      "docRequirements": ["bank_statements", "financial_statements", "personal_financial_statement", "equipment_quote"],
+      "productType": "equipment_financing",
+      "industries": ["general"],
+      "description": "Equipment Finance by Accord Financial Corp.. Amount: $20,000 - $1,500,000. Rate: 9% - 20%. Term: 12-72 months.",
+      "interestRateMin": 9.95,
+      "interestRateMax": 24.95,
+      "termMin": 12,
+      "termMax": 72,
+      "minCreditScore": 600,
+      "isActive": true
+    }
+  ]
+}

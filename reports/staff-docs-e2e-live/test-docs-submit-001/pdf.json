@@ -1,0 +1,20 @@
+{
+  "applicationDate": "2024-08-31",
+  "applicant": {
+    "legalName": "Banking Analysis Corp"
+  },
+  "documents": [],
+  "banking": null,
+  "answers": {
+    "legalName": "Banking Analysis Corp",
+    "businessName": "Banking Analysis Corp",
+    "loanAmount": 250000,
+    "country": "CA",
+    "province": "ON",
+    "revenue": 1500000,
+    "timeInBusiness": "5 years",
+    "industry": "Financial Services",
+    "email": "finance@bankinganalysis.ca",
+    "phone": "416-555-0199"
+  }
+}

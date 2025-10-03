@@ -1,0 +1,52 @@
+server/boot.ts:13:import { authMiddleware } from "./mw/auth";
+server/boot.ts:240:    const { requireSharedToken } = await import("./middleware/requireSharedToken.js");
+server/boot.ts:244:    app.use("/api/applications/validate-intake", requireSharedToken, applicationsValidateRouter());
+server/boot.ts:319:    const { requireSharedToken } = await import("./middleware/requireSharedToken.js");
+server/boot.ts:323:    app.use("/api/v1/applications/validate-intake", requireSharedToken, applicationsValidateRouter());
+server/boot.ts:403:  // Apply authMiddleware to staff-only routes (protected after login)
+server/boot.ts:404:  console.log("🔧 [OIB] Applying authMiddleware to staff-protected routes");
+server/boot.ts:417:      console.log(`✅ [MIDDLEWARE-BYPASS] Skipping authMiddleware for: ${fullPath}`);
+server/boot.ts:421:    authMiddleware(req, res, next);
+server/index.ts:12:import { requireSharedToken } from "./middleware/requireSharedToken";
+server/index.ts:38:app.use("/api/v1/products", requireSharedToken, productsV1Router());
+server/index.ts:39:app.use("/api/_int/state", requireSharedToken, stateRouter());
+server/index.ts:40:app.use("/api/lenders", requireSharedToken, lendersRouter());
+server/index.ts:41:app.use("/api/required-docs", requireSharedToken, requiredDocsDynamicRouter());
+server/middleware/requireLenderAuth.ts:2:export function requireLenderAuth(req: Request, res: Response, next: NextFunction) {
+server/middleware/requireSharedToken.ts:3:export function requireSharedToken(req: Request, res: Response, next: NextFunction) {
+server/middleware/lenderAuth.ts:25:export const requireLenderAuth = async (req: Request, res: Response, next: NextFunction) => {
+server/middleware/lenderAuth.ts:136:  await requireLenderAuth(req, res, () => {
+server/routes/lenders.router.ts:5:import { requireLenderAuth } from "../middleware/requireLenderAuth";
+server/routes/lenders.router.ts:98:  r.put("/lenders/:lenderId/self", requireLenderAuth, async (req: Request, res: Response) => {
+server/routes/required-docs.dynamic.ts:6:import { requireLenderAuth } from "../middleware/requireLenderAuth";
+server/routes/required-docs.dynamic.ts:67:  r.put("/lenders/:lenderId/required-docs/:docKey", requireLenderAuth, async (req:Request,res:Response)=>{
+server/routes/app-validate.mjs:7:import { requireSharedToken } from "../middleware/requireSharedToken.js";
+server/routes/app-validate.mjs:15:r.post("/applications/validate-intake", requireSharedToken, async (req, res) => {
+server/mw/auth.ts:27:export function authMiddleware(req: Request, res: Response, next: NextFunction) {
+server/routes/slf/dialer.ts:2:import { requireSLFAuth, type RBACRequest } from '../../middleware/authMiddleware';
+server/routes/slf/api.ts:2:import { requireSLFAuth, type RBACRequest } from '../../middleware/authMiddleware';
+server/routes/communications/callHistory.ts:2:import { requireAuth } from '../../middleware/authMiddleware';
+server/routes/admin/documentIntegrity.ts:2:import { requireAuth } from '../middleware/authMiddleware';
+server/routes/admin/documentAudit.ts:2:import { requireAuth } from '../middleware/authMiddleware';
+server/routes/applications.normalized.ts:3:import { requireAuth } from '../middleware/authMiddleware';
+server/routes/lender.portal.ts:13:const requireLenderAuth = (req: any, res: any, next: any) => {
+server/routes/lender.portal.ts:104:r.get("/lender-portal/api/my-products", requireLenderAuth, async (req: any, res) => {
+server/routes/lender.portal.ts:119:r.post("/lender-portal/api/my-products", requireLenderAuth, async (req: any, res) => {
+server/routes/lender.portal.ts:136:r.get("/lender-portal/api/my-products/:id", requireLenderAuth, async (req: any, res) => {
+server/routes/lender.portal.ts:159:r.put("/lender-portal/api/my-products/:id", requireLenderAuth, async (req: any, res) => {
+server/routes/lender.portal.ts:183:r.delete("/lender-portal/api/my-products/:id", requireLenderAuth, async (req: any, res) => {
+server/routes/lender.portal.ts:206:r.get("/lender-portal/api/reports", requireLenderAuth, async (req: any, res) => {
+server/routes/rbacSimple.ts:10:import { requireLenderAuth } from '../middleware/lenderAuth';
+server/routes/rbacSimple.ts:28:// router.get('/lender-products', requireLenderAuth, async (req: Request, res: Response) => {
+server/routes/rbacSimple.ts:65:router.patch('/lender-products/:id', requireLenderAuth, async (req: Request, res: Response) => {
+server/routes/rbacSimple.ts:199:router.post('/lender-products', requireLenderAuth, async (req: Request, res: Response) => {
+server/routes/rbacSimple.ts:251:router.delete('/lender-products/:id', requireLenderAuth, async (req: Request, res: Response) => {
+server/routes/segments.ts:5:import { requireAuth } from '../middleware/authMiddleware';
+server/routes/ai-reports.disabled.ts:4:import { authMiddleware } from '../auth';
+server/routes/ai-reports.disabled.ts:18:const authenticateStaff = authMiddleware;
+server/routes/linkedin.ts:3:import { requireAuth } from '../middleware/authMiddleware';
+server/routes/contactsCommunications.ts:2:import { requireAuth } from '../middleware/authMiddleware';
+server/routes/campaigns.ts:3:import { requireAuth } from '../middleware/authMiddleware';
+server/routes/ai-train.ts:4:// REMOVED: authMiddleware import (../auth module deleted)
+server/routes/feedback.ts:5:// REMOVED: authMiddleware import (../auth module deleted)
+server/routes/lender2FA.ts:8:import { requireAuth } from '../middleware/authMiddleware';

@@ -1,0 +1,7 @@
+Moved duplicates to .trash-2025-08-30_22-51-22
+CORS normalized.
+index.ts updated for shared-token scope
+boot.ts updated for shared-token scope
+Shared-token scope narrowed.
+Router server/routes/pipeline.router.ts already exists
+Router server/routes/users.router.ts already exists

@@ -1,0 +1,61 @@
+import { useEffect, useRef, useState } from "react";
+import { SLF } from "../../api/endpoints";
+type Thread = { id:string; contactName:string; contactNumber:string; last:string; updatedAt:string };
+type Message = { id:string; from:string; to:string; body:string; at:string; direction:"in"|"out" };
+export default function SlfComms(){
+  const [threads,setThreads]=useState<Thread[]>([]);
+  const [active,setActive]=useState<string|undefined>();
+  const [msgs,setMsgs]=useState<Message[]>([]);
+  const [text,setText]=useState(""); 
+  const [loading, setLoading] = useState(true);
+  const endRef=useRef<HTMLDivElement|null>(null);
+  
+  useEffect(()=>{ 
+    fetch(SLF.smsThreads,{})
+      .then(r=>r.json())
+      .then(data => {
+        setThreads(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("SLF SMS fetch error:", err);
+        setLoading(false);
+      });
+  },[]);
+  
+  useEffect(()=>{ if(!active) return; fetch(SLF.smsThread(active),{}).then(r=>r.json()).then(setMsgs); },[active]);
+  useEffect(()=>{ endRef.current?.scrollIntoView({behavior:"smooth"}); },[msgs]);
+  async function send(){ if(!active||!text.trim())return; await fetch(SLF.smsSend,{method:"POST", headers:{"Content-Type":"application/json"},body:JSON.stringify({ threadId: active, body: text })}); setText(""); const r=await fetch(SLF.smsThread(active),{}); setMsgs(await r.json()); }
+  
+  if (loading) return <div className="card pad" role="button" tabIndex={0}>Loading SLF communications...</div>;
+  
+  return (<div className="grid cols-2">
+    <div className="card pad" style={{maxHeight:"70vh",overflow:"auto"}}>
+      <div className="section-title" style={{color: "var(--slf-green)"}}>SLF SMS Threads</div>
+      <div className="subtle" style={{marginBottom: "12px"}}>Site Level Financial communications</div>
+      {threads.length > 0 ? (
+        <ul style={{margin:0,paddingLeft:16}}>{threads.map(t=>(
+          <li key={t.id} style={{margin:"10px 0",cursor:"pointer", padding:"8px", border: active === t.id ? "2px solid var(--slf-green)" : "1px solid #eee", borderRadius: "8px"}} onClick={()=>setActive(t.id)}>
+            <div style={{fontWeight:800}}>{t.contactName}</div><div className="subtle">{t.last}</div><div className="subtle">{t.updatedAt}</div>
+          </li>))}
+        </ul>
+      ) : (
+        <div className="subtle">No SMS threads found</div>
+      )}
+    </div>
+    <div className="card pad" style={{display:"flex",flexDirection:"column",height:"70vh"}}>
+      <div className="section-title">Conversation</div>
+      <div style={{flex:1,overflow:"auto",paddingRight:8}}>
+        {msgs.map(m=>(
+          <div key={m.id} style={{textAlign:m.direction==="out"?"right":"left",margin:"8px 0"}}>
+            <div className="card pad" style={{display:"inline-block"}}><div style={{whiteSpace:"pre-wrap"}}>{m.body}</div><div className="subtle">{m.at}</div></div>
+          </div>))}
+        <div ref={endRef}/>
+      </div>
+      <div style={{display:"flex",gap:8,marginTop:8}}>
+        <input className="auth-input" placeholder="Type SMS…" value={text} onChange={e=>setText(e.target.value)}/>
+        <button className="lm-inbound" onClick={send}>Send</button>
+      </div>
+    </div>
+  </div>);
+}

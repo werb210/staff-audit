@@ -1,0 +1,92 @@
+name: Staff CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: 
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres" 
+          --health-interval=5s
+          --health-timeout=5s 
+          --health-retries=20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/app
+        run: |
+          # Run the AI core migration
+          psql "$DATABASE_URL" -f migrations/20250824_ai_core.sql
+          
+          # Run other essential migrations
+          psql "$DATABASE_URL" -f migrations/000_init.sql || true
+          psql "$DATABASE_URL" -f migrations/010_contacts.sql || true
+          psql "$DATABASE_URL" -f migrations/020_applications.sql || true
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start server for testing
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/app
+          NODE_ENV: test
+          PORT: 5000
+        run: |
+          npm run start:server &
+          npx wait-on http://localhost:5000/health --timeout 60000
+
+      - name: Run API tests (Jest)
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/app
+          TEST_APP_ID: app_demo_1
+          TEST_CONTACT_ID: contact_demo_1
+          NODE_ENV: test
+        run: |
+          npx jest tests/api/ --runInBand --verbose
+
+      - name: Run UI smoke tests (Playwright)
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/app
+          NODE_ENV: test
+        run: |
+          npx playwright test tests/ai-actions.spec.ts --reporter=line
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7

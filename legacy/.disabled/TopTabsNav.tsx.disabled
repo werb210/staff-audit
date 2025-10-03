@@ -1,0 +1,27 @@
+import React,{useEffect} from "react";
+import { tabAllowed } from "../../../lib/rbac";
+
+export type TabKey="dashboard"|"pipeline"|"contacts"|"comms"|"marketing"|"lenders"|"settings";
+export const TABS:{key:TabKey;label:string;hash:`#/${string}`}[]=[
+  {key:"dashboard",label:"Dashboard",hash:"#/dashboard-home"},
+  {key:"pipeline",label:"Sales Pipeline",hash:"#/pipeline"},
+  {key:"contacts",label:"Contacts",hash:"#/contacts"},
+  {key:"comms",label:"Communication Hub",hash:"#/comms"},
+  {key:"marketing",label:"Marketing",hash:"#/marketing"},
+  {key:"lenders",label:"Lenders",hash:"#/lenders"},
+  {key:"settings",label:"Settings",hash:"#/settings"},
+];
+export function parseHash(h:string){const s=(h||"").toLowerCase(); if(s===""||s==="#"||s==="#/")return"dashboard"; return (TABS.find(t=>t.hash===s)?.key||"dashboard") as TabKey;}
+export function pushHash(tab:TabKey){const m=Object.fromEntries(TABS.map(t=>[t.key,t.hash])) as Record<TabKey,`#/${string}`>; if(location.hash!==m[tab]) history.replaceState(null,"",m[tab]);}
+export default function TopTabsNav({active,onChange,query,onQueryChange}:{active:TabKey;onChange:(t:TabKey)=>void;query:string;onQueryChange:(v:string)=>void;}){
+  const allowedTabs = TABS.filter(t => tabAllowed(t.key));
+  useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight")return;const i=allowedTabs.findIndex(t=>t.key===active);const n=e.key==="ArrowRight"?(i+1)%allowedTabs.length:(i-1+allowedTabs.length)%allowedTabs.length;onChange(allowedTabs[n].key)};window.addEventListener("keydown",onKey);return()=>window.removeEventListener("keydown",onKey)},[active,onChange,allowedTabs]);
+  return <div className="nav">
+    <div style={{display:"flex",gap:8,overflowX:"auto"}}>
+      {allowedTabs.map(t=>{const a=t.key===active;return <button key={t.key} onClick={()=>onChange(t.key)} aria-current={a?"page":undefined} className="btn">{t.label}</button>})}
+    </div>
+    <div style={{marginLeft:"auto"}}>
+      <input value={query} onChange={e=>onQueryChange(e.target.value)} placeholder="Search" className="btn" style={{width:220}}/>
+    </div>
+  </div>;
+}

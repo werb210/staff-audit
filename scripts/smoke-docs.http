@@ -1,0 +1,100 @@
+# @base = http://localhost:5000
+### S3 diag
+GET {{base}}/api/_int/s3/diag
+
+### S3 roundtrip test
+POST {{base}}/api/_int/s3/roundtrip
+Content-Type: application/json
+
+{
+  "contentType": "text/plain",
+  "scope": "private"
+}
+
+### Create test application
+POST {{base}}/api/applications
+Content-Type: application/json
+
+{
+  "businessLegalName": "OIB Test Company",
+  "country": "Canada",
+  "amountRequested": 50000
+}
+
+### Presign document upload
+POST {{base}}/api/documents/presign
+Content-Type: application/json
+
+{
+  "filename": "test-doc.pdf",
+  "contentType": "application/pdf",
+  "applicationId": "{{applicationId}}"
+}
+
+### List documents for application
+GET {{base}}/api/documents?applicationId={{applicationId}}
+
+### Get document view URL
+GET {{base}}/api/documents/{{documentId}}/view
+
+### Accept document
+POST {{base}}/api/documents/{{documentId}}/accept
+
+### Reject document
+POST {{base}}/api/documents/{{documentId}}/reject
+Content-Type: application/json
+
+{
+  "reason": "Document quality issues"
+}
+
+### ZIP all accepted documents
+GET {{base}}/api/documents/zip?applicationId={{applicationId}}
+
+### OCR process document
+POST {{base}}/api/ocr/process
+Content-Type: application/json
+
+{
+  "documentId": "{{documentId}}"
+}
+
+### Banking analysis
+POST {{base}}/api/banking/analyze
+Content-Type: application/json
+
+{
+  "documentId": "{{documentId}}"
+}
+
+### Match lenders
+POST {{base}}/api/lenders/match
+Content-Type: application/json
+
+{
+  "applicationId": "{{applicationId}}",
+  "country": "Canada",
+  "category": "Working Capital",
+  "amountRequested": 50000
+}
+
+### Send to lender (API)
+POST {{base}}/api/lenders/send
+Content-Type: application/json
+
+{
+  "applicationId": "{{applicationId}}",
+  "lenderId": "{{lenderId}}",
+  "documentIds": ["{{documentId}}"]
+}
+
+### Send to lender (Email)
+POST {{base}}/api/lenders/email
+Content-Type: application/json
+
+{
+  "to": "lenders@boreal.financial",
+  "subject": "Application Documents",
+  "text": "Please review the attached documents",
+  "html": "<p>Please review the attached documents</p>"
+}

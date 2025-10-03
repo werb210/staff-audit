@@ -1,0 +1,8 @@
+{
+  "at": 1756657050230,
+  "headers": {
+    "x-trace-id": "test-e2e-auth-fixed",
+    "content-type": "application/json"
+  },
+  "fields": []
+}

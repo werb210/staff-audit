@@ -1,0 +1,66 @@
+{
+  "id": "test-app-001",
+  "status": "submitted",
+  "requested_amount": 50000,
+  "form_data": {
+    "financialProfile": {
+      "businessLocation": "New York, NY",
+      "headquarters": "Manhattan, NY",
+      "industry": "Technology",
+      "lookingFor": "Working Capital",
+      "fundingAmount": 50000,
+      "fundsPurpose": "Inventory Purchase",
+      "salesHistory": "Growing",
+      "revenueLastYear": 500000,
+      "averageMonthlyRevenue": 45000,
+      "accountsReceivableBalance": 25000,
+      "fixedAssetsValue": 150000,
+      "equipmentValue": 75000
+    },
+    "lenderSelection": {
+      "selectedProductId": "quantum-ls-term-loan-21",
+      "selectedProductName": "Term Loan",
+      "selectedLenderName": "Quantum LS",
+      "matchScore": 95,
+      "selectedCategory": "term_loan",
+      "selectedCategoryName": "Term Loan"
+    },
+    "businessDetails": {
+      "operatingName": "Tech Solutions Inc",
+      "legalName": "Tech Solutions Incorporated",
+      "businessStreetAddress": "123 Business Ave",
+      "businessCity": "New York",
+      "businessState": "NY",
+      "businessPostalCode": "10001",
+      "businessPhone": "(555) 123-4567",
+      "employeeCount": 15,
+      "businessWebsite": "https://techsolutions.com",
+      "businessStartDate": "2020-01-15",
+      "businessStructure": "Corporation"
+    },
+    "applicantInfo": {
+      "title": "CEO",
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "john.smith@techsolutions.com",
+      "phone": "(555) 123-4567",
+      "ssn": "123-45-6789",
+      "dateOfBirth": "1985-03-15",
+      "address": "456 Executive Drive",
+      "city": "New York",
+      "state": "NY",
+      "postalCode": "10002",
+      "ownershipPercentage": 75
+    },
+    "partnerInfo": {
+      "hasPartner": true,
+      "partnerFirstName": "Jane",
+      "partnerLastName": "Doe", 
+      "partnerEmail": "jane.doe@techsolutions.com",
+      "partnerPhone": "(555) 234-5678",
+      "partnerOwnershipPercentage": 25,
+      "partnerSSN": "987-65-4321",
+      "partnerDateOfBirth": "1988-07-22"
+    }
+  }
+}

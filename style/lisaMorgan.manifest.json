@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "name": "LisaMorgan",
+    "classPrefix": "lm-",
+    "designTokensNamespace": "lm",
+    "fontFamilies": ["Inter", "SF Pro Text", "system-ui"],
+    "colorVars": ["--lm-color-primary", "--lm-color-bg", "--lm-color-surface", "--lm-color-text", "--lm-color-muted", "--lm-color-accent"],
+    "spacingScaleVars": ["--lm-space-1", "--lm-space-2", "--lm-space-3", "--lm-space-4", "--lm-space-6", "--lm-space-8"],
+    "radiusVars": ["--lm-radius-sm", "--lm-radius-md", "--lm-radius-lg", "--lm-radius-2xl"],
+    "shadowVars": ["--lm-shadow-sm", "--lm-shadow-md", "--lm-shadow-lg"],
+    "requiredUtilities": ["lm-btn", "lm-card", "lm-input", "lm-badge", "lm-table", "lm-navbar", "lm-sidebar"]
+  },
+  "forbidden": {
+    "inlineStyles": true,
+    "rawHexColors": true,
+    "arbitraryTailwindColors": true
+  },
+  "breakpoints": {
+    "mobile": { "width": 360, "height": 740 },
+    "tablet": { "width": 834, "height": 1112 },
+    "desktop": { "width": 1440, "height": 900 }
+  },
+  "responsiveness": {
+    "noHorizontalScroll": true,
+    "tapTargetMin": 44,
+    "fontScaleMin": 14,
+    "imagesUseResponsiveAttrs": true
+  },
+  "pages": [
+    "/portal", "/pipeline", "/contacts", "/documents", "/communication",
+    "/reports", "/ai-reports", "/training", "/chat", "/handoff",
+    "/lender-products", "/lender-management", "/tasks", "/calendar",
+    "/marketing", "/settings"
+  ]
+}
