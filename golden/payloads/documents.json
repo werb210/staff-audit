@@ -1,5 +1,0 @@
-[
-  { "category": "bank_statement", "filename": "cwb_mar_2025.pdf", "contentType": "application/pdf", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
-  { "category": "income_statement", "filename": "is_fy2024.pdf", "contentType": "application/pdf", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" },
-  { "category": "balance_sheet", "filename": "bs_fy2024.pdf", "contentType": "application/pdf", "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" }
-]

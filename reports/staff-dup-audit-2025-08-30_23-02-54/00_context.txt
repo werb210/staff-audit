@@ -1,2 +1,0 @@
-branch: main
-last:   a181af08  Update product routing and add data seeding scripts

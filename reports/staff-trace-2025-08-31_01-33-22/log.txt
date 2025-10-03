@@ -1,3 +1,0 @@
-== STAFF TRACE MAP SETUP @ 2025-08-31_01-33-22 ==
-Boot file: server/boot.ts
-Trace middleware: server/middleware/trace-intake.ts

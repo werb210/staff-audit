@@ -1,8 +1,0 @@
-{
-  "at": 1756604426900,
-  "headers": {
-    "x-trace-id": "middleware-test-123",
-    "content-type": "application/json"
-  },
-  "fields": []
-}

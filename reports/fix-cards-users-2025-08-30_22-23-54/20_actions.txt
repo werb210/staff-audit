@@ -1,4 +1,0 @@
-CORS normalized.
-Shared-token scope narrowed (auth/users/pipeline excluded).
-Pipeline read route ensured.
-Users routes ensured.
