@@ -1,312 +1,143 @@
-import { tokenService } from './tokenService';
+// server/services/office365Service.ts
+import 'isomorphic-fetch';
+import { ConfidentialClientApplication, Configuration, AuthorizationUrlRequest, AuthorizationCodeRequest, ClientCredentialRequest, AccountInfo } from '@azure/msal-node';
+import { Client } from '@microsoft/microsoft-graph-client';
 
-interface GraphApiResponse<T> {
-  value: T[];
-  '@odata.nextLink'?: string;
+export type OAuthToken = {
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt: number; // epoch ms
+};
+
+export type UserContext = {
+  // Your app's user id; use this to persist tokens per user
+  userId: string;
+};
+
+const {
+  O365_CLIENT_ID,
+  O365_CLIENT_SECRET,
+  O365_TENANT_ID,
+  O365_REDIRECT_URI,
+  O365_SCOPES, // optional: space- or comma-separated
+  NODE_ENV,
+} = process.env;
+
+if (!O365_CLIENT_ID || !O365_CLIENT_SECRET || !O365_TENANT_ID || !O365_REDIRECT_URI) {
+  throw new Error('Missing required O365 env vars: O365_CLIENT_ID, O365_CLIENT_SECRET, O365_TENANT_ID, O365_REDIRECT_URI');
 }
 
-interface CalendarEvent {
-  id: string;
-  subject: string;
-  start: {
-    dateTime: string;
-    timeZone: string;
-  };
-  end: {
-    dateTime: string;
-    timeZone: string;
-  };
-  location?: {
-    displayName: string;
-  };
-  attendees?: Array<{
-    emailAddress: {
-      address: string;
-      name: string;
-    };
-  }>;
-  organizer?: {
-    emailAddress: {
-      address: string;
-      name: string;
-    };
-  };
-}
+const DEFAULT_SCOPES = (O365_SCOPES ?? 'offline_access openid profile User.Read Mail.Read Calendars.Read')
+  .split(/[,\s]+/)
+  .filter(Boolean);
 
-interface EmailMessage {
-  id: string;
-  subject: string;
-  from: {
-    emailAddress: {
-      address: string;
-      name: string;
-    };
-  };
-  toRecipients: Array<{
-    emailAddress: {
-      address: string;
-      name: string;
-    };
-  }>;
-  receivedDateTime: string;
-  isRead: boolean;
-  importance: string;
-  bodyPreview: string;
-  hasAttachments: boolean;
-}
+const msalConfig: Configuration = {
+  auth: {
+    clientId: O365_CLIENT_ID,
+    authority: `https://login.microsoftonline.com/${O365_TENANT_ID}`,
+    clientSecret: O365_CLIENT_SECRET,
+  },
+  system: {
+    loggerOptions: {
+      loggerCallback(_level, message) {
+        if (NODE_ENV !== 'production') console.log('[MSAL]', message);
+      },
+      piiLoggingEnabled: false,
+    },
+  },
+};
 
-export class Office365Service {
-  private readonly baseUrl = 'https://graph.microsoft.com/v1.0';
+// NOTE: This service is intentionally stateless. Plug in your own storage where indicated.
+class Office365Service {
+  private cca = new ConfidentialClientApplication(msalConfig);
 
-  // Get access token for user
-  private async getAccessToken(userId: string): Promise<string | null> {
-    const token = await tokenService.getActiveToken(userId, 'microsoft');
-    return token?.accessToken || null;
+  /** =======  AUTH (Authorization Code, per-user)  ======= */
+
+  getAuthUrl(params: { userId: string; state?: string; prompt?: 'login' | 'select_account' }) {
+    const authReq: AuthorizationUrlRequest = {
+      scopes: DEFAULT_SCOPES,
+      redirectUri: O365_REDIRECT_URI!,
+      state: params.state ?? params.userId,
+      prompt: params.prompt,
+    };
+    return this.cca.getAuthCodeUrl(authReq);
   }
 
-  // Make authenticated request to Microsoft Graph API
-  private async makeGraphRequest<T>(
-    userId: string,
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const accessToken = await this.getAccessToken(userId);
-    
-    if (!accessToken) {
-      throw new Error('No valid Microsoft access token found');
-    }
+  /** Exchange auth code for tokens. Persist refreshToken against your user. */
+  async exchangeCodeForToken(code: string, state?: string): Promise<OAuthToken> {
+    const tokenReq: AuthorizationCodeRequest = {
+      code,
+      scopes: DEFAULT_SCOPES,
+      redirectUri: O365_REDIRECT_URI!,
+    };
+    const result = await this.cca.acquireTokenByCode(tokenReq);
+    if (!result?.accessToken) throw new Error('No access token from Microsoft.');
 
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+    // TODO: persist refresh token securely per userId (available on result.refreshToken)
+    // e.g., await saveUserRefreshToken({ userId: state, refreshToken: result.refreshToken })
+
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken ?? undefined,
+      expiresAt: Date.now() + (result.expiresIn ?? 0) * 1000,
+    };
+  }
+
+  /** Given a stored refresh token, get a fresh access token & Graph client for that user. */
+  async getUserGraphClient(refreshToken: string): Promise<Client> {
+    // Acquire silently by refresh token
+    const result = await this.cca.acquireTokenByRefreshToken({
+      refreshToken,
+      scopes: DEFAULT_SCOPES,
     });
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Microsoft token expired or invalid');
-      }
-      throw new Error(`Microsoft Graph API error: ${response.status} ${response.statusText}`);
-    }
+    if (!result?.accessToken) throw new Error('Failed to refresh user access token.');
 
-    return response.json();
+    return Client.init({
+      authProvider: (done) => done(null, result.accessToken),
+    });
   }
 
-  // Get user's calendar events
-  async getCalendarEvents(
-    userId: string,
-    options: {
-      startDate?: Date;
-      endDate?: Date;
-      limit?: number;
-    } = {}
-  ): Promise<CalendarEvent[]> {
-    try {
-      const { startDate, endDate, limit = 50 } = options;
-      
-      let endpoint = `/me/events?$top=${limit}&$orderby=start/dateTime`;
-      
-      // Add date filters if provided
-      if (startDate || endDate) {
-        const filters = [];
-        if (startDate) {
-          filters.push(`start/dateTime ge '${startDate.toISOString()}'`);
-        }
-        if (endDate) {
-          filters.push(`end/dateTime le '${endDate.toISOString()}'`);
-        }
-        endpoint += `&$filter=${filters.join(' and ')}`;
-      }
+  /** =======  APP-ONLY (client credentials)  ======= */
 
-      const response = await this.makeGraphRequest<GraphApiResponse<CalendarEvent>>(
-        userId,
-        endpoint
-      );
+  /** For background jobs using application permissions. */
+  async getAppGraphClient(scopes: string[] = ['https://graph.microsoft.com/.default']): Promise<Client> {
+    const req: ClientCredentialRequest = { scopes };
+    const result = await this.cca.acquireTokenByClientCredential(req);
+    if (!result?.accessToken) throw new Error('Failed to get app access token.');
 
-      return response.value;
-    } catch (error) {
-      console.error('Error fetching calendar events:', error);
-      throw error;
-    }
+    return Client.init({
+      authProvider: (done) => done(null, result.accessToken),
+    });
   }
 
-  // Get user's email messages
-  async getEmailMessages(
-    userId: string,
-    options: {
-      folder?: string;
-      limit?: number;
-      unreadOnly?: boolean;
-    } = {}
-  ): Promise<EmailMessage[]> {
-    try {
-      const { folder = 'inbox', limit = 25, unreadOnly = false } = options;
-      
-      let endpoint = `/me/mailFolders/${folder}/messages?$top=${limit}&$orderby=receivedDateTime desc`;
-      
-      if (unreadOnly) {
-        endpoint += `&$filter=isRead eq false`;
-      }
+  /** =======  Convenience helpers (delegated)  ======= */
 
-      const response = await this.makeGraphRequest<GraphApiResponse<EmailMessage>>(
-        userId,
-        endpoint
-      );
-
-      return response.value;
-    } catch (error) {
-      console.error('Error fetching email messages:', error);
-      throw error;
-    }
+  async getMe(refreshToken: string) {
+    const graph = await this.getUserGraphClient(refreshToken);
+    return graph.api('/me').get();
   }
 
-  // Create a calendar event
-  async createCalendarEvent(
-    userId: string,
-    event: {
-      subject: string;
-      start: string;
-      end: string;
-      timeZone?: string;
-      location?: string;
-      attendees?: string[];
-      body?: string;
-    }
-  ): Promise<CalendarEvent> {
-    try {
-      const eventData = {
-        subject: event.subject,
-        start: {
-          dateTime: event.start,
-          timeZone: event.timeZone || 'UTC',
-        },
-        end: {
-          dateTime: event.end,
-          timeZone: event.timeZone || 'UTC',
-        },
-        ...(event.location && {
-          location: {
-            displayName: event.location,
-          },
-        }),
-        ...(event.attendees && {
-          attendees: event.attendees.map(email => ({
-            emailAddress: {
-              address: email,
-            },
-          })),
-        }),
-        ...(event.body && {
-          body: {
-            contentType: 'text',
-            content: event.body,
-          },
-        }),
-      };
-
-      const response = await this.makeGraphRequest<CalendarEvent>(
-        userId,
-        '/me/events',
-        {
-          method: 'POST',
-          body: JSON.stringify(eventData),
-        }
-      );
-
-      return response;
-    } catch (error) {
-      console.error('Error creating calendar event:', error);
-      throw error;
-    }
+  async listMessages(refreshToken: string, top = 10) {
+    const graph = await this.getUserGraphClient(refreshToken);
+    return graph.api('/me/messages').top(top).orderby('receivedDateTime DESC').get();
   }
 
-  // Send an email
-  async sendEmail(
-    userId: string,
-    email: {
-      to: string[];
-      subject: string;
-      body: string;
-      cc?: string[];
-      bcc?: string[];
-      isHtml?: boolean;
-    }
-  ): Promise<void> {
-    try {
-      const message = {
-        message: {
-          subject: email.subject,
-          body: {
-            contentType: email.isHtml ? 'html' : 'text',
-            content: email.body,
-          },
-          toRecipients: email.to.map(address => ({
-            emailAddress: { address },
-          })),
-          ...(email.cc && {
-            ccRecipients: email.cc.map(address => ({
-              emailAddress: { address },
-            })),
-          }),
-          ...(email.bcc && {
-            bccRecipients: email.bcc.map(address => ({
-              emailAddress: { address },
-            })),
-          }),
-        },
-      };
-
-      await this.makeGraphRequest(
-        userId,
-        '/me/sendMail',
-        {
-          method: 'POST',
-          body: JSON.stringify(message),
-        }
-      );
-    } catch (error) {
-      console.error('Error sending email:', error);
-      throw error;
-    }
+  async listEvents(refreshToken: string, top = 10) {
+    const graph = await this.getUserGraphClient(refreshToken);
+    return graph.api('/me/events').top(top).orderby('start/dateTime DESC').get();
   }
 
-  // Get user profile information
-  async getUserProfile(userId: string): Promise<any> {
-    try {
-      const response = await this.makeGraphRequest(
-        userId,
-        '/me?$select=displayName,mail,userPrincipalName,id'
-      );
-
-      return response;
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      throw error;
-    }
+  async listContacts(refreshToken: string, top = 25) {
+    const graph = await this.getUserGraphClient(refreshToken);
+    return graph.api('/me/contacts').top(top).get();
   }
 
-  // Check if user has valid token
-  async isConnected(userId: string): Promise<boolean> {
-    try {
-      const token = await tokenService.getActiveToken(userId, 'microsoft');
-      return !!token;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  // Test connection by making a simple API call
-  async testConnection(userId: string): Promise<boolean> {
-    try {
-      await this.getUserProfile(userId);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
+  /** =======  Token store hooks (implement in your app)  ======= */
+  // Example signatures you can implement elsewhere and call from routes:
+  // async saveUserRefreshToken(userId: string, refreshToken: string) { ... }
+  // async getUserRefreshToken(userId: string): Promise<string | null> { ... }
 }
 
-export const office365Service = new Office365Service();
+const office365Service = new Office365Service();
+export default office365Service;
