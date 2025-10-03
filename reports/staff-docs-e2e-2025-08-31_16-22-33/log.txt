@@ -1,3 +1,0 @@
-== STAFF DOCS E2E SYSTEM SETUP @ 2025-08-31_16-22-33 ==
-Boot file: server/boot.ts
-Docs router: server/routes/test-docs.router.ts

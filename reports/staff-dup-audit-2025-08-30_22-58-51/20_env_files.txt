@@ -1,9 +1,0 @@
-.env
-.env.deployment
-.env.dev
-.env.example
-.env.local
-.env.production
-.env.production.example
-.env.production.local
-.env.temp

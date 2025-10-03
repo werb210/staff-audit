@@ -1,3 +1,0 @@
-CURRENT STATUS:
-LIST /pipeline/cards -> 200
-DETAIL /pipeline/cards/1 -> 404

@@ -1,1 +1,0 @@
-Products router exists at server/routes/products.v1.ts

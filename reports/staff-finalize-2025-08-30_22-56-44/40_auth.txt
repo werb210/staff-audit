@@ -1,2 +1,0 @@
-GET /users -> 200
-GET /users/me -> 200 (expect 401 when no staff session cookie)

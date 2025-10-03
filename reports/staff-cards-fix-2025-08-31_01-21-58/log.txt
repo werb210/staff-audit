@@ -1,2 +1,0 @@
-== STAFF CARDS OPEN FIX @ 2025-08-31_01-21-58 ==
-BASE=http://localhost:5000/api

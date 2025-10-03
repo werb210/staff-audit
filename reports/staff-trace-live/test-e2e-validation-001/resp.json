@@ -1,8 +1,0 @@
-{
-  "at": 1756656984579,
-  "method": "POST",
-  "path": "/test/intake",
-  "data": {
-    "error": "missing_bearer"
-  }
-}

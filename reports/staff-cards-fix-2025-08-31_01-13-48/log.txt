@@ -1,4 +1,0 @@
-== STAFF CARDS FIX @ 2025-08-31_01-13-48 ==
-BASE=http://localhost:5000/api
-PROBE LIST /pipeline/cards -> 200
-CANONICAL LIST: /pipeline/cards

@@ -1,3 +1,0 @@
-=== 0) Context ===
-branch: main
-last:   eb9b2896  Add various API routes for application and user management
