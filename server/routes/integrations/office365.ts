@@ -1,238 +1,87 @@
-import { Router } from 'express';
-import { authMiddleware } from '../../middleware/authJwt';
-import { tokenService } from '../../services/tokenService';
+// server/routes/integrations/office365.ts
+import { Router } from "express";
+import { z } from "zod";
+import office365 from "../../services/office365Service";
+import { requireJwt } from "../../mw/jwt-auth";
 
-const router = Router();
+const r = Router();
+const uid = (req: any) => req.user?.id || "anon";
 
-// Apply authentication middleware
-router.use(authMiddleware);
+// Start OAuth: returns auth URL
+r.get("/connect", requireJwt, async (req, res) => {
+  if (!office365.hasCredentials()) return res.status(500).json({ ok: false, message: "O365 not configured" });
+  const state = Buffer.from(JSON.stringify({ uid: uid(req) })).toString("base64url");
+  const url = await office365.getAuthUrl(state);
+  res.json({ ok: true, url });
+});
 
-interface MSGraphResponse {
-  value: any[];
-}
+// OAuth redirect URI
+r.get("/callback", async (req, res) => {
+  try {
+    const qp = z.object({ code: z.string(), state: z.string().optional() }).parse(req.query);
+    const state = qp.state ? JSON.parse(Buffer.from(qp.state, "base64url").toString("utf8")) : {};
+    const userId = state?.uid || "anon";
+    await office365.exchangeCodeForToken({ code: qp.code, userId });
+    res.type("html").send("<script>window.close&&window.close()</script>Connected. You can close this window.");
+  } catch (e: any) {
+    res.status(400).json({ ok: false, error: e?.message || "oauth_error" });
+  }
+});
 
-// Helper function to make Microsoft Graph API calls
-async function makeGraphApiCall(accessToken: string, endpoint: string): Promise<any> {
-  const response = await fetch(`https://graph.microsoft.com/v1.0${endpoint}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
-    }
+// Status
+r.get("/status", requireJwt, async (req, res) => {
+  res.json(await office365.status(uid(req)));
+});
+
+// Mail
+r.post("/sendmail", requireJwt, async (req, res) => {
+  const body = z.object({
+    to: z.union([z.string().email(), z.array(z.string().email()).nonempty()]),
+    subject: z.string().min(1),
+    html: z.string().optional(),
+    text: z.string().optional(),
+  }).parse(req.body);
+  await office365.sendMail(uid(req), body);
+  res.json({ ok: true });
+});
+
+r.get("/messages", requireJwt, async (req, res) => {
+  const top = Number(req.query.top ?? 25);
+  res.json(await office365.listMessages(uid(req), top));
+});
+
+// Contacts
+r.get("/contacts", requireJwt, async (req, res) => {
+  res.json(await office365.listContacts(uid(req)));
+});
+
+// Calendar
+r.get("/events", requireJwt, async (req, res) => {
+  const start = req.query.start as string | undefined;
+  const end = req.query.end as string | undefined;
+  res.json(await office365.listEvents(uid(req), { start, end }));
+});
+
+r.post("/events", requireJwt, async (req, res) => {
+  const schema = z.object({
+    subject: z.string().min(1),
+    body: z.object({ contentType: z.enum(["HTML", "Text"]).optional(), content: z.string().optional() }).optional(),
+    start: z.object({ dateTime: z.string(), timeZone: z.string().optional() }),
+    end: z.object({ dateTime: z.string(), timeZone: z.string().optional() }),
+    attendees: z.array(z.object({
+      emailAddress: z.object({ address: z.string().email(), name: z.string().optional() }),
+      type: z.enum(["required", "optional"]).optional(),
+    })).optional(),
+    location: z.object({ displayName: z.string() }).optional(),
   });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Graph API call failed: ${response.status} ${error}`);
-  }
-
-  return response.json();
-}
-
-// Get Office 365 Calendar Events
-router.get('/calendar', async (req: any, res: any) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    // Get stored Office 365 token
-    const token = await tokenService.getActiveToken(userId, 'microsoft');
-    if (!token) {
-      return res.status(401).json({ 
-        error: 'Office 365 not connected',
-        connectUrl: `/api/auth/microsoft?userId=${userId}`
-      });
-    }
-
-    // Fetch calendar events from Microsoft Graph
-    const { top = 10, days = 7 } = req.query;
-    const startTime = new Date().toISOString();
-    const endTime = new Date(Date.now() + parseInt(days as string) * 24 * 60 * 60 * 1000).toISOString();
-    
-    const endpoint = `/me/calendar/events?$top=${top}&$filter=start/dateTime ge '${startTime}' and start/dateTime le '${endTime}'&$orderby=start/dateTime`;
-    
-    const data: MSGraphResponse = await makeGraphApiCall(token.accessToken, endpoint);
-
-    const events = data.value.map((event: any) => ({
-      id: event.id,
-      subject: event.subject,
-      start: event.start,
-      end: event.end,
-      location: event.location?.displayName,
-      organizer: event.organizer?.emailAddress,
-      attendees: event.attendees?.map((a: any) => ({
-        name: a.emailAddress?.name,
-        email: a.emailAddress?.address,
-        status: a.status?.response
-      })),
-      isOnlineMeeting: event.isOnlineMeeting,
-      webLink: event.webLink,
-      body: event.body?.content ? event.body.content.substring(0, 200) + '...' : ''
-    }));
-
-    res.json({
-      success: true,
-      events,
-      totalCount: data.value.length,
-      connected: true,
-      tokenValid: true
-    });
-
-  } catch (error: unknown) {
-    console.error('Office 365 calendar sync error:', error);
-    
-    // Handle token expiration
-    if (error instanceof Error && error instanceof Error ? error.message : String(error).includes('401')) {
-      return res.status(401).json({ 
-        error: 'Office 365 token expired',
-        connected: false,
-        tokenValid: false,
-        reconnectUrl: `/api/auth/microsoft?userId=${req.user?.id}`
-      });
-    }
-
-    res.status(500).json({ 
-      error: 'Failed to fetch calendar events',
-      details: error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'
-    });
-  }
+  const input = schema.parse(req.body);
+  res.json(await office365.createEvent(uid(req), input));
 });
 
-// Get Office 365 Email Messages
-router.get('/email', async (req: any, res: any) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    // Get stored Office 365 token
-    const token = await tokenService.getActiveToken(userId, 'microsoft');
-    if (!token) {
-      return res.status(401).json({ 
-        error: 'Office 365 not connected',
-        connectUrl: `/api/auth/microsoft?userId=${userId}`
-      });
-    }
-
-    // Fetch emails from Microsoft Graph
-    const { top = 10, folder = 'inbox' } = req.query;
-    const endpoint = `/me/mailFolders/${folder}/messages?$top=${top}&$select=id,subject,from,receivedDateTime,bodyPreview,importance,isRead,hasAttachments&$orderby=receivedDateTime desc`;
-    
-    const data: MSGraphResponse = await makeGraphApiCall(token.accessToken, endpoint);
-
-    const emails = data.value.map((email: any) => ({
-      id: email.id,
-      subject: email.subject,
-      from: {
-        name: email.from?.emailAddress?.name,
-        email: email.from?.emailAddress?.address
-      },
-      receivedDateTime: email.receivedDateTime,
-      bodyPreview: email.bodyPreview,
-      importance: email.importance,
-      isRead: email.isRead,
-      hasAttachments: email.hasAttachments
-    }));
-
-    res.json({
-      success: true,
-      emails,
-      totalCount: data.value.length,
-      connected: true,
-      tokenValid: true,
-      folder
-    });
-
-  } catch (error: unknown) {
-    console.error('Office 365 email sync error:', error);
-    
-    // Handle token expiration
-    if (error instanceof Error && error instanceof Error ? error.message : String(error).includes('401')) {
-      return res.status(401).json({ 
-        error: 'Office 365 token expired',
-        connected: false,
-        tokenValid: false,
-        reconnectUrl: `/api/auth/microsoft?userId=${req.user?.id}`
-      });
-    }
-
-    res.status(500).json({ 
-      error: 'Failed to fetch emails',
-      details: error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'
-    });
-  }
+// Disconnect
+r.post("/disconnect", requireJwt, async (req, res) => {
+  await office365.revoke(uid(req));
+  res.json({ ok: true });
 });
 
-// Get Office 365 connection status
-router.get('/status', async (req: any, res: any) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    const token = await tokenService.getToken(userId, 'microsoft');
-    const isConnected = !!token;
-    const isExpired = token ? tokenService.isTokenExpired(token) : false;
-
-    res.json({
-      connected: isConnected && !isExpired,
-      tokenExists: isConnected,
-      tokenExpired: isExpired,
-      tokenCreatedAt: token?.createdAt,
-      tokenExpiresAt: token?.expiresAt,
-      connectUrl: `/api/auth/microsoft?userId=${userId}`
-    });
-
-  } catch (error: unknown) {
-    console.error('Office 365 status check error:', error);
-    res.status(500).json({ 
-      error: 'Failed to check Office 365 status',
-      details: error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'
-    });
-  }
-});
-
-// Test connection with user profile
-router.get('/profile', async (req: any, res: any) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    const token = await tokenService.getActiveToken(userId, 'microsoft');
-    if (!token) {
-      return res.status(401).json({ 
-        error: 'Office 365 not connected',
-        connectUrl: `/api/auth/microsoft?userId=${userId}`
-      });
-    }
-
-    const profile = await makeGraphApiCall(token.accessToken, '/me');
-
-    res.json({
-      success: true,
-      connected: true,
-      profile: {
-        id: profile.id,
-        displayName: profile.displayName,
-        mail: profile.mail,
-        userPrincipalName: profile.userPrincipalName,
-        jobTitle: profile.jobTitle,
-        department: profile.department
-      }
-    });
-
-  } catch (error: unknown) {
-    console.error('Office 365 profile error:', error);
-    res.status(500).json({ 
-      error: 'Failed to fetch Office 365 profile',
-      details: error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'
-    });
-  }
-});
-
-export default router;
+export default r;
