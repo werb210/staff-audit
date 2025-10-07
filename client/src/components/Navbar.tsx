@@ -1,6 +1,6 @@
 // client/src/components/Navbar.tsx
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 interface NavbarProps {
   onSignOut: () => void;
@@ -9,6 +9,9 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onSignOut, silo, onSiloSwitch }) => {
+  const linkClasses = ({ isActive }: { isActive: boolean }) =>
+    `px-3 py-2 rounded hover:bg-gray-700 ${isActive ? 'bg-gray-700 font-bold' : ''}`;
+
   return (
     <nav className="flex items-center justify-between bg-gray-800 text-white px-4 py-2">
       <div className="flex items-center space-x-4">
@@ -18,15 +21,12 @@ const Navbar: React.FC<NavbarProps> = ({ onSignOut, silo, onSiloSwitch }) => {
         >
           {silo}
         </button>
-        <Link to="/" className="font-bold">Dashboard</Link>
-        <Link to="/pipeline">Pipeline</Link>
-        <Link to="/contacts">Contacts</Link>
-        <Link to="/communications">Communications</Link>
-        <Link to="/tasks">Tasks & Calendar</Link>
-        <Link to="/marketing">Marketing</Link>
-        <Link to="/reports">Reports</Link>
-        <Link to="/lenders">Lenders</Link>
-        <Link to="/settings">Settings</Link>
+        <NavLink to="/" className={linkClasses}>Dashboard</NavLink>
+        <NavLink to="/pipeline" className={linkClasses}>Pipeline</NavLink>
+        <NavLink to="/contacts" className={linkClasses}>Contacts</NavLink>
+        <NavLink to="/documents" className={linkClasses}>Documents</NavLink>
+        <NavLink to="/crm" className={linkClasses}>Communications</NavLink>
+        {/* Add other NavLinks as needed */}
       </div>
       <button
         onClick={onSignOut}
