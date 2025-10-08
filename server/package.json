@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/index.ts",
+    "dev": "npx tsx src/index.ts",
     "start": "node --loader tsx src/index.ts"
   },
   "dependencies": {
