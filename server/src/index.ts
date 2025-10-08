@@ -8,7 +8,7 @@ import { Twilio } from "twilio";
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT) || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -113,7 +113,7 @@ app.post("/api/dialer/call", async (req, res) => {
   }
 });
 
-// --- Start server ---
-app.listen(port, () => {
-  console.log(`✅ Server running on port ${port}`);
+// --- Start server & expose port for Codespaces ---
+app.listen(port, "0.0.0.0", () => {
+  console.log(`✅ Server running and exposed on port ${port}`);
 });
