@@ -1,4 +1,3 @@
-// server/src/index.ts
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -15,7 +14,7 @@ app.use(bodyParser.json());
 
 // --- AWS S3 setup ---
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_REGION || "us-east-1",
   credentials: {
     accessKeyId: process.env.S3_ACCESS_KEY_ID || "",
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
@@ -34,25 +33,31 @@ if (process.env.TWILIO_ACCOUNT_SID?.startsWith("AC")) {
   console.warn("⚠️ Skipping Twilio init — missing or invalid Account SID");
 }
 
-// --- Root route (browser visible) ---
+// --- Root route (always visible in browser) ---
 app.get("/", (_req, res) => {
+  res.setHeader("Content-Type", "text/html");
   res.send(`
-    <html>
-      <head>
-        <title>Boreal Staff Server</title>
-        <style>
-          body { font-family: system-ui, sans-serif; margin: 40px; color: #222; }
-          h1 { color: #007acc; }
-          code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
-        </style>
-      </head>
-      <body>
-        <h1>🚀 Boreal Staff Server Running</h1>
-        <p>Environment: <code>${process.env.NODE_ENV}</code></p>
-        <p>Port: <code>${port}</code></p>
-        <p>Time: ${new Date().toLocaleString()}</p>
-        <p><a href="/api/health">/api/health</a> | <a href="/api/pipeline/stats">/api/pipeline/stats</a></p>
-      </body>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Boreal Staff Server</title>
+      <style>
+        body { font-family: system-ui, sans-serif; margin: 40px; color: #222; }
+        h1 { color: #007acc; }
+        code { background: #f4f4f4; padding: 3px 6px; border-radius: 4px; }
+      </style>
+    </head>
+    <body>
+      <h1>🚀 Boreal Staff Server Running</h1>
+      <p>Environment: <code>${process.env.NODE_ENV}</code></p>
+      <p>Port: <code>${port}</code></p>
+      <p>Time: ${new Date().toLocaleString()}</p>
+      <p>
+        <a href="/api/health">Check /api/health</a> |
+        <a href="/api/pipeline/stats">Check /api/pipeline/stats</a>
+      </p>
+    </body>
     </html>
   `);
 });
@@ -62,43 +67,36 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
 });
 
-// --- Pipeline stats (stub) ---
-app.get("/api/pipeline/stats", async (_req, res) => {
+// --- Pipeline stats ---
+app.get("/api/pipeline/stats", (_req, res) => {
   res.json({
     activeCalls: 0,
     pendingTasks: 0,
-    pipelineStages: {
-      application: 0,
-      financials: 0,
-      analysis: 0,
-    },
+    pipelineStages: { application: 0, financials: 0, analysis: 0 },
   });
 });
 
-// --- Contacts list (stub) ---
-app.get("/api/contacts", async (_req, res) => {
+// --- Contacts ---
+app.get("/api/contacts", (_req, res) => {
   res.json({ contacts: [] });
 });
 
-// --- Document upload (stub) ---
-app.post("/api/documents", async (req, res) => {
+// --- Document upload stub ---
+app.post("/api/documents", (_req, res) => {
   res.json({ message: "Upload stub" });
 });
 
-// --- Document status update (stub) ---
-app.put("/api/documents/:id/status", async (req, res) => {
+// --- Document status ---
+app.put("/api/documents/:id/status", (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   res.json({ id, status });
 });
 
-// --- Dialer call (stub) ---
+// --- Dialer stub ---
 app.post("/api/dialer/call", async (req, res) => {
-  if (!twilioClient) {
-    return res
-      .status(503)
-      .json({ error: "Twilio not configured (missing Account SID)" });
-  }
+  if (!twilioClient)
+    return res.status(503).json({ error: "Twilio not configured" });
   const { to, from } = req.body;
   try {
     const call = await twilioClient.calls.create({
@@ -107,13 +105,13 @@ app.post("/api/dialer/call", async (req, res) => {
       url: "http://demo.twilio.com/docs/voice.xml",
     });
     res.json({ callSid: call.sid });
-  } catch (error) {
-    console.error("Dialer error:", error);
+  } catch (err) {
+    console.error("Dialer error:", err);
     res.status(500).json({ error: "Dialer error" });
   }
 });
 
-// --- Start server & expose port for Codespaces ---
+// --- Start server ---
 app.listen(port, "0.0.0.0", () => {
-  console.log(`✅ Server running and exposed on port ${port}`);
+  console.log(`✅ Boreal Staff Server running at http://localhost:${port}`);
 });
