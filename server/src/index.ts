@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import contactsRouter from "./routes/contacts.js";
 
 dotenv.config();
 const app = express();
@@ -43,19 +44,17 @@ app.get("/", (_req, res) => {
 });
 
 // ✅ Health route
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", environment: "development" });
-});
+app.get("/api/health", (_req, res) =>
+  res.json({ status: "ok", environment: "development" })
+);
 
 // ✅ Pipeline stats placeholder
-app.get("/api/pipeline/stats", (_req, res) => {
-  res.json({ applications: 0, documents: 0, lenders: 0 });
-});
+app.get("/api/pipeline/stats", (_req, res) =>
+  res.json({ applications: 0, documents: 0, lenders: 0 })
+);
 
-// ✅ Contacts placeholder
-app.get("/api/contacts", (_req, res) => {
-  res.json({ contacts: [] });
-});
+// ✅ Contacts route (connected to DB)
+app.use("/api/contacts", contactsRouter);
 
 // ✅ Environment check route
 app.get("/api/env-check", (_req, res) => {
@@ -74,9 +73,7 @@ app.get("/api/env-check", (_req, res) => {
 });
 
 // fallback
-app.use((_req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
+app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
 // start server
 app.listen(Number(port), "0.0.0.0", () => {
