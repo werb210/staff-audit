@@ -6,8 +6,6 @@ import { Pool } from "pg";
 
 dotenv.config();
 const app = express();
-
-// ✅ Force Codespaces-compatible host and port
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
 const host = "0.0.0.0";
 
@@ -24,20 +22,22 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Root route
+// ✅ Root route (shows working links)
 app.get("/", (_req, res) => {
   res.type("html").send(`
-    <html><body>
-      <h1>✅ Boreal Staff Server Running</h1>
-      <p>Environment: development</p>
-      <ul>
-        <li><a href="/api/health" target="_blank">/api/health</a></li>
-        <li><a href="/api/pipeline/stats" target="_blank">/api/pipeline/stats</a></li>
-        <li><a href="/api/contacts" target="_blank">/api/contacts</a></li>
-        <li><a href="/api/env-check" target="_blank">/api/env-check</a></li>
-      </ul>
-      <p>Server running on port ${port}</p>
-    </body></html>
+    <html>
+      <body>
+        <h1>✅ Boreal Staff Server Running</h1>
+        <p>Environment: development</p>
+        <ul>
+          <li><a href="/api/health" target="_blank">/api/health</a></li>
+          <li><a href="/api/pipeline/stats" target="_blank">/api/pipeline/stats</a></li>
+          <li><a href="/api/contacts" target="_blank">/api/contacts</a></li>
+          <li><a href="/api/env-check" target="_blank">/api/env-check</a></li>
+        </ul>
+        <p>Server running on port ${port}</p>
+      </body>
+    </html>
   `);
 });
 
@@ -51,7 +51,7 @@ app.get("/api/pipeline/stats", (_req, res) => {
   res.json({ applications: 0, documents: 0, lenders: 0 });
 });
 
-// ✅ Contacts endpoint
+// ✅ Contacts endpoint (main test route)
 app.get("/api/contacts", async (_req, res) => {
   try {
     const result = await pool.query("SELECT id, name, email FROM contacts LIMIT 10;");
@@ -62,7 +62,7 @@ app.get("/api/contacts", async (_req, res) => {
   }
 });
 
-// ✅ Env check
+// ✅ Env check route
 app.get("/api/env-check", (_req, res) => {
   const mask = (v: string | undefined) =>
     v ? v.slice(0, 3) + "***" + v.slice(-3) : "❌ missing";
@@ -75,11 +75,13 @@ app.get("/api/env-check", (_req, res) => {
   });
 });
 
-// ✅ Catch-all for missing routes
+// ✅ 404 fallback
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
-// ✅ Start server with Codespaces-safe binding
+// ✅ Start server (Codespaces-safe binding)
 app.listen(port, host, () => {
   console.log(`✅ Boreal Staff Server running on http://${host}:${port}`);
-  console.log(`🌐 Codespaces URL should be: https://${process.env.CODESPACE_NAME}-${port}.app.github.dev`);
+  console.log(
+    `🌐 Codespaces URL should be: https://${process.env.CODESPACE_NAME}-${port}.app.github.dev`
+  );
 });
