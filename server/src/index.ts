@@ -42,14 +42,24 @@ app.get("/", (_req, res) => {
 });
 
 // simple test endpoints
-app.get("/api/health", (_req, res) => res.json({ status: "ok", environment: "development" }));
-app.get("/api/pipeline/stats", (_req, res) => res.json({ applications: 0, documents: 0, lenders: 0 }));
-app.get("/api/contacts", (_req, res) => res.json({ contacts: [] }));
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", environment: "development" });
+});
+
+app.get("/api/pipeline/stats", (_req, res) => {
+  res.json({ applications: 0, documents: 0, lenders: 0 });
+});
+
+app.get("/api/contacts", (_req, res) => {
+  res.json({ contacts: [] });
+});
 
 // fallback
-app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
+app.use((_req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
-// start
+// start server
 app.listen(Number(port), "0.0.0.0", () => {
   console.log(`✅ Boreal Staff Server running at http://localhost:${port}`);
   console.log("🌐 Accessible via Codespaces (Ports → 3001 → Open in Browser)");
