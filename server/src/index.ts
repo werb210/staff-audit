@@ -3,8 +3,6 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import Twilio from "twilio";
-import { S3Client } from "@aws-sdk/client-s3";
 
 dotenv.config();
 const app = express();
@@ -14,7 +12,7 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
-// 🧭 Root route — return HTML so you never see "Cannot GET /"
+// ✅ Root route — always responds with HTML
 app.get("/", (_req, res) => {
   res.type("html").send(`
     <!DOCTYPE html>
@@ -43,23 +41,13 @@ app.get("/", (_req, res) => {
   `);
 });
 
-// API routes
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", environment: "development" });
-});
+// simple test endpoints
+app.get("/api/health", (_req, res) => res.json({ status: "ok", environment: "development" }));
+app.get("/api/pipeline/stats", (_req, res) => res.json({ applications: 0, documents: 0, lenders: 0 }));
+app.get("/api/contacts", (_req, res) => res.json({ contacts: [] }));
 
-app.get("/api/pipeline/stats", (_req, res) => {
-  res.json({ applications: 0, documents: 0, lenders: 0 });
-});
-
-app.get("/api/contacts", (_req, res) => {
-  res.json({ contacts: [] });
-});
-
-// fallback for unmatched routes
-app.use((_req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
+// fallback
+app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
 // start
 app.listen(Number(port), "0.0.0.0", () => {
