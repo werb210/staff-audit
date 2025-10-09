@@ -3,9 +3,16 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import contactsRouter from "./routes/contacts.ts"; // ✅ explicit .ts for TSX runtime
+import { Router } from "express";
+import pkg from "pg";
 
 dotenv.config();
+const { Pool } = pkg;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+});
+
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -53,8 +60,16 @@ app.get("/api/pipeline/stats", (_req, res) =>
   res.json({ applications: 0, documents: 0, lenders: 0 })
 );
 
-// ✅ Contacts route (connected to DB)
-app.use("/api/contacts", contactsRouter);
+// ✅ Inline Contacts route (standalone, no import needed)
+app.get("/api/contacts", async (_req, res) => {
+  try {
+    const result = await pool.query("SELECT id, name, email FROM contacts LIMIT 10;");
+    res.json(result.rows);
+  } catch (err: any) {
+    console.error("Database error:", err.message);
+    res.status(500).json({ error: "Database error", details: err.message });
+  }
+});
 
 // ✅ Environment check route
 app.get("/api/env-check", (_req, res) => {
