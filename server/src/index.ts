@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import contactsRouter from "./routes/contacts"; // ✅ remove .js
+import contactsRouter from "./routes/contacts.ts"; // ✅ explicit .ts for TSX runtime
 
 dotenv.config();
 const app = express();
