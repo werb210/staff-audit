@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { Pool } from "pg";
+import contactsRouter from "./routes/contacts"; // ✅ use your new contacts route
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// debug: list registered routes
+// Debug: list registered routes
 const listRoutes = () => {
   const out: string[] = [];
   (app as any)._router.stack.forEach((layer: any) => {
@@ -32,6 +33,7 @@ const listRoutes = () => {
   return out;
 };
 
+// Root
 app.get("/", (_req, res) => {
   res.type("html").send(`
     <html><body>
@@ -57,14 +59,8 @@ app.get("/api/pipeline/stats", (_req, res) =>
   res.json({ applications: 0, documents: 0, lenders: 0 })
 );
 
-app.get("/api/contacts", async (_req, res) => {
-  try {
-    const r = await pool.query("SELECT id, name, email FROM contacts LIMIT 10;");
-    res.json(r.rows);
-  } catch (e: any) {
-    res.status(500).json({ error: "Database error", details: e.message });
-  }
-});
+// ✅ use the proper contacts router now
+app.use("/api/contacts", contactsRouter);
 
 app.get("/api/env-check", (_req, res) => {
   const mask = (v?: string) => (v ? v.slice(0, 3) + "***" + v.slice(-3) : "❌ missing");
@@ -80,5 +76,5 @@ app.get("/__routes", (_req, res) => res.json(listRoutes()));
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
 app.listen(port, host, () => {
-  console.log(`✅ Server on http://${host}:${port}`);
+  console.log(`✅ Server running at http://${host}:${port}`);
 });
