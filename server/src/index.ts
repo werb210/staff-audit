@@ -20,15 +20,15 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Dynamic import (works with tsx live dev)
+// ✅ Correct dynamic import for tsx
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const contactsRouter = (await import(path.join(__dirname, "routes", "contacts.ts"))).default;
 
-// ✅ Mount the contacts route
+// ✅ Mount contacts router
 app.use("/api/contacts", contactsRouter);
 
-// ✅ Base route
+// ✅ Root page
 app.get("/", (_req, res) => {
   res.type("html").send(`
     <html><body>
@@ -46,17 +46,15 @@ app.get("/", (_req, res) => {
   `);
 });
 
-// ✅ Health route
+// ✅ Simple routes
 app.get("/api/health", (_req, res) =>
   res.json({ status: "ok", environment: process.env.NODE_ENV || "development" })
 );
 
-// ✅ Dummy pipeline stats route
 app.get("/api/pipeline/stats", (_req, res) =>
   res.json({ applications: 0, documents: 0, lenders: 0 })
 );
 
-// ✅ Env check route
 app.get("/api/env-check", (_req, res) => {
   const mask = (v?: string) => (v ? v.slice(0, 3) + "***" + v.slice(-3) : "❌ missing");
   res.json({
@@ -66,7 +64,7 @@ app.get("/api/env-check", (_req, res) => {
   });
 });
 
-// ✅ Debug route to verify mounted routes
+// ✅ Debug route list
 app.get("/__routes", (_req, res) => {
   const out: string[] = [];
   (app as any)._router.stack.forEach((layer: any) => {
@@ -80,7 +78,7 @@ app.get("/__routes", (_req, res) => {
   res.json(out);
 });
 
-// ✅ 404 handler
+// ✅ 404 fallback
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
 // ✅ Start server
