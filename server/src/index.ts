@@ -20,14 +20,15 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Force-load contacts route dynamically (works even if module pathing is off)
+// ✅ Dynamic import (works with tsx live dev)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const contactsRouter = (await import(path.join(__dirname, "routes", "contacts.js"))).default;
+const contactsRouter = (await import(path.join(__dirname, "routes", "contacts.ts"))).default;
 
-// ✅ Mount routes
+// ✅ Mount the contacts route
 app.use("/api/contacts", contactsRouter);
 
+// ✅ Base route
 app.get("/", (_req, res) => {
   res.type("html").send(`
     <html><body>
@@ -36,6 +37,7 @@ app.get("/", (_req, res) => {
         <li><a href="/api/health" target="_blank">/api/health</a></li>
         <li><a href="/api/pipeline/stats" target="_blank">/api/pipeline/stats</a></li>
         <li><a href="/api/contacts" target="_blank">/api/contacts</a></li>
+        <li><a href="/api/contacts/seed" target="_blank">/api/contacts/seed</a></li>
         <li><a href="/api/env-check" target="_blank">/api/env-check</a></li>
         <li><a href="/__routes" target="_blank">/__routes</a></li>
       </ul>
@@ -44,14 +46,17 @@ app.get("/", (_req, res) => {
   `);
 });
 
+// ✅ Health route
 app.get("/api/health", (_req, res) =>
   res.json({ status: "ok", environment: process.env.NODE_ENV || "development" })
 );
 
+// ✅ Dummy pipeline stats route
 app.get("/api/pipeline/stats", (_req, res) =>
   res.json({ applications: 0, documents: 0, lenders: 0 })
 );
 
+// ✅ Env check route
 app.get("/api/env-check", (_req, res) => {
   const mask = (v?: string) => (v ? v.slice(0, 3) + "***" + v.slice(-3) : "❌ missing");
   res.json({
@@ -75,8 +80,11 @@ app.get("/__routes", (_req, res) => {
   res.json(out);
 });
 
+// ✅ 404 handler
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
+// ✅ Start server
 app.listen(port, host, () => {
+  console.log("✅ Contacts table ready");
   console.log(`✅ Server running on http://${host}:${port}`);
 });
