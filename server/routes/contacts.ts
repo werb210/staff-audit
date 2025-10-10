@@ -3,8 +3,18 @@ import express from "express";
 const router = express.Router();
 
 /**
+ * Health check route to verify the Contacts API is active
+ */
+router.get("/", (_req, res) => {
+  res.json({
+    message: "✅ Contacts API online",
+    endpoints: ["/api/contacts/seed", "/api/contacts"],
+  });
+});
+
+/**
  * @route GET /api/contacts/seed
- * @desc Seeds the contacts table with sample data for testing
+ * @desc Seeds sample contacts (mock data for testing)
  */
 router.get("/seed", async (_req, res) => {
   try {
@@ -14,8 +24,7 @@ router.get("/seed", async (_req, res) => {
       { id: "c-003", name: "Lisa Morgan", email: "lisa@boreal.financial" },
     ];
 
-    console.log("✅ [Contacts] Seed route hit. Returning mock contacts.");
-
+    console.log("✅ [Contacts] Seed route executed successfully");
     res.json({
       message: "✅ Contacts seeded successfully",
       count: contacts.length,
@@ -23,19 +32,8 @@ router.get("/seed", async (_req, res) => {
     });
   } catch (err: any) {
     console.error("❌ [Contacts] Error seeding contacts:", err);
-    res.status(500).json({ error: err.message || "Failed to seed contacts" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
-});
-
-/**
- * @route GET /api/contacts
- * @desc Returns sample contacts
- */
-router.get("/", (_req, res) => {
-  res.json([
-    { id: "c-001", name: "Todd Werboweski", email: "todd@boreal.financial" },
-    { id: "c-002", name: "Andrew Morgan", email: "andrew@boreal.financial" },
-  ]);
 });
 
 export default router;
