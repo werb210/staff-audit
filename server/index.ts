@@ -1,8 +1,12 @@
 // Load .env but don't override Replit Secrets
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config({ override: false });
 
-console.log(`✅ [ENV] Replit Secrets preserved. TWILIO_ACCOUNT_SID prefix: ${process.env.TWILIO_ACCOUNT_SID?.substring(0, 8) || 'NOT_SET'}`);
+console.log(
+  `✅ [ENV] Replit Secrets preserved. TWILIO_ACCOUNT_SID prefix: ${
+    process.env.TWILIO_ACCOUNT_SID?.substring(0, 8) || "NOT_SET"
+  }`
+);
 
 // 🔒 Enforce correct Twilio account before anything else
 import "./config/twilioGuard";
@@ -20,6 +24,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import http from "http";
+import { z } from "zod";
 
 // Diagnostics
 import { attachRouteReporter } from "./_diag.routes.js";
@@ -28,20 +33,30 @@ import { attachDbDiag } from "./_diag.db.js";
 // APIs & middleware
 import featuresApi from "./routes/api/features";
 import { preCapture, postPersist } from "./middleware/losslessFieldCarriage";
-import { apiRateLimit, authRateLimit, adminRateLimit, publicRateLimit } from "./middleware/rateLimiting";
+import {
+  apiRateLimit,
+  authRateLimit,
+  adminRateLimit,
+  publicRateLimit,
+} from "./middleware/rateLimiting";
 
 // JWT auth
 import { ensureJwt } from "./middleware/ensureJwt";
 import { authJwt } from "./middleware/authJwt";
 
-// ✅ Consolidated Office 365 routes (single source of truth)
+// ✅ Consolidated Office 365 routes
 import o365Routes from "./routes/integrations/office365";
+
+// ✅ Contacts routes
+import contactsRouter from "./routes/contacts";
 
 const app = express();
 app.set("trust proxy", 1);
 
 // --- Parsers FIRST
-app.use(express.json({ limit: "2mb", strict: true, type: ["application/json","application/csp-report"] }));
+app.use(
+  express.json({ limit: "2mb", strict: true, type: ["application/json", "application/csp-report"] })
+);
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
 // Security headers / CSP (relaxed in dev)
@@ -52,7 +67,11 @@ app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
   } else {
-    const frameAncestors = ["'self'", "https://staff.boreal.financial", "https://*.boreal.financial"];
+    const frameAncestors = [
+      "'self'",
+      "https://staff.boreal.financial",
+      "https://*.boreal.financial",
+    ];
     const policy = [
       `default-src 'self'`,
       `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://sdk.twilio.com blob: data:`,
@@ -65,7 +84,7 @@ app.use((req, res, next) => {
       `media-src 'self' blob: data:`,
       `object-src 'none'`,
       `base-uri 'self'`,
-      `form-action 'self'`
+      `form-action 'self'`,
     ].join("; ");
 
     res.setHeader("Content-Security-Policy", policy);
@@ -86,28 +105,35 @@ app.use(helmet({ contentSecurityPolicy: false }));
 // --- CORS for JWT (no credentials)
 const allowlist = (process.env.ALLOW_ORIGINS || "")
   .split(",")
-  .map(s => s.trim())
+  .map((s) => s.trim())
   .filter(Boolean)
   .concat(["https://replit.dev", "https://replit.com"]);
 
-app.use(cors({
-  origin: (origin, cb) => cb(null, !origin || allowlist.includes(origin) || /\.replit\.dev$/.test(origin || "")),
-  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type","Authorization"],
-  exposedHeaders: ["Authorization"],
-  credentials: false,
-}));
-app.options("*", (_req,res)=>res.sendStatus(200));
+app.use(
+  cors({
+    origin: (origin, cb) =>
+      cb(null, !origin || allowlist.includes(origin) || /\.replit\.dev$/.test(origin || "")),
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"],
+    credentials: false,
+  })
+);
+app.options("*", (_req, res) => res.sendStatus(200));
 
 // CSP report receiver
-app.post("/csp-report", express.json({ type: ["application/json", "application/csp-report"] }), (req, res) => {
-  try {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[CSP-REPORT]", JSON.stringify(req.body || {}, null, 2));
-    }
-  } catch {}
-  res.status(204).end();
-});
+app.post(
+  "/csp-report",
+  express.json({ type: ["application/json", "application/csp-report"] }),
+  (req, res) => {
+    try {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[CSP-REPORT]", JSON.stringify(req.body || {}, null, 2));
+      }
+    } catch {}
+    res.status(204).end();
+  }
+);
 
 // Mount Feature Registry API AFTER parsers
 app.use("/api/features", featuresApi);
@@ -123,7 +149,6 @@ app.use((req, res, next) => {
 });
 
 // --- Minimal APIs used by Settings/Lenders so pages don't 401/404 once logged in
-import { z } from "zod";
 app.get("/api/lenders", authJwt, (_req, res) =>
   res.json([{ id: "l-001", name: "Example Lender", status: "active" }])
 );
@@ -131,30 +156,36 @@ app.get("/api/lender-products", authJwt, (_req, res) =>
   res.json([{ id: "p-001", lenderId: "l-001", name: "Term Loan", aprMin: 6.99, aprMax: 15.99 }])
 );
 app.get("/api/ads-analytics/overview", ensureJwt, (req, res) => {
-  const q = z.object({ customerId: z.string().min(1).optional(), range: z.string().optional() }).parse(req.query);
+  const q = z
+    .object({ customerId: z.string().min(1).optional(), range: z.string().optional() })
+    .parse(req.query);
   if (!q.customerId) return res.status(400).json({ error: "customerId required" });
   res.json({ connected: false, message: "Google Ads not connected" });
 });
 
 // Apply rate limiting to API routes
-app.use('/api/', apiRateLimit);
-app.use('/api/auth/', authRateLimit);
-app.use('/api/admin/', adminRateLimit);
-app.use('/public/', publicRateLimit);
+app.use("/api/", apiRateLimit);
+app.use("/api/auth/", authRateLimit);
+app.use("/api/admin/", adminRateLimit);
+app.use("/public/", publicRateLimit);
 
 // ✅ Consolidated Office 365 routes
 app.use("/api/o365", o365Routes);
 
+// ✅ Contacts API (now active)
+app.use("/api/contacts", contactsRouter);
+
 const server = http.createServer(app);
 
 // COMPLETELY DISABLE WebSocket during any deployment or production context
-const isProduction = process.env.NODE_ENV === 'production';
-const isDeployment = process.env.REPLIT_DEPLOYMENT === 'true';
+const isProduction = process.env.NODE_ENV === "production";
+const isDeployment = process.env.REPLIT_DEPLOYMENT === "true";
 const isReplitEnvironment = process.env.REPL_ID !== undefined;
-const isWebSocketDisabled = process.env.ENABLE_WS === 'false';
+const isWebSocketDisabled = process.env.ENABLE_WS === "false";
 
 // Only allow WebSocket in pure development mode
-const allowWebSocket = !isProduction && !isDeployment && !isReplitEnvironment && !isWebSocketDisabled;
+const allowWebSocket =
+  !isProduction && !isDeployment && !isReplitEnvironment && !isWebSocketDisabled;
 
 if (allowWebSocket) {
   try {
@@ -169,7 +200,7 @@ if (allowWebSocket) {
     isProduction,
     isDeployment,
     isReplitEnvironment,
-    isWebSocketDisabled
+    isWebSocketDisabled,
   });
 }
 
@@ -193,29 +224,31 @@ if (process.env.API_DIAG === "1") {
       status: "healthy",
       build_time: new Date().toISOString(),
       environment: process.env.NODE_ENV || "development",
-      endpoints_active: true
+      endpoints_active: true,
     });
   });
 
-  console.log("🔧 [DIAG] Route and DB diagnostics enabled at /api/_int/routes and /api/_int/db-sanity");
+  console.log(
+    "🔧 [DIAG] Route and DB diagnostics enabled at /api/_int/routes and /api/_int/db-sanity"
+  );
   console.log("🔧 [DIAG] Build health endpoint enabled at /api/_int/build");
 }
 
 // Twilio environment check endpoint
-app.get('/api/_int/twilio-check', (_req, res) => {
+app.get("/api/_int/twilio-check", (_req, res) => {
   res.json({
     TWILIO_ACCOUNT_SID: !!process.env.TWILIO_ACCOUNT_SID,
     TWILIO_API_KEY_SID: !!process.env.TWILIO_API_KEY_SID,
     TWILIO_API_KEY_SECRET: !!process.env.TWILIO_API_KEY_SECRET,
     TWILIO_TWIML_APP_SID: !!process.env.TWILIO_TWIML_APP_SID,
     TWILIO_AUTH_TOKEN: !!process.env.TWILIO_AUTH_TOKEN,
-    account_prefix: process.env.TWILIO_ACCOUNT_SID?.substring(0, 8) || 'NOT_SET',
-    twiml_app_prefix: process.env.TWILIO_TWIML_APP_SID?.substring(0, 8) || 'NOT_SET',
+    account_prefix: process.env.TWILIO_ACCOUNT_SID?.substring(0, 8) || "NOT_SET",
+    twiml_app_prefix: process.env.TWILIO_TWIML_APP_SID?.substring(0, 8) || "NOT_SET",
   });
 });
 
 const PORT = Number(process.env.PORT) || 5000;
-const HOST = '0.0.0.0';
+const HOST = "0.0.0.0";
 
 server.listen(PORT, HOST, () => {
   console.log(`🚀 Enhanced Auth Server running on ${HOST}:${PORT}`);
