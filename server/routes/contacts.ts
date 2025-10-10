@@ -17,7 +17,6 @@ const r = Router();
 r.get("/pipeline", async (req: any, res: any) => {
   try {
     console.log('🔍 GET /api/contacts/pipeline - Fetching contact details');
-    // Return empty array for now - this endpoint is being called by the frontend
     res.json({ ok: true, items: [], count: 0 });
   } catch (e: any) {
     console.error("❌ [CONTACTS-PIPELINE] Error:", e);
@@ -28,12 +27,9 @@ r.get("/pipeline", async (req: any, res: any) => {
 r.get("/", async (req: any, res: any) => {
   try {
     console.log('🔍 GET /api/contacts - Fetching real contacts from database');
-    
-    // Get silo from query params (for BF vs SLF isolation)
     const silo = req.query.silo || (req.path.includes('/slf/') ? 'slf' : 'bf');
     console.log(`🏢 STRICT FILTERING contacts for silo: ${silo}`);
-    
-    // STRICT silo filtering - NO BLEED OVER between BF and SLF
+
     const contactsQuery = `
       SELECT 
         id, full_name, email, phone, company_name, job_title, status, 
@@ -43,12 +39,10 @@ r.get("/", async (req: any, res: any) => {
       ORDER BY created_at DESC 
       LIMIT 100
     `;
-    
     const contactsResult = await pool.query(contactsQuery, [silo]);
     console.log(`📋 Found ${contactsResult.rows.length} contacts in contacts table`);
-    
+
     if (contactsResult.rows.length > 0) {
-      // Format contacts for frontend
       const contacts = contactsResult.rows.map((c: any) => ({
         id: c.id,
         name: c.full_name,
@@ -64,12 +58,11 @@ r.get("/", async (req: any, res: any) => {
         updatedAt: c.updated_at?.toISOString ? c.updated_at.toISOString() : c.updated_at,
         lastContact: c.updated_at?.toISOString ? c.updated_at.toISOString() : c.updated_at
       }));
-      
+
       console.log(`✅ Returning ${contacts.length} formatted contacts`);
       return res.json({ ok: true, items: contacts, count: contacts.length });
     }
-    
-    // Fallback: Fetch from applications if no contacts in contacts table
+
     console.log('🔄 No contacts found, falling back to applications merge');
     const enhancedQuery = `
       SELECT 
@@ -81,7 +74,6 @@ r.get("/", async (req: any, res: any) => {
       ORDER BY a.created_at DESC
       LIMIT 500
     `;
-    
     const result = await pool.query(enhancedQuery);
     const apps = result.rows.map((row: any) => {
       const email = row.contact_email || null;
@@ -98,7 +90,7 @@ r.get("/", async (req: any, res: any) => {
         updatedAt: row.updated_at,
       };
     });
-    
+
     const mergedContacts = mergeContactsFromApplications(apps);
     res.json({ ok: true, items: mergedContacts, count: mergedContacts.length });
   } catch (e:any) {
@@ -107,11 +99,9 @@ r.get("/", async (req: any, res: any) => {
   }
 });
 
-// GET /api/contacts/normalized - Deduplicated view with application counts from ContactIndex
 r.get('/normalized', async (_req, res) => {
   try {
     console.log('🔍 GET /api/contacts/normalized - Fetching from ContactIndex');
-    
     const contactIndex = getContactIndex();
     const items = Array.from(contactIndex.values()).map(contact => ({
       id: contact.id,
@@ -126,21 +116,17 @@ r.get('/normalized', async (_req, res) => {
       createdAt: contact.created_at,
       updatedAt: contact.updated_at,
     }));
-    
     console.log(`✅ Normalized contacts from ContactIndex: ${items.length} unique contacts`);
     res.json({ ok: true, items, count: items.length });
-    
   } catch (e: any) {
     console.error('❌ Error in normalized contacts:', e);
     res.status(500).json({ ok: false, items: [], error: 'CONTACTINDEX_ERROR', detail: e.message });
   }
 });
 
-// GET /api/contacts/merge-dry - Analyze duplicates without changes
 r.get('/merge-dry', async (_req, res) => {
   try {
     console.log('🔍 GET /api/contacts/merge-dry - Analyzing duplicates');
-    
     const result = await pool.query(`
       SELECT 
         a.id, a.contact_email, a.contact_first_name, a.contact_last_name, 
@@ -150,17 +136,13 @@ r.get('/merge-dry', async (_req, res) => {
       WHERE a.contact_email IS NOT NULL
       ORDER BY a.created_at DESC
     `);
-    
     const emailBuckets = new Map();
     const contactIndex = getContactIndex();
-    
+
     result.rows.forEach((row: any) => {
       const canonicalEmail = canonEmail(row.contact_email);
       if (!canonicalEmail) return;
-      
-      if (!emailBuckets.has(canonicalEmail)) {
-        emailBuckets.set(canonicalEmail, []);
-      }
+      if (!emailBuckets.has(canonicalEmail)) emailBuckets.set(canonicalEmail, []);
       emailBuckets.get(canonicalEmail).push({
         id: row.id,
         email: row.contact_email,
@@ -169,8 +151,7 @@ r.get('/merge-dry', async (_req, res) => {
         updatedAt: row.updated_at,
       });
     });
-    
-    // Find buckets with >1 record that aren't already in ContactIndex
+
     const duplicateBuckets = Array.from(emailBuckets.entries())
       .filter(([canonEmail, records]) => records.length > 1 && !contactIndex.has(canonEmail))
       .map(([canonEmail, records]) => ({
@@ -178,33 +159,20 @@ r.get('/merge-dry', async (_req, res) => {
         count: records.length,
         records: records,
       }));
-    
+
     console.log(`🔍 Found ${duplicateBuckets.length} unprocessed duplicate buckets`);
-    res.json({ 
-      ok: true, 
-      buckets: duplicateBuckets, 
-      toMergeCount: duplicateBuckets.reduce((sum, b) => sum + b.count - 1, 0),
-      total_processed: contactIndex.size
-    });
-    
+    res.json({ ok: true, buckets: duplicateBuckets });
   } catch (e: any) {
     console.error('❌ Error in merge dry-run:', e);
     res.status(500).json({ ok: false, error: 'DB_ERROR', detail: e.message });
   }
 });
 
-// POST /api/contacts/merge - Execute automatic merge via ContactsGuard
 r.post('/merge', async (_req, res) => {
   try {
     console.log('🔄 POST /api/contacts/merge - Triggering ContactsGuard refresh');
-    
-    // ContactsGuard refresh handled via getContactIndex() - no external import needed
-    
-    // Trigger a fresh run of the contacts guard (which updates ContactIndex)
     const contactIndex = getContactIndex();
     const beforeCount = contactIndex.size;
-    
-    // Re-run the deduplication logic
     const result = await pool.query(`
       SELECT 
         a.id, a.contact_email, a.contact_first_name, a.contact_last_name, 
@@ -214,15 +182,12 @@ r.post('/merge', async (_req, res) => {
       WHERE a.contact_email IS NOT NULL
       ORDER BY a.updated_at DESC
     `);
-    
+
     const emailBuckets = new Map();
     result.rows.forEach((row: any) => {
       const canonicalEmail = canonEmail(row.contact_email);
       if (!canonicalEmail) return;
-      
-      if (!emailBuckets.has(canonicalEmail)) {
-        emailBuckets.set(canonicalEmail, []);
-      }
+      if (!emailBuckets.has(canonicalEmail)) emailBuckets.set(canonicalEmail, []);
       emailBuckets.get(canonicalEmail).push({
         id: row.id,
         email: row.contact_email,
@@ -233,18 +198,14 @@ r.post('/merge', async (_req, res) => {
         updatedAt: row.updated_at,
       });
     });
-    
-    // Update ContactIndex with fresh data
+
     let merged = 0;
     for (const [canonicalEmail, records] of emailBuckets) {
-      const sortedRecords = records.sort((a: any, b: any) => 
-        new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
-      );
-      
+      const sortedRecords = records.sort((a: any, b: any) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
       const primary = sortedRecords[0];
       const allNames = records.map((r: any) => r.name).filter((n: any) => n !== 'Name Not Set');
       const allCompanies = records.map((r: any) => r.company).filter((c: any) => c !== '—');
-      
+
       const normalized = {
         id: primary.id,
         email: primary.email,
@@ -258,309 +219,93 @@ r.post('/merge', async (_req, res) => {
         updated_at: new Date().toISOString(),
         mergedFrom: records.length > 1 ? records.length : undefined,
       };
-      
       contactIndex.set(canonicalEmail, normalized);
       merged++;
     }
-    
+
     const afterCount = contactIndex.size;
     console.log(`✅ Merge complete: processed ${merged} emails, ContactIndex: ${beforeCount} → ${afterCount}`);
-    
-    res.json({ 
-      ok: true, 
-      merged: merged, 
-      affected: Array.from(contactIndex.keys()),
-      before_count: beforeCount,
-      after_count: afterCount,
-      note: 'ContactIndex refreshed with latest deduplication'
-    });
-    
+    res.json({ ok: true, merged, before_count: beforeCount, after_count: afterCount });
   } catch (e: any) {
     console.error('❌ Error in merge execution:', e);
     res.status(500).json({ ok: false, error: 'MERGE_ERROR', detail: e.message });
   }
 });
 
-r.get("/:id/timeline", async (req: any, res: any) => {
+r.get("/seed", async (_req, res) => {
   try {
-    const { rows } = await pool.query(
-      `SELECT * FROM contact_events WHERE contact_id=$1 ORDER BY occurred_at DESC LIMIT 200`, [req.params.id]
-    );
-    res.json({ ok:true, items: rows });
-  } catch (e:any) {
-    res.status(500).json({ ok:false, error:"DB_ERROR", detail:e.message });
-  }
-});
+    console.log("🌱 Seeding contacts table...");
 
-// Individual contact endpoints for 3-panel contacts UI
-r.get('/:emailKey', async (req: any, res: any) => {
-  try {
-    const { emailKey } = req.params;
-    console.log(`🔍 GET /api/contacts/${emailKey} - Fetching contact details`);
-    
-    const contactIndex = getContactIndex();
-    const contact = contactIndex.get(decodeURIComponent(emailKey));
-    
-    if (!contact) {
-      res.status(404).json({ ok: false, error: 'CONTACT_NOT_FOUND' });
-      return;
+    const countResult = await pool.query("SELECT COUNT(*) FROM contacts");
+    const count = parseInt(countResult.rows[0].count, 10);
+    if (count > 0) {
+      console.log("✅ Contacts table already has data; skipping seed.");
+      return res.json({ ok: true, message: "Contacts already exist", count });
     }
-    
-    // Get applications for this contact
-    const applications = await pool.query(`
-      SELECT id, contact_email, legal_business_name, requested_amount, status 
-      FROM applications 
-      WHERE contact_email = $1 
-      ORDER BY created_at DESC
-    `, [contact.email]);
-    
-    const item = {
-      ...contact,
-      applications: applications.rows.map(app => ({
-        id: app.id,
-        businessName: app.legal_business_name || 'Business Name Not Set',
-        amount: app.requested_amount || 0,
-        status: app.status
-      }))
-    };
-    
-    console.log(`✅ Contact found: ${contact.name} with ${applications.rows.length} applications`);
-    res.json({ ok: true, item });
-    
-  } catch (e: any) {
-    console.error('❌ Error fetching contact:', e);
-    res.status(500).json({ ok: false, error: 'DB_ERROR', detail: e.message });
-  }
-});
 
-// Contact timeline endpoint
-r.get('/:emailKey/timeline', async (req: any, res: any) => {
-  try {
-    const { emailKey } = req.params;
-    console.log(`🔍 GET /api/contacts/${emailKey}/timeline - Fetching contact timeline`);
-    
-    const contactIndex = getContactIndex();
-    const contact = contactIndex.get(decodeURIComponent(emailKey));
-    
-    if (!contact) {
-      res.status(404).json({ ok: false, error: 'CONTACT_NOT_FOUND' });
-      return;
-    }
-    
-    // Get application timeline events for this contact
-    const events = await pool.query(`
-      SELECT 
-        id, created_at, updated_at, status, requested_amount,
-        legal_business_name, 'application' as event_type
-      FROM applications 
-      WHERE contact_email = $1 
-      ORDER BY created_at DESC
-      LIMIT 50
-    `, [contact.email]);
-    
-    const items = events.rows.map(event => ({
-      id: event.id,
-      ts: event.created_at,
-      kind: event.event_type,
-      summary: `Application: ${event.legal_business_name || 'Business'} - $${(event.requested_amount || 0).toLocaleString()} (${event.status})`,
-      occurred_at: event.created_at,
-      description: `Status: ${event.status}`,
-      event_type: 'application'
-    }));
-    
-    console.log(`✅ Timeline found: ${items.length} events for ${contact.name}`);
-    res.json({ ok: true, items });
-    
-  } catch (e: any) {
-    console.error('❌ Error fetching timeline:', e);
-    res.status(500).json({ ok: false, error: 'DB_ERROR', detail: e.message });
-  }
-});
-
-// DELETE /api/contacts/:id - Delete contact
-r.delete('/:id', async (req: any, res: any) => {
-  try {
-    const { id } = req.params;
-    console.log(`🗑️ DELETE /api/contacts/${id} - Deleting contact`);
-    
-    // Try to delete from contacts table first
-    const contactResult = await pool.query(`
-      DELETE FROM contacts WHERE id = $1 RETURNING id
-    `, [id]);
-    
-    if (contactResult.rows.length > 0) {
-      console.log(`✅ Contact deleted from contacts table: ${id}`);
-      res.json({ ok: true, message: 'Contact deleted successfully' });
-      return;
-    }
-    
-    // If not found in contacts table, try to remove from contact index if it exists
-    const contactIndex = getContactIndex();
-    let removed = false;
-    
-    // Look for contact by ID in the contact index
-    for (const [key, contact] of contactIndex.entries()) {
-      if (contact.id === id) {
-        contactIndex.delete(key);
-        removed = true;
-        console.log(`✅ Contact removed from contact index: ${id}`);
-        break;
+    const seedData = [
+      {
+        full_name: "Lisa Morgan",
+        first_name: "Lisa",
+        last_name: "Morgan",
+        email: "lisa@boreal.financial",
+        phone: "+15878881837",
+        company_name: "Boreal Financial Partners",
+        job_title: "Managing Director",
+        status: "active",
+        silo: "bf"
+      },
+      {
+        full_name: "Andrew Thompson",
+        first_name: "Andrew",
+        last_name: "Thompson",
+        email: "andrew@boreal.financial",
+        phone: "+15878881234",
+        company_name: "Boreal Financial Partners",
+        job_title: "Senior Advisor",
+        status: "active",
+        silo: "bf"
+      },
+      {
+        full_name: "SLF Contact",
+        first_name: "SLF",
+        last_name: "Contact",
+        email: "contact@slf.ca",
+        phone: "+17553146801",
+        company_name: "Site Level Financial",
+        job_title: "Account Manager",
+        status: "active",
+        silo: "slf"
       }
-    }
-    
-    if (removed) {
-      res.json({ ok: true, message: 'Contact removed from index successfully' });
-    } else {
-      res.status(404).json({ ok: false, error: 'Contact not found' });
-    }
-    
-  } catch (e: any) {
-    console.error('❌ Error deleting contact:', e);
-    res.status(500).json({ ok: false, error: 'DB_ERROR', detail: e.message });
-  }
-});
+    ];
 
-// POST /api/contacts - Create new contact
-r.post('/', async (req: any, res: any) => {
-  try {
-    const { fullName, firstName, lastName, email, phone, company, title, status, notes } = req.body;
-    console.log(`📝 POST /api/contacts - Creating new contact: ${fullName || firstName + ' ' + lastName}`);
-    
-    // 🔒 SECURITY: Sanitize all input fields to prevent XSS
-    const sanitizedData = {
-      fullName: fullName ? sanitizeHtml(fullName, { allowedTags: [], allowedAttributes: {} }).trim() || null : null,
-      firstName: firstName ? sanitizeHtml(firstName, { allowedTags: [], allowedAttributes: {} }).trim() || null : null,
-      lastName: lastName ? sanitizeHtml(lastName, { allowedTags: [], allowedAttributes: {} }).trim() || null : null,
-      email: email && validator.isEmail(email) ? sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} }).trim() || null : null,
-      phone: phone ? sanitizeHtml(phone, { allowedTags: [], allowedAttributes: {} }).trim() || null : null,
-      company: company ? sanitizeHtml(company, { allowedTags: [], allowedAttributes: {} }).trim() || null : null,
-      title: title ? sanitizeHtml(title, { allowedTags: [], allowedAttributes: {} }).trim() || null : null,
-      status: status ? sanitizeHtml(status, { allowedTags: [], allowedAttributes: {} }).trim() || 'new' : 'new',
-      notes: notes ? sanitizeHtml(notes, { allowedTags: [], allowedAttributes: {} }).trim() || null : null
-    };
-    
-    // 🔒 SECURITY: Validate required fields after sanitization
-    if (!sanitizedData.fullName && !sanitizedData.firstName && !sanitizedData.lastName) {
-      return res.status(400).json({ ok: false, error: 'Contact name is required after security validation' });
+    for (const c of seedData) {
+      await pool.query(
+        `INSERT INTO contacts (
+          id, full_name, first_name, last_name, email, phone, company_name, 
+          job_title, status, silo, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, now(), now()
+        )`,
+        [
+          c.full_name,
+          c.first_name,
+          c.last_name,
+          c.email,
+          c.phone,
+          c.company_name,
+          c.job_title,
+          c.status,
+          c.silo
+        ]
+      );
     }
-    
-    if (!sanitizedData.email && !sanitizedData.phone) {
-      return res.status(400).json({ ok: false, error: 'Valid email or phone is required' });
-    }
-    
-    // Insert into contacts table
-    const insertResult = await pool.query(`
-      INSERT INTO contacts (
-        id, full_name, first_name, last_name, email, phone, 
-        company_name, job_title, status, notes, created_at, updated_at
-      ) VALUES (
-        gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, now(), now()
-      ) RETURNING *
-    `, [
-      sanitizedData.fullName || (sanitizedData.firstName + ' ' + sanitizedData.lastName).trim(),
-      sanitizedData.firstName, 
-      sanitizedData.lastName, 
-      sanitizedData.email, 
-      sanitizedData.phone, 
-      sanitizedData.company, 
-      sanitizedData.title, 
-      sanitizedData.status, 
-      sanitizedData.notes
-    ]);
-    
-    const newContact = insertResult.rows[0];
-    console.log(`✅ Contact created: ${newContact.id}`);
-    
-    // Format response to match ContactsHub expectations
-    const formattedContact = {
-      id: newContact.id,
-      fullName: newContact.full_name,
-      firstName: newContact.first_name,
-      lastName: newContact.last_name,
-      email: newContact.email,
-      phone: newContact.phone,
-      company: newContact.company_name,
-      title: newContact.job_title,
-      status: newContact.status,
-      notes: newContact.notes,
-      createdAt: newContact.created_at,
-      updatedAt: newContact.updated_at
-    };
-    
-    res.status(201).json({ ok: true, data: formattedContact });
-    
-  } catch (e: any) {
-    console.error('❌ Error creating contact:', e);
-    res.status(500).json({ ok: false, error: 'DB_ERROR', detail: e.message });
-  }
-});
 
-// PATCH /api/contacts/:id - Update contact
-r.patch('/:id', async (req: any, res: any) => {
-  try {
-    const { id } = req.params;
-    const { fullName, firstName, lastName, email, phone, company, title, status, notes } = req.body;
-    console.log(`📝 PATCH /api/contacts/${id} - Updating contact`);
-    
-    // 🔒 SECURITY: Sanitize all input fields to prevent XSS
-    const sanitizedData = {
-      fullName: fullName ? sanitizeHtml(fullName, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      firstName: firstName ? sanitizeHtml(firstName, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      lastName: lastName ? sanitizeHtml(lastName, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      email: email && validator.isEmail(email) ? sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      phone: phone ? sanitizeHtml(phone, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      company: company ? sanitizeHtml(company, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      title: title ? sanitizeHtml(title, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      status: status ? sanitizeHtml(status, { allowedTags: [], allowedAttributes: {} }) : undefined,
-      notes: notes ? sanitizeHtml(notes, { allowedTags: [], allowedAttributes: {} }) : undefined
-    };
-    
-    const updateResult = await pool.query(`
-      UPDATE contacts SET
-        full_name = COALESCE($2, full_name),
-        first_name = COALESCE($3, first_name),
-        last_name = COALESCE($4, last_name),
-        email = COALESCE($5, email),
-        phone = COALESCE($6, phone),
-        company_name = COALESCE($7, company_name),
-        job_title = COALESCE($8, job_title),
-        status = COALESCE($9, status),
-        notes = COALESCE($10, notes),
-        updated_at = now()
-      WHERE id = $1
-      RETURNING *
-    `, [id, sanitizedData.fullName, sanitizedData.firstName, sanitizedData.lastName, 
-        sanitizedData.email, sanitizedData.phone, sanitizedData.company, 
-        sanitizedData.title, sanitizedData.status, sanitizedData.notes]);
-    
-    if (updateResult.rows.length === 0) {
-      return res.status(404).json({ ok: false, error: 'Contact not found' });
-    }
-    
-    const updatedContact = updateResult.rows[0];
-    console.log(`✅ Contact updated: ${id}`);
-    
-    // Format response
-    const formattedContact = {
-      id: updatedContact.id,
-      fullName: updatedContact.full_name,
-      firstName: updatedContact.first_name,
-      lastName: updatedContact.last_name,
-      email: updatedContact.email,
-      phone: updatedContact.phone,
-      company: updatedContact.company_name,
-      title: updatedContact.job_title,
-      status: updatedContact.status,
-      notes: updatedContact.notes,
-      createdAt: updatedContact.created_at,
-      updatedAt: updatedContact.updated_at
-    };
-    
-    res.json({ ok: true, data: formattedContact });
-    
+    console.log("✅ Contacts seeded successfully");
+    res.json({ message: "✅ Contacts seeded successfully", count: seedData.length });
   } catch (e: any) {
-    console.error('❌ Error updating contact:', e);
-    res.status(500).json({ ok: false, error: 'DB_ERROR', detail: e.message });
+    console.error("❌ Error seeding contacts:", e);
+    res.status(500).json({ error: "Database error", details: e.message });
   }
 });
 
