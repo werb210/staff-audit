@@ -1,7 +1,7 @@
 {
   "name": "Boreal Staff App (Unified Codespaces)",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
-  "postCreateCommand": "bash ./verify-codespaces.sh",
+  "postCreateCommand": "npm install && npm run build || true",
   "forwardPorts": [5000],
   "customizations": {
     "vscode": {
@@ -21,6 +21,6 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "updateContentCommand": "bash ./start-dev.sh",
+  "updateContentCommand": "npm install && npx tsx server/src/index.ts",
   "remoteUser": "node"
 }
