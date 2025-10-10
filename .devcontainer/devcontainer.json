@@ -1,0 +1,12 @@
+{
+  "name": "Boreal Staff App (Clean Boot)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "20" },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [5000],
+  "postCreateCommand": "npm install || true",
+  "remoteUser": "node"
+}
