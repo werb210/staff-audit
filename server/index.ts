@@ -1,36 +1,38 @@
-// Load .env but don't override Replit Secrets
+// =======================================================
+// Boreal Financial Staff Server (Unified Entry Point)
+// =======================================================
+
+// 1️⃣ Load .env but don't override Replit Secrets
 import dotenv from "dotenv";
 dotenv.config({ override: false });
-
 console.log(
   `✅ [ENV] Replit Secrets preserved. TWILIO_ACCOUNT_SID prefix: ${
     process.env.TWILIO_ACCOUNT_SID?.substring(0, 8) || "NOT_SET"
   }`
 );
 
-// 🔒 Enforce correct Twilio account before anything else
+// 2️⃣ Twilio + Secrets guards
 import "./config/twilioGuard";
-
-// Run secrets guard on boot
 try {
   const { checkSecrets } = await import("./config/secretsGuard");
   checkSecrets();
 } catch (e: any) {
-  console.error("⚠️  [SecretsGuard] Failed:", e.message);
-  console.error("⚠️  [SecretsGuard] Server will continue but some features may not work");
+  console.error("⚠️ [SecretsGuard] Failed:", e.message);
+  console.error("⚠️ [SecretsGuard] Continuing; some features may not work");
 }
 
+// 3️⃣ Core imports
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import http from "http";
 import { z } from "zod";
 
-// Diagnostics
+// Diagnostics utilities
 import { attachRouteReporter } from "./_diag.routes.js";
 import { attachDbDiag } from "./_diag.db.js";
 
-// APIs & middleware
+// Middleware & APIs
 import featuresApi from "./routes/api/features";
 import { preCapture, postPersist } from "./middleware/losslessFieldCarriage";
 import {
@@ -40,26 +42,33 @@ import {
   publicRateLimit,
 } from "./middleware/rateLimiting";
 
-// JWT auth
+// Auth middlewares
 import { ensureJwt } from "./middleware/ensureJwt";
 import { authJwt } from "./middleware/authJwt";
 
-// ✅ Consolidated Office 365 routes
+// Integration routes
 import o365Routes from "./routes/integrations/office365";
-
-// ✅ Contacts routes
 import contactsRouter from "./routes/contacts";
 
+// =======================================================
+// Express Setup
+// =======================================================
 const app = express();
 app.set("trust proxy", 1);
 
-// --- Parsers FIRST
+// --- Body parsers
 app.use(
-  express.json({ limit: "2mb", strict: true, type: ["application/json", "application/csp-report"] })
+  express.json({
+    limit: "5mb",
+    strict: true,
+    type: ["application/json", "application/csp-report"],
+  })
 );
-app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
-// Security headers / CSP (relaxed in dev)
+// =======================================================
+// Security Headers
+// =======================================================
 app.use((req, res, next) => {
   const isProd = process.env.NODE_ENV === "production";
 
@@ -72,7 +81,7 @@ app.use((req, res, next) => {
       "https://staff.boreal.financial",
       "https://*.boreal.financial",
     ];
-    const policy = [
+    const csp = [
       `default-src 'self'`,
       `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://sdk.twilio.com blob: data:`,
       `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com data:`,
@@ -87,22 +96,23 @@ app.use((req, res, next) => {
       `form-action 'self'`,
     ].join("; ");
 
-    res.setHeader("Content-Security-Policy", policy);
+    res.setHeader("Content-Security-Policy", csp);
     res.setHeader("Referrer-Policy", "no-referrer");
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
     res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-    res.setHeader("Origin-Agent-Cluster", "?1");
     res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     res.setHeader("X-DNS-Prefetch-Control", "off");
-    res.setHeader("X-Download-Options", "noopen");
     res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
     res.setHeader("X-XSS-Protection", "0");
   }
   next();
 });
+
 app.use(helmet({ contentSecurityPolicy: false }));
 
-// --- CORS for JWT (no credentials)
+// =======================================================
+// CORS Setup
+// =======================================================
 const allowlist = (process.env.ALLOW_ORIGINS || "")
   .split(",")
   .map((s) => s.trim())
@@ -121,34 +131,24 @@ app.use(
 );
 app.options("*", (_req, res) => res.sendStatus(200));
 
-// CSP report receiver
-app.post(
-  "/csp-report",
-  express.json({ type: ["application/json", "application/csp-report"] }),
-  (req, res) => {
-    try {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("[CSP-REPORT]", JSON.stringify(req.body || {}, null, 2));
-      }
-    } catch {}
-    res.status(204).end();
-  }
-);
+// =======================================================
+// Core API Routes
+// =======================================================
 
-// Mount Feature Registry API AFTER parsers
+// Feature registry
 app.use("/api/features", featuresApi);
 
-// Lossless Field Carriage (pre + post) for create endpoint
+// Application lossless middleware
 app.use("/api/v1/applications", preCapture);
 app.use("/api/v1/applications", postPersist);
 
-// Add Vary header first
-app.use((req, res, next) => {
-  res.setHeader("Vary", "Origin");
-  next();
-});
+// Contact system
+app.use("/api/contacts", contactsRouter);
 
-// --- Minimal APIs used by Settings/Lenders so pages don't 401/404 once logged in
+// Office 365 integrations
+app.use("/api/o365", o365Routes);
+
+// Small test APIs
 app.get("/api/lenders", authJwt, (_req, res) =>
   res.json([{ id: "l-001", name: "Example Lender", status: "active" }])
 );
@@ -163,61 +163,20 @@ app.get("/api/ads-analytics/overview", ensureJwt, (req, res) => {
   res.json({ connected: false, message: "Google Ads not connected" });
 });
 
-// Apply rate limiting to API routes
+// =======================================================
+// Rate Limiting
+// =======================================================
 app.use("/api/", apiRateLimit);
 app.use("/api/auth/", authRateLimit);
 app.use("/api/admin/", adminRateLimit);
 app.use("/public/", publicRateLimit);
 
-// ✅ Consolidated Office 365 routes
-app.use("/api/o365", o365Routes);
-
-// ✅ Contacts API (now active)
-app.use("/api/contacts", contactsRouter);
-
-const server = http.createServer(app);
-
-// COMPLETELY DISABLE WebSocket during any deployment or production context
-const isProduction = process.env.NODE_ENV === "production";
-const isDeployment = process.env.REPLIT_DEPLOYMENT === "true";
-const isReplitEnvironment = process.env.REPL_ID !== undefined;
-const isWebSocketDisabled = process.env.ENABLE_WS === "false";
-
-// Only allow WebSocket in pure development mode
-const allowWebSocket =
-  !isProduction && !isDeployment && !isReplitEnvironment && !isWebSocketDisabled;
-
-if (allowWebSocket) {
-  try {
-    const { initializeWebSocketServer: initWS } = await import("./websocket");
-    initWS(server);
-    console.log("🔌 [WEBSOCKET] WebSocket server enabled in development mode");
-  } catch (err) {
-    console.log("🔌 [WEBSOCKET] WebSocket module not available:", err);
-  }
-} else {
-  console.log("🔌 [WEBSOCKET] WebSocket DISABLED for deployment safety", {
-    isProduction,
-    isDeployment,
-    isReplitEnvironment,
-    isWebSocketDisabled,
-  });
-}
-
-// Import and apply the rest of the application setup (includes auth setup)
-import boot from "./boot";
-
-// Use async IIFE to handle top-level await properly
-(async () => {
-  await boot(app, server);
-})();
-
-// Diagnostics (guarded by API_DIAG=1)
+// =======================================================
+// Diagnostics
+// =======================================================
 if (process.env.API_DIAG === "1") {
   attachRouteReporter(app);
   attachDbDiag(app);
-
-  // Build health endpoint for smoke tests
   app.get("/api/_int/build", (_req, res) => {
     res.json({
       ok: true,
@@ -227,14 +186,12 @@ if (process.env.API_DIAG === "1") {
       endpoints_active: true,
     });
   });
-
-  console.log(
-    "🔧 [DIAG] Route and DB diagnostics enabled at /api/_int/routes and /api/_int/db-sanity"
-  );
-  console.log("🔧 [DIAG] Build health endpoint enabled at /api/_int/build");
+  console.log("🔧 [DIAG] Enabled: /api/_int/build, /api/_int/routes, /api/_int/db-sanity");
 }
 
-// Twilio environment check endpoint
+// =======================================================
+// Twilio Environment Check
+// =======================================================
 app.get("/api/_int/twilio-check", (_req, res) => {
   res.json({
     TWILIO_ACCOUNT_SID: !!process.env.TWILIO_ACCOUNT_SID,
@@ -247,15 +204,52 @@ app.get("/api/_int/twilio-check", (_req, res) => {
   });
 });
 
-const PORT = Number(process.env.PORT) || 5000;
-const HOST = "0.0.0.0";
+// =======================================================
+// WebSocket (disabled in prod)
+// =======================================================
+const server = http.createServer(app);
+const isProduction = process.env.NODE_ENV === "production";
+const isDeployment = process.env.REPLIT_DEPLOYMENT === "true";
+const isReplitEnv = process.env.REPL_ID !== undefined;
+const isWebSocketDisabled = process.env.ENABLE_WS === "false";
+const allowWebSocket = !isProduction && !isDeployment && !isReplitEnv && !isWebSocketDisabled;
 
-server.listen(PORT, HOST, () => {
-  console.log(`🚀 Enhanced Auth Server running on ${HOST}:${PORT}`);
-  if (allowWebSocket) {
-    console.log(`🔌 WebSocket server available on path /ws`);
+if (allowWebSocket) {
+  try {
+    const { initializeWebSocketServer: initWS } = await import("./websocket");
+    initWS(server);
+    console.log("🔌 [WEBSOCKET] Enabled in dev");
+  } catch (err) {
+    console.log("🔌 [WEBSOCKET] Module not available:", err);
   }
-  console.log(`🌐 External access: Server now accessible from external connections`);
-});
+} else {
+  console.log("🔌 [WEBSOCKET] Disabled (prod/deploy env)");
+}
+
+// =======================================================
+// Boot App Logic
+// =======================================================
+import boot from "./boot";
+(async () => {
+  await boot(app, server);
+})();
+
+// =======================================================
+// Final Server Listen
+// =======================================================
+if (!process.env._BOOTED_ONCE) {
+  process.env._BOOTED_ONCE = "1";
+  const PORT = Number(process.env.PORT) || 3001;
+  const HOST = "0.0.0.0";
+
+  server.listen(PORT, HOST, () => {
+    console.log(`🚀 Boreal Staff Server running on http://${HOST}:${PORT}`);
+    console.log("✅ Contacts table ready");
+    console.log("🌐 External access enabled");
+  });
+} else {
+  console.error("❌ Duplicate boot detected — refusing to start again.");
+  process.exit(1);
+}
 
 export default server;
