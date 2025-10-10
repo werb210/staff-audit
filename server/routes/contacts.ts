@@ -1,26 +1,40 @@
+// =======================================================
+// Boreal Financial Staff Server — Contacts Route
+// =======================================================
+
 import express from "express";
 import { Pool } from "pg";
 
 const router = express.Router();
 
-// ✅ Create database pool connection
+// ✅ PostgreSQL Connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
-// ✅ GET /api/contacts — list contacts
+// =======================================================
+// GET /api/contacts
+// =======================================================
 router.get("/", async (_req, res) => {
   try {
-    const result = await pool.query("SELECT id, name, email, phone FROM contacts ORDER BY name ASC");
-    res.json({ ok: true, count: result.rows.length, items: result.rows });
+    const result = await pool.query(
+      "SELECT id, name, email, phone FROM contacts ORDER BY name ASC"
+    );
+    res.json({
+      ok: true,
+      count: result.rows.length,
+      items: result.rows,
+    });
   } catch (err) {
     console.error("[Contacts] Error fetching:", err);
     res.status(500).json({ ok: false, error: "Failed to fetch contacts" });
   }
 });
 
-// ✅ POST /api/contacts/seed — seed demo contacts
+// =======================================================
+// POST /api/contacts/seed
+// =======================================================
 router.post("/seed", async (_req, res) => {
   try {
     await pool.query(`
@@ -41,14 +55,16 @@ router.post("/seed", async (_req, res) => {
       ON CONFLICT DO NOTHING
     `);
 
-    res.json({ ok: true, message: "Seeded sample contacts." });
+    res.json({ ok: true, message: "Seeded sample contacts" });
   } catch (err) {
     console.error("[Contacts] Error seeding:", err);
     res.status(500).json({ ok: false, error: "Failed to seed contacts" });
   }
 });
 
-// ✅ 404 fallback for bad routes under /api/contacts
+// =======================================================
+// 404 Fallback for /api/contacts/*
+// =======================================================
 router.use((_req, res) => {
   res.status(404).json({ ok: false, error: "Contact route not found" });
 });
