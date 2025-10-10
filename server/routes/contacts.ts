@@ -1,39 +1,56 @@
 import express from "express";
+import { Pool } from "pg";
 
 const router = express.Router();
 
-/**
- * Health check route to verify the Contacts API is active
- */
-router.get("/", (_req, res) => {
-  res.json({
-    message: "✅ Contacts API online",
-    endpoints: ["/api/contacts/seed", "/api/contacts"],
-  });
+// ✅ Create database pool connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
-/**
- * @route GET /api/contacts/seed
- * @desc Seeds sample contacts (mock data for testing)
- */
-router.get("/seed", async (_req, res) => {
+// ✅ GET /api/contacts — list contacts
+router.get("/", async (_req, res) => {
   try {
-    const contacts = [
-      { id: "c-001", name: "Todd Werboweski", email: "todd@boreal.financial" },
-      { id: "c-002", name: "Andrew Morgan", email: "andrew@boreal.financial" },
-      { id: "c-003", name: "Lisa Morgan", email: "lisa@boreal.financial" },
-    ];
-
-    console.log("✅ [Contacts] Seed route executed successfully");
-    res.json({
-      message: "✅ Contacts seeded successfully",
-      count: contacts.length,
-      contacts,
-    });
-  } catch (err: any) {
-    console.error("❌ [Contacts] Error seeding contacts:", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    const result = await pool.query("SELECT id, name, email, phone FROM contacts ORDER BY name ASC");
+    res.json({ ok: true, count: result.rows.length, items: result.rows });
+  } catch (err) {
+    console.error("[Contacts] Error fetching:", err);
+    res.status(500).json({ ok: false, error: "Failed to fetch contacts" });
   }
+});
+
+// ✅ POST /api/contacts/seed — seed demo contacts
+router.post("/seed", async (_req, res) => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS contacts (
+        id SERIAL PRIMARY KEY,
+        name TEXT,
+        email TEXT,
+        phone TEXT
+      )
+    `);
+
+    await pool.query(`
+      INSERT INTO contacts (name, email, phone)
+      VALUES
+        ('Lisa Morgan', 'lisa@boreal.financial', '+15878881837'),
+        ('Todd Werboweski', 'todd@boreal.financial', '+18254511768'),
+        ('Andrew Morris', 'andrew@boreal.financial', '+17753146801')
+      ON CONFLICT DO NOTHING
+    `);
+
+    res.json({ ok: true, message: "Seeded sample contacts." });
+  } catch (err) {
+    console.error("[Contacts] Error seeding:", err);
+    res.status(500).json({ ok: false, error: "Failed to seed contacts" });
+  }
+});
+
+// ✅ 404 fallback for bad routes under /api/contacts
+router.use((_req, res) => {
+  res.status(404).json({ ok: false, error: "Contact route not found" });
 });
 
 export default router;
