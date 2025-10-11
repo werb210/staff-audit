@@ -57,7 +57,6 @@ import contactsRouter from "./routes/contacts";
 const app = express();
 app.set("trust proxy", 1);
 
-// --- Body parsers
 app.use(
   express.json({
     limit: "5mb",
@@ -141,18 +140,10 @@ app.options("*", (_req, res) => res.sendStatus(200));
 // =======================================================
 // Core API Routes
 // =======================================================
-
-// Feature registry
 app.use("/api/features", featuresApi);
-
-// Application lossless middleware
 app.use("/api/v1/applications", preCapture);
 app.use("/api/v1/applications", postPersist);
-
-// Contact system
 app.use("/api/contacts", contactsRouter);
-
-// Office 365 integrations
 app.use("/api/o365", o365Routes);
 
 // Small test APIs
@@ -160,9 +151,7 @@ app.get("/api/lenders", authJwt, (_req, res) =>
   res.json([{ id: "l-001", name: "Example Lender", status: "active" }])
 );
 app.get("/api/lender-products", authJwt, (_req, res) =>
-  res.json([
-    { id: "p-001", lenderId: "l-001", name: "Term Loan", aprMin: 6.99, aprMax: 15.99 },
-  ])
+  res.json([{ id: "p-001", lenderId: "l-001", name: "Term Loan" }])
 );
 app.get("/api/ads-analytics/overview", ensureJwt, (req, res) => {
   const q = z
@@ -241,7 +230,12 @@ if (allowWebSocket) {
 import boot from "./boot";
 (async () => {
   await boot(app, server);
-  await runStartupDiagnostics(app); // 🧩 runs DB/S3/Twilio health check + exposes /api/_int/db-health
+
+  const diag = await runStartupDiagnostics(app); // runs DB/S3/Twilio health check
+  if (isProduction && (!diag.ok || !diag.parts.db.ok || !diag.parts.s3.ok)) {
+    console.error("❌ Critical: DB or S3 failed health check. Shutting down.");
+    process.exit(1);
+  }
 })();
 
 // =======================================================
