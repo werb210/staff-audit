@@ -1,21 +1,25 @@
 // server/boot.ts
 import type { Express } from "express";
 import { attachUserIfPresent } from "./mw/jwt-auth.js";
-import routes from "./routes/index.js";  // ✅ Explicitly load router, not the folder
+import routes from "./routes/index.js";  // ✅ Load router explicitly
 import { setupAuth } from "./auth/routes.js";
 
 export default async function boot(app: Express) {
-  // Auth routes (/api/auth/*)
+  // ✅ Mount authentication routes first
   setupAuth(app);
 
-  // Attach req.user if a JWT is present
+  // ✅ Attach user context if a JWT is present
   app.use(attachUserIfPresent);
 
-  // Grouped API routers (integrations, etc.)
+  // ✅ Mount main API routes (from routes/index.js)
   app.use("/api", routes);
 
-  // Minimal health check
+  // ✅ Health check endpoint
   app.get("/api/_int/state", (_req, res) => {
-    res.json({ ok: true, ts: new Date().toISOString() });
+    res.json({
+      ok: true,
+      ts: new Date().toISOString(),
+      status: "healthy",
+    });
   });
 }
