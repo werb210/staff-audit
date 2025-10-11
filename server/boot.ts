@@ -2,19 +2,20 @@
 import type { Express } from "express";
 import { attachUserIfPresent } from "./mw/jwt-auth.js";
 import { setupAuth } from "./auth/routes.js";
-import router from "./routes/index.js"; // ✅ Import actual Express Router
+import apiRouter from "./routes/index.js"; // ✅ renamed variable for clarity
 
 export default async function boot(app: Express) {
-  // ✅ Mount authentication routes first
+  // 1️⃣ Mount auth routes first
   setupAuth(app);
 
-  // ✅ Attach user context if a JWT is present
+  // 2️⃣ Attach req.user if JWT is present
   app.use(attachUserIfPresent);
 
-  // ✅ Mount main API router
-  app.use("/api", router);
+  // 3️⃣ Mount grouped routes under /api
+  const unwrap = (mod: any) => (mod?.default ? mod.default : mod);
+  app.use("/api", unwrap(apiRouter));
 
-  // ✅ Minimal health check
+  // 4️⃣ Minimal health check endpoint
   app.get("/api/_int/state", (_req, res) => {
     res.json({
       ok: true,
