@@ -1,8 +1,3 @@
-#!/bin/bash
-set -euo pipefail
-echo "🧹 Cleaning up duplicate router declarations in server/routes/index.ts..."
-
-cat > server/routes/index.ts <<'EOF'
 import express from "express";
 import analyticsRouter from "./analytics/index.js";
 import clientRouter from "./client/index.js";
@@ -24,11 +19,3 @@ router.get("/", (_req, res) => {
 });
 
 export default router;
-EOF
-
-echo "✅ server/routes/index.ts rebuilt successfully."
-
-pkill -f "tsx" || true
-pkill -f "node.*3001" || true
-echo "🚀 Restarting server..."
-npx tsx server/index.ts
