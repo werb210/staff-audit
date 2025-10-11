@@ -19,4 +19,5 @@ router.get("/", (_req, res) => {
   });
 });
 
-export { router }; // 👈 use named export, not default
+// ✅ make sure this is a default export
+export default router;
