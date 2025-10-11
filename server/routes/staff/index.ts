@@ -1,13 +1,8 @@
-import { Router } from "express";
-import contacts from "./contacts";
-import lenderProducts from "./lenderProducts";
-import pipeline from "./pipeline";
-import applications from "./applications";
+import express from "express";
+const router = express.Router();
 
-const staffRouter = Router();
-staffRouter.use(contacts);
-staffRouter.use(lenderProducts);
-staffRouter.use(pipeline);
-staffRouter.use(applications);
+router.get("/", (_req, res) => {
+  res.json({ ok: true, route: "staff/index operational" });
+});
 
-export default staffRouter;
+export default router;
