@@ -1,16 +1,18 @@
-// server/routes/index.ts
 import express from "express";
-import analyticsRouter from "./analytics/index.js";
-import clientRouter from "./client/index.js";
-import staffRouter from "./staff/index.js";
-import twilioRouter from "./twilio/index.js";
+import analytics from "./analytics/index.js";
+import client from "./client/index.js";
+import staff from "./staff/index.js";
+import twilio from "./twilio/index.js";
 
 const router = express.Router();
 
-router.use("/analytics", analyticsRouter);
-router.use("/client", clientRouter);
-router.use("/staff", staffRouter);
-router.use("/twilio", twilioRouter);
+// 🧩 Helper: unwrap default exports in case TSX imported { default: router }
+const unwrap = (mod: any) => (mod?.default ? mod.default : mod);
+
+router.use("/analytics", unwrap(analytics));
+router.use("/client", unwrap(client));
+router.use("/staff", unwrap(staff));
+router.use("/twilio", unwrap(twilio));
 
 router.get("/", (_req, res) => {
   res.json({
@@ -19,5 +21,4 @@ router.get("/", (_req, res) => {
   });
 });
 
-// ✅ make sure this is a default export
 export default router;
