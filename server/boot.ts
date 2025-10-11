@@ -1,26 +1,13 @@
-// server/boot.ts
-import type { Express } from "express";
-import { attachUserIfPresent } from "./mw/jwt-auth.js";
-import { setupAuth } from "./auth/routes.js";
+import express from "express";
+import routes from "./routes/index.js";
 
-// Force ESM/CJS interop safety
-import routesImport from "./routes/index.js";
-const apiRouter =
-  typeof routesImport === "function"
-    ? routesImport
-    : routesImport.default && typeof routesImport.default === "function"
-    ? routesImport.default
-    : (() => {
-        console.error("[BootDiag] Invalid router import:", routesImport);
-        throw new Error("Invalid router export — expected Express Router");
-      })();
+export default async function boot(app: express.Application) {
+  console.log("🧩 Restoring full route mount...");
+  app.use("/api", routes);
 
-export default async function boot(app: Express) {
-  setupAuth(app);
-  app.use(attachUserIfPresent);
-  app.use("/api", apiRouter);
+  app.get("/api/_int/state", (_req, res) => {
+    res.json({ ok: true, state: "ready", ts: new Date().toISOString() });
+  });
 
-  app.get("/api/_int/state", (_req, res) =>
-    res.json({ ok: true, status: "healthy", ts: new Date().toISOString() })
-  );
+  console.log("✅ All routes mounted successfully");
 }
