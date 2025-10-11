@@ -3,30 +3,24 @@ import type { Express } from "express";
 import { attachUserIfPresent } from "./mw/jwt-auth.js";
 import { setupAuth } from "./auth/routes.js";
 
-// ✅ Import using * to handle both ESM and CommonJS interop
-import * as routesModule from "./routes/index.js";
-const routes =
-  typeof routesModule.default === "function"
-    ? routesModule.default
-    : routesModule;
+// Force ESM/CJS interop safety
+import routesImport from "./routes/index.js";
+const apiRouter =
+  typeof routesImport === "function"
+    ? routesImport
+    : routesImport.default && typeof routesImport.default === "function"
+    ? routesImport.default
+    : (() => {
+        console.error("[BootDiag] Invalid router import:", routesImport);
+        throw new Error("Invalid router export — expected Express Router");
+      })();
 
-// 🧩 Boot function
 export default async function boot(app: Express) {
-  // 1️⃣ Auth routes
   setupAuth(app);
-
-  // 2️⃣ JWT user attach middleware
   app.use(attachUserIfPresent);
+  app.use("/api", apiRouter);
 
-  // 3️⃣ Mount all API routes (handle object default case)
-  app.use("/api", routes);
-
-  // 4️⃣ Minimal health check
-  app.get("/api/_int/state", (_req, res) => {
-    res.json({
-      ok: true,
-      status: "healthy",
-      ts: new Date().toISOString(),
-    });
-  });
+  app.get("/api/_int/state", (_req, res) =>
+    res.json({ ok: true, status: "healthy", ts: new Date().toISOString() })
+  );
 }
