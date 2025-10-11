@@ -1,24 +1,21 @@
-// server/routes/index.ts
-import express from "express";
+#!/bin/bash
+set -euo pipefail
+echo "🧹 Cleaning up duplicate router declarations in server/routes/index.ts..."
 
-// Import each subrouter safely
-import analytics from "./analytics/index.js";
-import client from "./client/index.js";
-import staff from "./staff/index.js";
-import twilio from "./twilio/index.js";
+cat > server/routes/index.ts <<'EOF'
+import express from "express";
+import analyticsRouter from "./analytics/index.js";
+import clientRouter from "./client/index.js";
+import staffRouter from "./staff/index.js";
+import twilioRouter from "./twilio/index.js";
 
 const router = express.Router();
 
-// Helper to unwrap default exports in case of mixed module systems
-const unwrap = (mod: any) => (mod?.default ? mod.default : mod);
+router.use("/analytics", analyticsRouter);
+router.use("/client", clientRouter);
+router.use("/staff", staffRouter);
+router.use("/twilio", twilioRouter);
 
-// Mount subrouters
-router.use("/analytics", unwrap(analytics));
-router.use("/client", unwrap(client));
-router.use("/staff", unwrap(staff));
-router.use("/twilio", unwrap(twilio));
-
-// Root check
 router.get("/", (_req, res) => {
   res.json({
     ok: true,
@@ -27,3 +24,11 @@ router.get("/", (_req, res) => {
 });
 
 export default router;
+EOF
+
+echo "✅ server/routes/index.ts rebuilt successfully."
+
+pkill -f "tsx" || true
+pkill -f "node.*3001" || true
+echo "🚀 Restarting server..."
+npx tsx server/index.ts
