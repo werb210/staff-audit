@@ -31,6 +31,7 @@ import { z } from "zod";
 // Diagnostics utilities
 import { attachRouteReporter } from "./_diag.routes.js";
 import { attachDbDiag } from "./_diag.db.js";
+import { runStartupDiagnostics } from "./_diag.startup.js"; // 🧩 Startup Diagnostics Reporter
 
 // Middleware & APIs
 import featuresApi from "./routes/api/features";
@@ -100,7 +101,10 @@ app.use((req, res, next) => {
     res.setHeader("Referrer-Policy", "no-referrer");
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
     res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains"
+    );
     res.setHeader("X-DNS-Prefetch-Control", "off");
     res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
     res.setHeader("X-XSS-Protection", "0");
@@ -122,7 +126,10 @@ const allowlist = (process.env.ALLOW_ORIGINS || "")
 app.use(
   cors({
     origin: (origin, cb) =>
-      cb(null, !origin || allowlist.includes(origin) || /\.replit\.dev$/.test(origin || "")),
+      cb(
+        null,
+        !origin || allowlist.includes(origin) || /\.replit\.dev$/.test(origin || "")
+      ),
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Authorization"],
@@ -153,7 +160,9 @@ app.get("/api/lenders", authJwt, (_req, res) =>
   res.json([{ id: "l-001", name: "Example Lender", status: "active" }])
 );
 app.get("/api/lender-products", authJwt, (_req, res) =>
-  res.json([{ id: "p-001", lenderId: "l-001", name: "Term Loan", aprMin: 6.99, aprMax: 15.99 }])
+  res.json([
+    { id: "p-001", lenderId: "l-001", name: "Term Loan", aprMin: 6.99, aprMax: 15.99 },
+  ])
 );
 app.get("/api/ads-analytics/overview", ensureJwt, (req, res) => {
   const q = z
@@ -232,6 +241,7 @@ if (allowWebSocket) {
 import boot from "./boot";
 (async () => {
   await boot(app, server);
+  await runStartupDiagnostics(app); // 🧩 runs DB/S3/Twilio health check + exposes /api/_int/db-health
 })();
 
 // =======================================================
