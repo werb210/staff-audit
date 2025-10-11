@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { getLenderProducts } from './lenderProducts';
+iimport express from "express";
+const router = express.Router();
 
-const router = Router();
-
-// ✅ Public endpoint, no authentication middleware
-router.get('/lender-products', getLenderProducts);
+// Example placeholder
+router.get("/", (_req, res) => {
+  res.json({ ok: true, route: "client" });
+});
 
 export default router;
