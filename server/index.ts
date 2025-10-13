@@ -9,7 +9,7 @@ import cors from "cors";
 import compression from "compression";
 import helmet from "helmet";
 import dotenv from "dotenv";
-import { applyBodyParserFix } from "./patches/fix-body-parser"; // ✅ new import
+import { applyBodyParserFix } from "./patches/fix-body-parser"; // ✅ enhanced parser
 
 // Load environment variables
 dotenv.config();
@@ -18,19 +18,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-applyBodyParserFix(app); // ✅ apply enhanced parser immediately
 
-// Security and performance middleware
+// ✅ Apply enhanced body parser before anything else
+applyBodyParserFix(app);
+
+// ✅ Security and performance middleware
 app.use(helmet());
 app.use(cors());
 app.use(compression());
 app.use(cookieParser());
 
-// ✅ remove old JSON + URL-encoded parsers
-// app.use(express.json({ limit: "5mb", strict: true, type: ["application/json", "application/csp-report"] }));
-// app.use(express.urlencoded({ extended: true, limit: "5mb" }));
-
-// Static file serving
+// ✅ Static file serving
 const distPath = path.resolve(__dirname, "../client/dist");
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
@@ -39,11 +37,16 @@ if (fs.existsSync(distPath)) {
   console.warn("⚠️  No client build found at:", distPath);
 }
 
-// API Routes
+// ✅ API Routes
 import apiRouter from "./api/index.js";
 app.use("/api", apiRouter);
 
-// SPA fallback for client-side routing
+// ✅ Healthcheck endpoint
+app.get("/api/_int/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// ✅ SPA fallback for client-side routing
 app.get("*", (req, res) => {
   const indexFile = path.join(distPath, "index.html");
   if (fs.existsSync(indexFile)) {
@@ -53,17 +56,12 @@ app.get("*", (req, res) => {
   }
 });
 
-// Healthcheck endpoint
-app.get("/api/_int/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
-// Start server
+// ✅ Start server (Codespaces-safe)
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
-server.listen(PORT, () => {
-  console.log(`🚀 Staff App backend running on http://localhost:${PORT}`);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Staff App backend running on http://0.0.0.0:${PORT}`);
 });
 
 export default app;
