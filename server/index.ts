@@ -1,66 +1,69 @@
-#!/bin/bash
-# === PATCH: Fix JSON truncation in Staff App (client → staff field loss) ===
-# Target file: server/index.ts
-
-# 1️⃣ Create improved parser patch
-mkdir -p patches
-
-cat > patches/fix-body-parser.ts <<'EOF'
+// server/index.ts
 import express from "express";
+import path from "path";
+import fs from "fs";
+import http from "http";
+import { fileURLToPath } from "url";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import compression from "compression";
+import helmet from "helmet";
+import dotenv from "dotenv";
+import { applyBodyParserFix } from "./patches/fix-body-parser"; // ✅ new import
 
-/**
- * 🧩 Enhanced Body Parser
- * Expands JSON + URL encoding limits to preserve all nested form data (up to 20 MB, 208+ fields)
- * and logs every large inbound POST for debugging.
- */
-export function applyBodyParserFix(app: express.Application) {
-  // Override defaults
-  app.use(express.json({ limit: "20mb", strict: false }));
-  app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+// Load environment variables
+dotenv.config();
 
-  // Debug: show field count + payload size
-  app.use((req, _res, next) => {
-    if (["POST", "PUT", "PATCH"].includes(req.method)) {
-      try {
-        const size = JSON.stringify(req.body || {}).length;
-        const count =
-          req.body && typeof req.body === "object"
-            ? Object.keys(req.body).length
-            : 0;
-        console.log(
-          `🧩 [BodyParser] ${req.method} ${req.path} — ${size} bytes, ${count} fields`
-        );
-        if (count < 20)
-          console.warn(
-            "⚠️ [BodyParser] Low field count — possible truncated JSON or missing nested data"
-          );
-      } catch (err) {
-        console.error("❌ [BodyParser] Logging error:", err);
-      }
-    }
-    next();
-  });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+applyBodyParserFix(app); // ✅ apply enhanced parser immediately
+
+// Security and performance middleware
+app.use(helmet());
+app.use(cors());
+app.use(compression());
+app.use(cookieParser());
+
+// ✅ remove old JSON + URL-encoded parsers
+// app.use(express.json({ limit: "5mb", strict: true, type: ["application/json", "application/csp-report"] }));
+// app.use(express.urlencoded({ extended: true, limit: "5mb" }));
+
+// Static file serving
+const distPath = path.resolve(__dirname, "../client/dist");
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  console.log("📦 Serving static files from:", distPath);
+} else {
+  console.warn("⚠️  No client build found at:", distPath);
 }
-EOF
 
-# 2️⃣ Inject into server/index.ts
-# Add these two lines *immediately after* the line:
-#   const app = express();
+// API Routes
+import apiRouter from "./api/index.js";
+app.use("/api", apiRouter);
 
-echo "⚙️  Add below to server/index.ts right after 'const app = express();'"
-echo ""
-echo "import { applyBodyParserFix } from './patches/fix-body-parser';"
-echo "applyBodyParserFix(app);"
-echo ""
-echo "🚀 Then comment out or delete the old lines:"
-echo "  app.use(express.json({ limit: '5mb', strict: true, type: ['application/json', 'application/csp-report'] }));"
-echo "  app.use(express.urlencoded({ extended: true, limit: '5mb' }));"
+// SPA fallback for client-side routing
+app.get("*", (req, res) => {
+  const indexFile = path.join(distPath, "index.html");
+  if (fs.existsSync(indexFile)) {
+    res.sendFile(indexFile);
+  } else {
+    res.status(404).send("⚠️  No client build found; API-only mode");
+  }
+});
 
-# 3️⃣ Restart the staff server after editing.
-echo ""
-echo "✅ After restart, run the following test to verify parsing:"
-cat <<'CURL'
-curl -X POST http://localhost:3001/api/v1/applications \
-  -H "Content-Type: application/json" \
-  -d @<(jq -n '{'$(for i in {1..208}; do echo "\"field$i\":\"test$i\","; done | sed "$ s/,$//")'}')
-CURL
+// Healthcheck endpoint
+app.get("/api/_int/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
+
+server.listen(PORT, () => {
+  console.log(`🚀 Staff App backend running on http://localhost:${PORT}`);
+});
+
+export default app;
