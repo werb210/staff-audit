@@ -1,19 +1,15 @@
+// server/api/index.ts
 import { Router } from "express";
-
-// ✅ Correct router that includes /stats endpoint
-import dashboard from "../routes/dashboard-api.js";
-import analyticsDashboard from "../routes/analytics-dashboard.js";
-import aiControlDashboard from "../routes/ai-control-dashboard.js";
+import dashboardRoutes from "../routes/dashboard.js";
 
 const router = Router();
 
-router.use("/dashboard", dashboard);
-router.use("/dashboard/analytics", analyticsDashboard);
-router.use("/dashboard/ai", aiControlDashboard);
-
-// Simple health check endpoint
+// ✅ Health check
 router.get("/_int/health", (_req, res) => {
-  res.json({ status: "ok", source: "server/api/index.ts", timestamp: new Date().toISOString() });
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// ✅ Mount dashboard routes (including /dashboard/stats)
+router.use("/dashboard", dashboardRoutes);
 
 export default router;
