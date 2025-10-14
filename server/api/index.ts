@@ -2,7 +2,7 @@
 import { Router } from "express";
 
 // ✅ Correctly import the dashboard routes that include /stats
-import dashboard from "../routes/dashboard-api.js";   // <-- fixed path
+import dashboard from "../routes/dashboard-api.js";   // <-- correct file
 import analyticsDashboard from "../routes/analytics-dashboard.js";
 import aiControlDashboard from "../routes/ai-control-dashboard.js";
 
