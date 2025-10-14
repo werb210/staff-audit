@@ -1,17 +1,16 @@
-// server/api/index.ts
 import { Router } from "express";
 
-// ✅ Import the correct dashboard router
+// ✅ Import all active dashboard route modules
 import dashboard from "../routes/dashboard.js";
 import analyticsDashboard from "../routes/analytics-dashboard.js";
 import aiControlDashboard from "../routes/ai-control-dashboard.js";
 
 const router = Router();
 
-// ✅ Mount routes
+// ✅ Mount under /dashboard prefix
 router.use("/dashboard", dashboard);
-router.use("/analytics-dashboard", analyticsDashboard);
-router.use("/ai-control-dashboard", aiControlDashboard);
+router.use("/dashboard/analytics", analyticsDashboard);
+router.use("/dashboard/ai", aiControlDashboard);
 
 // ✅ Healthcheck
 router.get("/_int/health", (_req, res) => {
