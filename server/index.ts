@@ -1,8 +1,8 @@
 // server/api/index.ts
 import { Router } from "express";
 
-// ✅ Import active dashboard route modules
-import dashboard from "../routes/dashboard.js";
+// ✅ Import correct dashboard route modules
+import dashboard from "../routes/dashboard-api.js"; // <-- FIXED filename
 import analyticsDashboard from "../routes/analytics-dashboard.js";
 import aiControlDashboard from "../routes/ai-control-dashboard.js";
 
