@@ -1,8 +1,8 @@
 // server/api/index.ts
 import { Router } from "express";
 
-// ✅ Import routes with correct relative paths (two levels up from /server/api/)
-import dashboard from "../routes/dashboard.js";
+// ✅ Import routes with correct relative paths
+import dashboard from "../routes/dashboard-api.js"; // <-- FIXED: now points to correct dashboard file
 import analyticsDashboard from "../routes/analytics-dashboard.js";
 import aiControlDashboard from "../routes/ai-control-dashboard.js";
 
