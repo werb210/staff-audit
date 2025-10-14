@@ -1,8 +1,8 @@
 // server/api/index.ts
 import { Router } from "express";
 
-// ✅ Import routes with correct relative paths
-import dashboard from "../routes/dashboard-api.js"; // <-- FIXED: now points to correct dashboard file
+// ✅ Correctly import the dashboard routes that include /stats
+import dashboard from "../routes/dashboard-api.js";   // <-- fixed path
 import analyticsDashboard from "../routes/analytics-dashboard.js";
 import aiControlDashboard from "../routes/ai-control-dashboard.js";
 
@@ -13,7 +13,7 @@ router.use("/dashboard", dashboard);
 router.use("/dashboard/analytics", analyticsDashboard);
 router.use("/dashboard/ai", aiControlDashboard);
 
-// ✅ Healthcheck
+// ✅ Healthcheck endpoint
 router.get("/_int/health", (_req, res) => {
   res.json({
     status: "ok",
