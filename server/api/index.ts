@@ -1,14 +1,18 @@
 import { Router } from "express";
-import dashboard from "../routes/dashboard.js";
+import dashboard from "../routes/dashboard.ts"; // ✅ Fixed import extension
 
 const router = Router();
 
-// Mount routes
+// ✅ Mount routes
 router.use("/dashboard", dashboard);
 
-// Healthcheck
+// ✅ Healthcheck
 router.get("/_int/health", (_req, res) => {
-  res.json({ status: "ok", source: "api/index.ts", timestamp: new Date().toISOString() });
+  res.json({
+    status: "ok",
+    source: "api/index.ts",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 export default router;
