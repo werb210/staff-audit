@@ -1,22 +1,22 @@
 import { Router } from "express";
 
-// ✅ Import all active dashboard route modules
+// ✅ Correct imports for active dashboard modules
 import dashboard from "../routes/dashboard.js";
 import analyticsDashboard from "../routes/analytics-dashboard.js";
 import aiControlDashboard from "../routes/ai-control-dashboard.js";
 
 const router = Router();
 
-// ✅ Mount under /dashboard prefix
+// ✅ Mount properly
 router.use("/dashboard", dashboard);
 router.use("/dashboard/analytics", analyticsDashboard);
 router.use("/dashboard/ai", aiControlDashboard);
 
-// ✅ Healthcheck
+// ✅ Healthcheck route (visible via curl /api/_int/health)
 router.get("/_int/health", (_req, res) => {
   res.json({
     status: "ok",
-    source: "api/index.ts",
+    source: "server/api/index.ts",
     timestamp: new Date().toISOString(),
   });
 });
