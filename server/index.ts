@@ -20,6 +20,8 @@ const app = express();
 
 // ✅ Apply middleware stack
 applyBodyParserFix(app);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
 app.use(compression());
