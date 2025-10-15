@@ -2,13 +2,17 @@ import { Router } from "express";
 import v1Router from "./v1/index.js";
 
 const router = Router();
-router.use("/v1", v1Router);
 
-router.stack.forEach((layer) => {
-  if (layer?.route) console.log("🧩 Registered route:", layer.route.path);
-  else if (layer?.name === 'router') console.log("🧩 Mounted router:", layer.regexp);
+// ✅ Health check endpoint
+router.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Staff App API is live",
+    timestamp: new Date().toISOString(),
+  });
 });
 
-console.log("✅ Loaded: server/api/index.js");
+// ✅ Mount versioned routes
+router.use("/v1", v1Router);
 
 export default router;
