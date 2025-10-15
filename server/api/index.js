@@ -7,9 +7,14 @@ const router = Router();
 router.get("/health", (req, res) => {
   res.status(200).json({
     status: "ok",
-    message: "Staff App API is live",
+    message: "Staff API running correctly",
     timestamp: new Date().toISOString(),
   });
+});
+
+// ✅ Root debug route
+router.get("/", (req, res) => {
+  res.json({ message: "API root reachable" });
 });
 
 // ✅ Mount versioned routes
