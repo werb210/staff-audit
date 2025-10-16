@@ -1,9 +1,3 @@
-<<<<<<< Updated upstream
-"scripts": {
-  "dev": "node --max-old-space-size=4096 ./node_modules/.bin/tsx server/index.ts",
-  "start": "node --max-old-space-size=4096 ./node_modules/.bin/tsx server/index.ts",
-  "clean": "pkill -9 -f node || true && rm -rf node_modules/.cache dist build .vite .cache || true"
-=======
 {
   "name": "rest-express",
   "version": "1.0.0",
@@ -276,5 +270,4 @@
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
   }
->>>>>>> Stashed changes
 }
