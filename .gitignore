@@ -151,3 +151,4 @@ dist/
 .vite/
 node_modules/.vite/
 
+\!client/dist
