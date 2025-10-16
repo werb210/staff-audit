@@ -1,6 +1,5 @@
 // client/src/components/Navbar.tsx
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 
 interface NavbarProps {
   onSignOut: () => void;

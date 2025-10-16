@@ -6,7 +6,6 @@ import './index.css';
 import { setupPWA } from './lib/pwa';
 import log from '@/lib/log';
 import { Providers } from '@/app/Providers';
-import { BrowserRouter } from 'react-router-dom';
 
 setupPWA();
 

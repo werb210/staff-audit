@@ -1,6 +1,5 @@
 // client/src/App.tsx
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import DashboardPage from './pages/DashboardPage';
 import PipelinePage from './pages/PipelinePage';
