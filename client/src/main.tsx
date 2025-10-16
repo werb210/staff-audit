@@ -14,7 +14,7 @@ console.log('🎯 [REACT] Starting React application mount process...');
 
 const root = document.getElementById('root');
 if (!root) {
-  console.error('❌ [REACT] CRITICAL: Root element (#root) not found in DOM!');
+  console.error('❌ [REACT] Root element (#root) not found in DOM!');
   document.body.innerHTML =
     '<div style="padding:20px;color:red;border:2px solid red;background:#ffe6e6;"><h2>🚨 React Mount Failed</h2><p>Root element (#root) not found in DOM</p></div>';
 } else {
@@ -23,7 +23,8 @@ if (!root) {
     console.log('🚀 [REACT] Rendering full application...');
     reactRoot.render(
       <Providers>
-        <BrowserRouter basename="/staff-audit/">
+        {/* ✅ GitHub Pages fix: router must have correct basename */}
+        <BrowserRouter basename="/staff-audit">
           <App />
         </BrowserRouter>
       </Providers>
