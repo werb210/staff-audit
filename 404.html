@@ -3,10 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <script>
-      // Redirect any 404 to hash-based route for GitHub Pages
-      const path = location.pathname.replace("/staff-audit", "");
-      const target = "/staff-audit/#" + (path.startsWith("/") ? path.slice(1) : path);
-      location.replace(target);
+      const path = location.pathname.replace("/staff-audit/", "");
+      location.replace("/staff-audit/#/" + path);
     </script>
   </head>
   <body></body>
