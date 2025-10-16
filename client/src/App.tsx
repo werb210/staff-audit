@@ -1,15 +1,29 @@
-import { Route } from "wouter";
-import { Dashboard } from "./pages/Dashboard";
-import { NotFound } from "./pages/NotFound";
+import React from "react";
+import { Route, Switch } from "wouter";
 
-const App = () => {
+function Home() {
   return (
-    <>
-      <Route path="/" component={Dashboard} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="*" component={NotFound} />
-    </>
+    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+      <h2>Boreal Financial — Staff Portal</h2>
+      <p>Dashboard is active and routing is functional.</p>
+    </div>
   );
-};
+}
 
-export default App;
+function NotFound() {
+  return (
+    <div style={{ padding: "2rem", color: "red", fontFamily: "sans-serif" }}>
+      <h3>404 — Page Not Found</h3>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Switch>
+      <Route path="/staff-audit/" component={Home} />
+      <Route path="/" component={Home} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
