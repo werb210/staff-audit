@@ -6,7 +6,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <nav style={{ width: 220, background: "#0f172a", color: "#f8fafc", padding: "1rem" }}>
       <h2 style={{ color: "#38bdf8" }}>Boreal Staff</h2>
       <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-        <Link href="/staff-audit/"><span>Dashboard</span></Link>
+        <Link href="/staff-audit"><span>Dashboard</span></Link>
         <Link href="/staff-audit/crm"><span>CRM</span></Link>
         <Link href="/staff-audit/documents"><span>Documents</span></Link>
         <Link href="/staff-audit/communication"><span>Communication</span></Link>
