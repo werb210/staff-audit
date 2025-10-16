@@ -1,2 +1,0 @@
-/* HOTFIX: hide any banner containers that break layout */
-.banner, .promo-banner, [data-test="top-banner"] { display: none !important; }

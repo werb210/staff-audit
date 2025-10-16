@@ -1,4 +1,0 @@
-Scanning for legacy/duplicate markers...
-Suspect markers: 10
-Parallel bases:  0
-Route dups:      559

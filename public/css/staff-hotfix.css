@@ -1,3 +1,0 @@
-/* temporary: remove any top banners/overlays that push content off-screen */
-div[data-banner], .global-banner, .promo-banner { display:none !important; }
-.main-container, .app-container { padding-top: 0 !important; }

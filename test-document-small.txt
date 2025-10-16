@@ -1,1 +1,0 @@
-Small file - should be rejected by safe writer (under 100 bytes)

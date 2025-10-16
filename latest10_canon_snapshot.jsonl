@@ -1,6 +1,0 @@
-{"id":"b0d56f0f-32c8-47ea-945b-780b99e20201","created_at":"2025-09-04 18:03:35.782","canon_version":"v1","field_count":null,"canon_len":277,"first_25_keys":["business.country","business.industry","business.businessName","applicant.email","applicant.phone","applicant.lastName","applicant.firstName","financial.annualRevenue","financial.requestedAmount"],"hash_verified":"pending_column"}
-{"id":"a1381940-6cbc-4ca4-bd87-5dc8c40017a1","created_at":"2025-09-04 18:02:38.965","canon_version":"v1","field_count":null,"canon_len":117,"first_25_keys":["business.industry","business.businessName","financial.requestedAmount"],"hash_verified":"pending_column"}
-{"id":"1d5edc2b-825d-4c5e-8aac-6183f1105cf6","created_at":"2025-09-04 16:47:03.994","canon_version":"v1","field_count":null,"canon_len":171,"first_25_keys":["industry","lookingFor","headquarters","fundingAmount","businessLocation","accountsReceivableBalance"],"hash_verified":"pending_column"}
-{"id":"sample","created_at":"2025-09-04","canon_version":"v1","field_count":0,"canon_len":0,"first_25_keys":[],"hash_verified":false}
-{"id":"sample","created_at":"2025-09-04","canon_version":"v1","field_count":0,"canon_len":0,"first_25_keys":[],"hash_verified":false}
-{"id":"sample","created_at":"2025-09-04","canon_version":"v1","field_count":0,"canon_len":0,"first_25_keys":[],"hash_verified":false}

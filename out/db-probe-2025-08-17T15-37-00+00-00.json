@@ -1,1 +1,0 @@
-{"ok":true,"reason":"connected","tables":{"users":{"ok":true,"rows":[{"n":8}]},"roles":{"ok":false,"error":"error: relation \"roles\" does not exist"},"feature_flags":{"ok":true,"rows":[{"n":0}]},"applications":{"ok":true,"rows":[{"n":4}]},"contacts":{"ok":true,"rows":[{"n":54}]},"lenders":{"ok":true,"rows":[{"n":21}]},"lender_products":{"ok":true,"rows":[{"n":51}]}}}

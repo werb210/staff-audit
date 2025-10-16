@@ -1,4 +1,0 @@
-Probing BASE=http://localhost:5000/api
-products: 44
-lenders:  30
-reqdocs:  0

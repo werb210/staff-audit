@@ -1,7 +1,0 @@
-Probing BASE=http://localhost:5000/api
-products: 44
-lenders:  30
-reqdocs:  0
-
-REQUIRED DOCS DEBUGGING:
-{"success":true,"required_documents":["Bank Statements (Last 6 months)","Business License","Tax Returns (Last 2 years)","Financial Statements"]}
