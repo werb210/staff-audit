@@ -7,12 +7,12 @@
   "theme_color": "#003366",
   "icons": [
     {
-      "src": "/staff-audit/brand/apple-touch-icon.png",
+      "src": "./brand/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/staff-audit/brand/favicon.png",
+      "src": "./brand/favicon.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/png"
     }
