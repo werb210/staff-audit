@@ -1,25 +1,13 @@
-// client/src/App.tsx
-import React, { useState } from 'react';
-import Navbar from './components/Navbar';
-import DashboardPage from './pages/DashboardPage';
-import PipelinePage from './pages/PipelinePage';
-import DocumentsPage from './pages/DocumentsPage';
-import CRMPage from './pages/CRMPage';
+import { Route } from "wouter";
+import { Dashboard } from "./pages/Dashboard";
+import { NotFound } from "./pages/NotFound";
 
-const App: React.FC = () => {
-  const [silo, setSilo] = useState<'Boreal' | 'Site Level Financial'>('Boreal');
-
-  const handleSignOut = () => {
-    // TODO: sign-out logic (e.g. clear auth token, redirect to login)
-    console.log('Signing out...');
-  };
-
-  const handleSiloSwitch = () => {
-    setSilo(prev => (prev === 'Boreal' ? 'Site Level Financial' : 'Boreal'));
-  };
-
+export const App = () => {
   return (
+    <>
+      <Route path="/" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="*" component={NotFound} />
+    </>
   );
 };
-
-export default App;
