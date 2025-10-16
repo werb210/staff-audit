@@ -66,11 +66,6 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryS
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <AppErrorBoundary>
-          {children}
-        </AppErrorBoundary>
-      </Router>
     </QueryClientProvider>
   );
 }

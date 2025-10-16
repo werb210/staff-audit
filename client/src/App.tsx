@@ -19,18 +19,6 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router>
-      <Navbar onSignOut={handleSignOut} silo={silo} onSiloSwitch={handleSiloSwitch} />
-      <main className="p-4">
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/pipeline" element={<PipelinePage />} />
-          <Route path="/documents" element={<DocumentsPage />} />
-          <Route path="/contacts" element={<CRMPage />} />
-          {/* add more routes as needed */}
-        </Routes>
-      </main>
-    </Router>
   );
 };
 

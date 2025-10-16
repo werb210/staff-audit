@@ -23,9 +23,7 @@ if (!root) {
     reactRoot.render(
       <Providers>
         {/* ✅ GitHub Pages fix: router must have correct basename */}
-        <BrowserRouter basename="/staff-audit">
           <App />
-        </BrowserRouter>
       </Providers>
     );
     console.log('✅ [REACT] Full app render completed!');
