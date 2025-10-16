@@ -4,7 +4,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/',            // <— important on Replit/prod
+  base: '/staff-audit/',     // ✅ required for GitHub Pages deployment
   plugins: [
     react()
     // rollupGuard() // DISABLED to fix build issues
@@ -18,13 +18,13 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     host: '0.0.0.0',
-    hmr: { overlay: false }, // keep overlay off
+    hmr: { overlay: false },
     proxy: {
       '/api': 'http://localhost:5000'
     }
   },
   build: { 
-    sourcemap: false,          // avoid sourcemap 500s in preview
+    sourcemap: false,
     rollupOptions: {
       external: [],
       output: {
