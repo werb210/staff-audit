@@ -1,1 +1,13 @@
-<meta http-equiv='refresh' content='0;url=/staff-audit/'/>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      // Redirect any 404 to hash-based route for GitHub Pages
+      const path = location.pathname.replace("/staff-audit", "");
+      const target = "/staff-audit/#" + (path.startsWith("/") ? path.slice(1) : path);
+      location.replace(target);
+    </script>
+  </head>
+  <body></body>
+</html>
