@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <script>
-      const path = location.pathname.replace("/staff-audit/", "");
-      location.replace("/staff-audit/#/" + path);
+      // Redirect any 404 to the hash route
+      const path = location.pathname.replace("/staff-audit", "");
+      const redirect = "/staff-audit/#" + (path.startsWith("/") ? path.slice(1) : path);
+      location.replace(redirect);
     </script>
   </head>
   <body></body>
