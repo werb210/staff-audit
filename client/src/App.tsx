@@ -1,29 +1,26 @@
 import React from "react";
 import { Route, Switch } from "wouter";
+import { Layout } from "./components/Layout";
+import { Dashboard, CRM, Documents, Communication, Reports, Settings } from "./pages";
 
-function Home() {
-  return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h2>Boreal Financial — Staff Portal</h2>
-      <p>Dashboard is active and routing is functional.</p>
-    </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <div style={{ padding: "2rem", color: "red", fontFamily: "sans-serif" }}>
-      <h3>404 — Page Not Found</h3>
-    </div>
-  );
-}
+const NotFound = () => (
+  <div style={{ padding: "2rem", color: "red" }}>
+    <h3>404 — Page Not Found</h3>
+  </div>
+);
 
 export default function App() {
   return (
-    <Switch>
-      <Route path="/staff-audit/" component={Home} />
-      <Route path="/" component={Home} />
-      <Route component={NotFound} />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route path="/staff-audit/" component={Dashboard} />
+        <Route path="/staff-audit/crm" component={CRM} />
+        <Route path="/staff-audit/documents" component={Documents} />
+        <Route path="/staff-audit/communication" component={Communication} />
+        <Route path="/staff-audit/reports" component={Reports} />
+        <Route path="/staff-audit/settings" component={Settings} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
   );
 }
