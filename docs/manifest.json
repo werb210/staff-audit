@@ -1,25 +1,20 @@
 {
   "name": "Boreal Financial — Staff Portal",
   "short_name": "Boreal Staff",
-  "description": "Secure • Fast • Document-First",
-  "start_url": "/",
+  "start_url": "/staff-audit/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#1F4F82",
   "background_color": "#ffffff",
-  "scope": "/",
+  "theme_color": "#003366",
   "icons": [
     {
-      "src": "/brand/favicon.png",
-      "sizes": "32x32",
+      "src": "/staff-audit/brand/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/brand/apple-touch-icon.png", 
-      "sizes": "180x180",
+      "src": "/staff-audit/brand/favicon.png",
+      "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/png"
     }
-  ],
-  "categories": ["business", "finance", "productivity"],
-  "lang": "en-US"
+  ]
 }
