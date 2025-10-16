@@ -1,0 +1,23 @@
+{
+  "allowed": [
+    "/api/pipeline",
+    "/api/lenders",
+    "/api/lender-products", 
+    "/api/contacts",
+    "/api/comm/calls",
+    "/api/comm/sms",
+    "/api/comm/email",
+    "/api/tasks",
+    "/api/calendar",
+    "/api/reports",
+    "/api/marketing"
+  ],
+  "infrastructure": [
+    "/api/ops",
+    "/api/audit", 
+    "/api/health",
+    "/api/twilio",
+    "/api/auth",
+    "/api/applications"
+  ]
+}

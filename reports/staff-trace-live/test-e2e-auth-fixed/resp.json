@@ -1,0 +1,76 @@
+{
+  "at": 1756657050272,
+  "method": "POST",
+  "path": "/intake",
+  "data": {
+    "ok": true,
+    "traceId": "test-e2e-auth-fixed",
+    "coverage": {
+      "inbound_total": 10,
+      "normalized_total": 12,
+      "card_total": 18,
+      "pdf_total": 39,
+      "lender_total": 17,
+      "normalized_hit_rate": 1,
+      "card_hit_rate": 1.5,
+      "pdf_hit_rate": 0,
+      "lender_hit_rate": 1.4,
+      "missing_in_normalized": [
+        "loanAmount",
+        "country",
+        "province",
+        "revenue",
+        "timeInBusiness",
+        "industry",
+        "employees",
+        "email",
+        "phone",
+        "useOfFunds"
+      ],
+      "missing_in_card": [
+        "loanAmount",
+        "country",
+        "province",
+        "revenue",
+        "timeInBusiness",
+        "industry",
+        "employees",
+        "email",
+        "phone",
+        "useOfFunds"
+      ],
+      "missing_in_pdf": [
+        "loanAmount",
+        "country",
+        "province",
+        "revenue",
+        "timeInBusiness",
+        "industry",
+        "employees",
+        "email",
+        "phone",
+        "useOfFunds"
+      ],
+      "missing_in_lender": [
+        "loanAmount",
+        "country",
+        "province",
+        "revenue",
+        "timeInBusiness",
+        "industry",
+        "employees",
+        "email",
+        "phone",
+        "useOfFunds"
+      ]
+    },
+    "files": {
+      "incoming": "reports/staff-e2e-live/test-e2e-auth-fixed/incoming.json",
+      "normalized": "reports/staff-e2e-live/test-e2e-auth-fixed/normalized.json",
+      "card": "reports/staff-e2e-live/test-e2e-auth-fixed/card.json",
+      "pdf": "reports/staff-e2e-live/test-e2e-auth-fixed/pdf.json",
+      "lender": "reports/staff-e2e-live/test-e2e-auth-fixed/lender.json",
+      "coverageFile": "reports/staff-e2e-live/test-e2e-auth-fixed/coverage.json"
+    }
+  }
+}

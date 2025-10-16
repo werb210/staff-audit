@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Auth</title>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    <script>
+        // Test iframe detection
+        const inIframe = (() => {
+          try { return window.self !== window.top; } catch { return true; }
+        })();
+
+        const isIOSWebKit = /iP(ad|hone|od)/.test(navigator.platform) ||
+          (!!navigator.userAgent.match(/Version\/[\d.]+.*Safari/) && !navigator.userAgent.includes('Chrome'));
+
+        const FORCE_BEARER_MODE = inIframe || isIOSWebKit;
+
+        console.log('Environment Detection:', { 
+          inIframe, 
+          isIOSWebKit, 
+          FORCE_BEARER_MODE,
+          userAgent: navigator.userAgent,
+          platform: navigator.platform
+        });
+
+        // Test login
+        async function testLogin() {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ email: 'todd.w@boreal.financial', password: 'password123' })
+            });
+            const data = await response.json();
+            console.log('Login response:', data);
+            
+            if (data.devBearer) {
+                sessionStorage.setItem('devBearer', data.devBearer);
+                console.log('Bearer token saved');
+                
+                // Test bearer auth
+                const testResponse = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${data.devBearer}` }
+                });
+                const testData = await testResponse.json();
+                console.log('Bearer auth test:', testData);
+            }
+        }
+
+        testLogin();
+    </script>
+</body>
+</html>

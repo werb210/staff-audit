@@ -1,0 +1,5 @@
+== STAFF CARDS OPEN FIX @ 2025-08-31_01-28-14 ==
+BASE=http://localhost:5000/api
+PROBE LIST /pipeline/cards -> 200
+STEP 1/7 Discover list endpoint: PASS
+CANONICAL LIST: /pipeline/cards

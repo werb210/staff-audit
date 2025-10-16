@@ -1,0 +1,24 @@
+client/src/AppRoutes.tsx:1:import { createBrowserRouter } from "react-router-dom";
+client/src/AppRoutes.tsx:10:export const router = createBrowserRouter([
+client/src/_graveyard/Comms.tsx:30:        <Route path="/" element={<Navigate to="sms" replace />} />
+client/src/_graveyard/Comms.tsx:31:        <Route path="sms" element={<Sms initialThreadId={thread||undefined} />} />
+client/src/_graveyard/Comms.tsx:32:        <Route path="calls" element={<Calls/>} />
+client/src/_graveyard/Comms.tsx:33:        <Route path="email" element={<Email compose={compose==="1"} />} />
+client/src/_graveyard/Comms.tsx:34:        <Route path="chat" element={<ChatHandoff/>} />
+client/src/App.tsx:2:import { createBrowserRouter, createHashRouter, RouterProvider, Navigate } from "react-router-dom";
+client/src/App.tsx:28:  router = createBrowserRouter(routes, { basename: BASENAME });
+client/src/SimpleAuthApp.tsx:189:      <Route path="/dev-login" element={<DevLogin />} />
+client/src/SimpleAuthApp.tsx:204:      <Route path="*" element={<Navigate to="/" replace />} />
+client/src/pages/Portal.tsx:16:        <Route path="/staff/*" element={<StaffDashboard />} />
+client/src/pages/Portal.tsx:17:        <Route path="*" element={<Navigate to="/staff" replace />} />
+client/src/pages/slf/SlfShell.tsx:25:        <Route path="/" element={<Navigate to="dashboard" replace/>}/>
+client/src/pages/slf/SlfShell.tsx:26:        <Route path="dashboard" element={<SlfDashboard/>}/>
+client/src/pages/slf/SlfShell.tsx:27:        <Route path="pipeline" element={<SlfPipeline/>}/>
+client/src/pages/slf/SlfShell.tsx:28:        <Route path="contacts" element={<SlfContacts/>}/>
+client/src/pages/slf/SlfShell.tsx:29:        <Route path="comms" element={<SlfComms/>}/>
+client/src/pages/marketing/Marketing.tsx:29:        <Route path="/" element={<Navigate to="templates" replace />} />
+client/src/pages/marketing/Marketing.tsx:30:        <Route path="templates" element={<Templates />} />
+client/src/pages/marketing/Marketing.tsx:31:        <Route path="campaigns" element={<Campaigns />} />
+client/src/pages/marketing/Marketing.tsx:32:        <Route path="audience" element={<Audience />} />
+client/src/pages/marketing/Marketing.tsx:33:        <Route path="bulk" element={<BulkEmail />} />
+client/src/pages/marketing/Marketing.tsx:34:        <Route path="analytics" element={<Analytics />} />

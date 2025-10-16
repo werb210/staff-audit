@@ -1,0 +1,40 @@
+{
+  "applicationId": "production-verification-test",
+  "formData": {
+    "step1": {
+      "requestedAmount": 125000,
+      "use_of_funds": "Inventory Purchase",
+      "selectedCategory": "Working Capital",
+      "businessLocation": "CA",
+      "averageMonthlyRevenue": 180000,
+      "salesHistory": "5+yr",
+      "equipment_value": 40000,
+      "fixedAssetsValue": 75000,
+      "accountsReceivableBalance": 50000
+    },
+    "step3": {
+      "businessName": "Production Verification Corp",
+      "legalName": "Production Verification Corporation",
+      "operatingName": "PVC Ltd.",
+      "businessStructure": "corporation",
+      "businessCity": "Ottawa",
+      "businessState": "ON",
+      "businessPhone": "16135551234",
+      "businessStartDate": "2017-04-01",
+      "businessIndustry": "Manufacturing",
+      "numberOfEmployees": "25-50"
+    },
+    "step4": {
+      "applicantFirstName": "David",
+      "applicantLastName": "Production",
+      "applicantEmail": "david.production@pvc.ca",
+      "applicantPhone": "+16135551234",
+      "applicantCity": "Ottawa",
+      "applicantState": "ON",
+      "applicantAddress": "456 Production Ave",
+      "applicantSSN": "987-65-4321",
+      "email": "david.production@pvc.ca",
+      "hasPartner": false
+    }
+  }
+}

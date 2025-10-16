@@ -1,0 +1,82 @@
+server/services/applicationMapper.ts:22:    // Optionally hydrate legacy columns if they exist
+server/routes/applications/create.ts:97:    legacyFieldsDetected: Object.keys(req.body).filter(key => 
+server/routes/applications/create.ts:170:                            (req.body.step1 ? 'client-v2-step-based' : 'client-v1-legacy');
+server/routes/applications/create.ts:176:    detectedFormat: req.body.step1 ? 'step-based' : 'flat-legacy'
+server/routes/applications/create.ts:179:  // STRICT LEGACY FORMAT REJECTION - Check for legacy fields first
+server/routes/applications/create.ts:210:    // STRICT STEP-BASED FORMAT ONLY - No legacy support
+server/routes/applications/create.ts:223:    // FIELD MAPPING: Apply legacy field name mappings before validation
+server/routes/applications/create.ts:484:            detectedFormat: req.body.step1 ? 'step-based' : 'flat-legacy',
+server/routes/public/applications.ts:38:const legacyAppSchema = z.object({
+server/routes/public/applications.ts:60:    // Try new schema first, fall back to legacy
+server/routes/public/applications.ts:65:      const legacyParsed = legacyAppSchema.safeParse(req.body);
+server/routes/public/applications.ts:66:      if (!legacyParsed.success) {
+server/routes/public/applications.ts:73:      // Handle legacy format (existing working code)
+server/routes/public/applications.ts:74:      const legacy = legacyParsed.data;
+server/routes/public/applications.ts:75:      const contactEmail = legacy.step4?.email || "";
+server/routes/public/applications.ts:80:      // Get business info (legacy)
+server/routes/public/applications.ts:90:        const first = legacy.step4?.firstName ?? "";
+server/routes/public/applications.ts:91:        const last  = legacy.step4?.lastName ?? "";
+server/routes/public/applications.ts:92:        const phone = legacy.step4?.phone ?? legacy.step3?.businessPhone ?? "000-000-0000";
+server/routes/public/applications.ts:102:      // Create application (legacy) - STRICT VALIDATION: NO PLACEHOLDERS
+server/routes/public/applications.ts:103:      const reqAmt = parseFloat(legacy.step1?.requestedAmount?.replace(/[^0-9.]/g, '') || "0") || 0;
+server/routes/public/applications.ts:104:      const useOfFunds = legacy.step1?.useOfFunds || "working capital";
+server/routes/public/applications.ts:105:      const businessName = legacy.step3?.businessName;
+server/routes/public/applications.ts:137:      console.log(`✅ Created legacy application ${applicationId} for ${businessName}`);
+server/routes/comms/templates.ts:162:    // 4) fallback to legacy template if no versions exist
+server/routes/catalog-public.mjs:36:  // include stable + legacy keys (no defaults here)
+server/routes/catalog-public.mjs:44:    productCategory: r.category,        // legacy alias for older clients
+server/routes/catalog.mjs:55:    // include stable + legacy keys (no defaults here)
+server/routes/catalog.mjs:63:      productCategory: r.category,        // legacy alias for older clients
+server/routes/catalog-fields.mjs:46:    legacy_aliases: LEGACY_ALIASES,
+server/routes/catalog-dedupe.mjs:6:// Helper to fetch from canonical, then legacy
+server/routes/catalog-dedupe.mjs:18:  return { source: "legacy", products: j2?.products ?? [] };
+server/routes/publicApi.ts:153:// const legacyUpload = multer({ 
+server/routes/publicApi.ts:308:// router.post('/upload/:id', legacyUpload.single('document'), async (req: any, res) => {
+server/routes/crmPublic.ts:7:// 🚨 DEPRECATED: This route uses legacy crm_contacts table
+server/routes/crmPublic.ts:16:      message: "This route is deprecated. Use the unified CRM system instead.",
+server/routes/crmPublic.ts:71:    console.error('[CRM PUBLIC] Error in deprecated route:', error);
+server/routes/crmPublic.ts:73:      error: "Failed to process deprecated route",
+server/routes/documentNormalization.ts:43: * Returns the legacy to canonical document type mappings
+server/routes/documentNormalization.ts:49:    legacy_mappings: LEGACY_DOCUMENT_MAPPING,
+server/routes/twilio-diagnostics.ts:210:      'Twilio Programmable Chat (deprecated)',
+server/routes/applications.normalized.ts:7:// map any legacy/DB field names into one canonical shape
+server/routes/users-management.ts:114:        // Map mobilePhone to legacy phone field for backward compatibility
+server/routes/auth-verify.ts:21:  legacyHeaders: false,
+server/routes/applications.ts:317:router.post("/legacy", async (req, res) => {
+server/routes/pipeline.ts:75:      legacyId: app.legacy_id,
+server/utils/documentNormalization.ts:60:  // Check legacy mapping
+server/utils/documentNormalization.ts:135: * Gets all legacy variants that map to a canonical type
+server/utils/documentNormalization.ts:140:    .map(([legacy, _]) => legacy);
+server/utils/uuidValidator.ts:3: * Handles both standard UUIDs and legacy ID formats
+server/utils/uuidValidator.ts:27: * Validates if a string is a valid legacy ID format
+server/utils/uuidValidator.ts:55: * Supports both UUID and legacy ID formats
+server/utils/uuidValidator.ts:86:export function detectIdFormat(id: string): 'uuid' | 'legacy' | 'numeric' | 'unknown' {
+server/utils/uuidValidator.ts:94:    return 'legacy';
+server/utils/productNormalization.ts:95:  // Normalize document requirements - use standardized field first, fallback to legacy
+server/utils/productNormalization.ts:131:    // 🚀 DUAL FIELD SUPPORT: Provide legacy aliases for backward compatibility
+server/middleware/sessionSecurity.ts:156:      legacyHeaders: false,
+server/middleware/sessionSecurity.ts:163:      legacyHeaders: false,
+server/middleware/sessionSecurity.ts:170:      legacyHeaders: false,
+server/middleware/sessionSecurity.ts:177:      legacyHeaders: false,
+server/middleware/rateLimit.ts:8:  legacyHeaders: false
+server/middleware/rateLimit.ts:15:  legacyHeaders: false
+server/middleware/rate-public.mjs:7:    legacyHeaders: false
+server/middleware/diagProvenance.ts:18:        // Helper: tag LENDER PRODUCT (legacy shape)
+server/middleware/diagProvenance.ts:20:          // Heuristics for legacy fields -> adjust if your transformer differs
+server/middleware/diagProvenance.ts:26:                ? prov.fallbackNull('missing legacy mapping')
+server/middleware/diagProvenance.ts:27:                : prov.alias('country', 'legacy alias') as any,
+server/middleware/chatRateLimit.ts:19:  legacyHeaders: false,
+server/middleware/chatRateLimit.ts:40:  legacyHeaders: false,
+server/middleware/chatRateLimit.ts:61:  legacyHeaders: false,
+server/middleware/chatRateLimit.ts:82:  legacyHeaders: false,
+server/middleware/chatRateLimit.ts:103:  legacyHeaders: false,
+server/middleware/chatRateLimit.ts:124:  legacyHeaders: false,
+server/middleware/chatRateLimit.ts:145:  legacyHeaders: false,
+server/middleware/chatRateLimit.ts:166:  legacyHeaders: false,
+server/security/rateLimit.ts:7:  legacyHeaders: false
+server/security/rateLimit.ts:14:  legacyHeaders: false
+server/security/harden.ts:43:    legacyHeaders: false
+server/security/productionHardening.ts:54:    legacyHeaders: false,
+server/mw/aiRateLimit.ts:7:  legacyHeaders: false,
+server/twilioService.ts:41:  return sendSMS(to, message, 'BF'); // Default to BF for legacy calls
+server/emailAuth.ts:66:    // Fallback to Authorization header (legacy flow)

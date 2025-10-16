@@ -1,0 +1,33 @@
+.modal {position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;background:rgba(15,23,42,.38);z-index:60}
+.modal-card{margin-top:5vh;width:min(1080px,96vw);max-height:88vh;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-md);display:flex;flex-direction:column}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px solid var(--line)}
+.modal-body{display:grid;grid-template-columns:240px 1fr;min-height:520px}
+.modal-side{border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px}
+.modal-main{padding:12px;overflow:auto}
+.tab-btn{border:1px solid var(--line);border-radius:999px;padding:.4rem .8rem;background:#fff}
+.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.lanes{display:grid;grid-template-columns:repeat(6, minmax(220px,1fr));gap:12px;align-items:start}
+.lane{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:420px}
+.lane-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;cursor:grab}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:8px}
+.badge{border:1px solid #c7d2fe;background:#eef2ff;color:#1e3a8a;border-radius:999px;padding:.2rem .6rem;font-size:.75rem}
+.row{display:flex;gap:10px;align-items:center}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border:1px solid var(--line);padding:.5rem;text-align:left}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Dialer slide-in from right */
+#dialer-slidein{position:fixed;top:0;right:-360px;width:350px;height:100vh;background:#fff;border-left:1px solid var(--line);transition:right 0.3s ease;z-index:999;display:flex;flex-direction:column;box-shadow:-4px 0 12px rgba(0,0,0,.1)}
+#dialer-slidein.open{right:0}
+.dialer-head{padding:12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.dialer-main{flex:1;padding:12px;display:flex;flex-direction:column;gap:12px}
+.dialer-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dialer-key{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff;font-size:18px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.dialer-key:hover{background:#f1f5f9;border-color:var(--accent)}
+.dialer-actions{display:flex;gap:8px;justify-content:center}
+.dialer-btn{width:48px;height:48px;border-radius:50%;border:none;font-size:20px;cursor:pointer;transition:all 0.2s}
+.dialer-btn.green{background:#10b981;color:white}
+.dialer-btn.red{background:#ef4444;color:white}
+.dialer-btn:hover{opacity:0.8;transform:scale(1.05)}
+.dialer-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}

@@ -1,0 +1,9 @@
+Sample Financial Statement
+
+ABC Company Financial Report
+Revenue: 25,000 per month
+Expenses: 5,000 per month  
+Net Income: 0,000 per month
+Cash Balance: 50,000
+Account: Checking 12345678
+Bank: TD Canada Trust

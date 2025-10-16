@@ -1,0 +1,8 @@
+Probing BASE=http://localhost:5000/api
+products: 0
+lenders:  0
+reqdocs:  0
+Re-testing probes after server restart...
+RETRY products: 44
+RETRY lenders:  30
+RETRY reqdocs:  2

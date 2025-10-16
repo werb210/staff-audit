@@ -1,0 +1,7 @@
+import type { Request, Response, NextFunction } from "express";
+export function requireAdminToken(req: Request, res: Response, next: NextFunction) {
+  const expected = process.env.ADMIN_MUTATION_TOKEN;
+  const got = String(req.headers["x-admin-token"] || "");
+  if (!expected || got !== expected) return res.status(403).json({ ok:false, error:"admin_forbidden" });
+  next();
+}

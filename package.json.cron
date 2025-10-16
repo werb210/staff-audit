@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "test:document-enum-72h": "node scripts/final-document-upload-test.js",
+    "validate:document-types": "node scripts/final-document-upload-test.js"
+  },
+  "cron": {
+    "document-enum-validation": {
+      "schedule": "0 0 */3 * *",
+      "command": "npm run test:document-enum-72h",
+      "description": "Test all document types every 72 hours for enum validation"
+    }
+  }
+}

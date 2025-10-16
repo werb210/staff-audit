@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendation Engine Debug Panel</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button.danger {
+            background: #dc3545;
+        }
+        .button.danger:hover {
+            background: #c82333;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .log-entry {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background: #f8f9fa;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .json-viewer {
+            background: #263238;
+            color: #eeffff;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Recommendation Engine Debug Panel</h1>
+            <p>Monitor and test the lender recommendation system with real-time analytics</p>
+        </div>
+
+        <!-- Test Recommendation Logging -->
+        <div class="section">
+            <h2>📊 Test Recommendation Logging</h2>
+            <div class="grid">
+                <div>
+                    <label>Applicant ID:</label>
+                    <input type="text" id="applicantId" placeholder="Enter applicant UUID">
+                    
+                    <label>Recommended Lenders:</label>
+                    <textarea id="recommendedLenders" placeholder='["Lender A", "Lender B"]' rows="3"></textarea>
+                    
+                    <label>Rejected Lenders:</label>
+                    <textarea id="rejectedLenders" placeholder='["Lender C - Missing docs", "Lender D - Country mismatch"]' rows="3"></textarea>
+                    
+                    <label>Filters Applied:</label>
+                    <textarea id="filtersApplied" placeholder='["credit_score_min", "industry_type", "loan_amount"]' rows="3"></textarea>
+                    
+                    <button class="button" onclick="testRecommendationLog()">Submit Test Log</button>
+                </div>
+                <div>
+                    <h3>Recent Test Results</h3>
+                    <div id="testResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Escalation Testing -->
+        <div class="section">
+            <h2>🆘 Test Chat Escalation</h2>
+            <div class="grid">
+                <div>
+                    <label>Session ID:</label>
+                    <input type="text" id="sessionId" placeholder="chat-session-123">
+                    
+                    <label>User Name:</label>
+                    <input type="text" id="userName" placeholder="John Doe">
+                    
+                    <label>User Email:</label>
+                    <input type="email" id="userEmail" placeholder="john@example.com">
+                    
+                    <label>Message:</label>
+                    <textarea id="escalationMessage" placeholder="I need help with my application..." rows="3"></textarea>
+                    
+                    <label>Escalation Reason:</label>
+                    <select id="escalationReason">
+                        <option value="general_inquiry">General Inquiry</option>
+                        <option value="technical_issue">Technical Issue</option>
+                        <option value="application_status">Application Status</option>
+                        <option value="document_upload">Document Upload</option>
+                        <option value="payment_issue">Payment Issue</option>
+                    </select>
+                    
+                    <button class="button" onclick="testChatEscalation()">Test Escalation</button>
+                </div>
+                <div>
+                    <h3>Test Issue Report</h3>
+                    <label>Issue Type:</label>
+                    <select id="issueType">
+                        <option value="bug">Bug Report</option>
+                        <option value="feature_request">Feature Request</option>
+                        <option value="ui_issue">UI Issue</option>
+                        <option value="performance">Performance Issue</option>
+                        <option value="security">Security Concern</option>
+                    </select>
+                    
+                    <label>Severity:</label>
+                    <select id="severity">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                    
+                    <label>Description:</label>
+                    <textarea id="issueDescription" placeholder="Describe the issue..." rows="3"></textarea>
+                    
+                    <button class="button" onclick="testIssueReport()">Test Issue Report</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Analytics -->
+        <div class="section">
+            <h2>📈 Recommendation Dashboard</h2>
+            <button class="button" onclick="loadDashboard()">Refresh Dashboard</button>
+            <div id="dashboardData"></div>
+        </div>
+
+        <!-- Live Chat Escalations -->
+        <div class="section">
+            <h2>🔴 Live Chat Escalations</h2>
+            <button class="button" onclick="loadEscalations()">Refresh Escalations</button>
+            <div id="escalationsData"></div>
+        </div>
+
+        <!-- System Status -->
+        <div class="section">
+            <h2>⚡ System Status</h2>
+            <button class="button" onclick="checkSystemStatus()">Check All Endpoints</button>
+            <div id="systemStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test recommendation logging
+        async function testRecommendationLog() {
+            const applicantId = document.getElementById('applicantId').value;
+            const recommendedLenders = JSON.parse(document.getElementById('recommendedLenders').value || '[]');
+            const rejectedLenders = JSON.parse(document.getElementById('rejectedLenders').value || '[]');
+            const filtersApplied = JSON.parse(document.getElementById('filtersApplied').value || '[]');
+
+            try {
+                const response = await fetch('/api/analytics/recommendation-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        applicantId,
+                        recommendedLenders,
+                        rejectedLenders,
+                        filtersApplied
+                    })
+                });
+
+                const result = await response.json();
+                document.getElementById('testResults').innerHTML = `
+                    <div class="log-entry">
+                        <strong>Status:</strong> <span class="status ${result.success ? 'success' : 'error'}">${result.success ? 'SUCCESS' : 'ERROR'}</span><br>
+                        <strong>Response:</strong><br>
+                        <div class="json-viewer">${JSON.stringify(result, null, 2)}</div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('testResults').innerHTML = `
+                    <div class="log-entry">
+                        <span class="status error">ERROR</span><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test chat escalation
+        async function testChatEscalation() {
+            const sessionId = document.getElementById('sessionId').value;
+            const userName = document.getElementById('userName').value;
+            const userEmail = document.getElementById('userEmail').value;
+            const message = document.getElementById('escalationMessage').value;
+            const escalationReason = document.getElementById('escalationReason').value;
+
+            try {
+                const response = await fetch('/api/public/chat/escalate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId,
+                        userName,
+                        userEmail,
+                        message,
+                        escalationReason
+                    })
+                });
+
+                const result = await response.json();
+                alert(`Escalation ${result.success ? 'successful' : 'failed'}: ${result.message}`);
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Test issue report
+        async function testIssueReport() {
+            const sessionId = document.getElementById('sessionId').value || 'debug-session-' + Date.now();
+            const userName = document.getElementById('userName').value || 'Debug User';
+            const userEmail = document.getElementById('userEmail').value;
+            const issueType = document.getElementById('issueType').value;
+            const severity = document.getElementById('severity').value;
+            const description = document.getElementById('issueDescription').value;
+
+            try {
+                const response = await fetch('/api/public/chat/report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId,
+                        userName,
+                        userEmail,
+                        issueType,
+                        description,
+                        severity
+                    })
+                });
+
+                const result = await response.json();
+                alert(`Issue report ${result.success ? 'submitted' : 'failed'}: ${result.message}`);
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/analytics/recommendation-dashboard');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const stats = result.dashboard.stats;
+                    const rejectionReasons = result.dashboard.topRejectionReasons;
+                    const topLenders = result.dashboard.mostRecommendedLenders;
+
+                    document.getElementById('dashboardData').innerHTML = `
+                        <div class="grid">
+                            <div class="card">
+                                <h3>📊 Statistics</h3>
+                                <p><strong>Total Recommendations:</strong> ${stats.total_recommendations || 0}</p>
+                                <p><strong>Successful Matches:</strong> ${stats.successful_matches || 0}</p>
+                                <p><strong>Rejections:</strong> ${stats.rejections || 0}</p>
+                                <p><strong>Avg Recommendations/Applicant:</strong> ${parseFloat(stats.avg_recommendations_per_applicant || 0).toFixed(2)}</p>
+                            </div>
+                            <div class="card">
+                                <h3>❌ Top Rejection Reasons</h3>
+                                ${rejectionReasons.map(r => `<p>${r.reason}: ${r.count}</p>`).join('')}
+                            </div>
+                            <div class="card">
+                                <h3>⭐ Most Recommended Lenders</h3>
+                                ${topLenders.map(l => `<p>${l.lender}: ${l.count}</p>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('dashboardData').innerHTML = `<p class="status error">Failed to load dashboard: ${result.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('dashboardData').innerHTML = `<p class="status error">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Load escalations
+        async function loadEscalations() {
+            try {
+                const response = await fetch('/api/chat/escalations?limit=10');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const escalations = result.escalations;
+                    document.getElementById('escalationsData').innerHTML = `
+                        <div class="grid">
+                            ${escalations.map(e => `
+                                <div class="card">
+                                    <h4>Session: ${e.session_id}</h4>
+                                    <p><strong>User:</strong> ${e.user_name} (${e.user_email || 'No email'})</p>
+                                    <p><strong>Status:</strong> <span class="status ${e.status === 'pending' ? 'warning' : 'success'}">${e.status.toUpperCase()}</span></p>
+                                    <p><strong>Reason:</strong> ${e.escalation_reason}</p>
+                                    <p><strong>Message:</strong> ${e.message}</p>
+                                    <p><strong>Created:</strong> ${new Date(e.created_at).toLocaleString()}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('escalationsData').innerHTML = `<p class="status error">Failed to load escalations: ${result.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('escalationsData').innerHTML = `<p class="status error">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Check system status
+        async function checkSystemStatus() {
+            const endpoints = [
+                { name: 'Recommendation Log', url: '/api/analytics/recommendation-dashboard' },
+                { name: 'Chat Escalations', url: '/api/chat/escalations' },
+                { name: 'Issue Reports', url: '/api/chat/issue-reports' },
+                { name: 'Microsoft Graph', url: '/api/msgraph/health' }
+            ];
+
+            let statusHtml = '<div class="grid">';
+
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url);
+                    const isHealthy = response.ok;
+                    
+                    statusHtml += `
+                        <div class="card">
+                            <h4>${endpoint.name}</h4>
+                            <p><span class="status ${isHealthy ? 'success' : 'error'}">${isHealthy ? 'HEALTHY' : 'ERROR'}</span></p>
+                            <p>Status: ${response.status}</p>
+                            <p>URL: ${endpoint.url}</p>
+                        </div>
+                    `;
+                } catch (error) {
+                    statusHtml += `
+                        <div class="card">
+                            <h4>${endpoint.name}</h4>
+                            <p><span class="status error">ERROR</span></p>
+                            <p>Error: ${error.message}</p>
+                            <p>URL: ${endpoint.url}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            statusHtml += '</div>';
+            document.getElementById('systemStatus').innerHTML = statusHtml;
+        }
+
+        // Auto-load dashboard on page load
+        window.onload = function() {
+            loadDashboard();
+            loadEscalations();
+            checkSystemStatus();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "endpoints": [
+    "/api/applications",
+    "/api/applications/:id"
+  ],
+  "schemas": [
+    "server/routes/applications.ts",
+    "shared/schema.ts"
+  ],
+  "lockTimestamp": "2025-07-27T21:56:46.981Z",
+  "compatibility": "MULTI_TENANT_SAFE",
+  "breaking_changes": false
+}

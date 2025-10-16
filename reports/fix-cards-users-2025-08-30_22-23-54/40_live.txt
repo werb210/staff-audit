@@ -1,0 +1,5 @@
+BASE=https://staff.boreal.financial/api
+Token fp: 
+GET /pipeline/cards/does-not-exist -> 404
+GET /users/me -> 200
+GET /users -> 200

@@ -1,0 +1,18 @@
+Page,Button/Control,Status,Test_ID,Action,Notes
+Dashboard,Main Navigation Tabs,PASS,nav-dashboard,Navigate,All tabs render and clickable
+Pipeline,Drag Drop Cards,PASS,pipeline-card,Drag/Click,30 cards loaded across 6 stages
+Contacts,Contact List,PASS,contact-card,Click/Select,20 contacts in HubSpot-style layout
+Tasks,Tasks & Calendar Page,PASS,tasks-calendar,Navigate,FIXED: No longer crashes with JS error
+Lenders,Lender Products Grid,PASS,lender-product,View/Edit,32 products displayed
+Settings,User Management,PASS,user-mgmt,CRUD,16 users manageable
+Dialer,FAB Button,PASS,dialer-fab,Open Panel,Dialer panel opens successfully
+Dialer,Keypad Controls,PARTIAL,dialer-keypad,Input,UI present but needs Twilio integration test
+Dialer,Call Controls,PARTIAL,dialer-controls,Call Actions,Mute/Hold/Transfer buttons present
+Documents,Upload System,PASS,doc-upload,File Upload,S3 integration working
+Documents,Accept/Reject,PARTIAL,doc-actions,Process,UI present but needs destructive testing
+Pipeline,Move Between Stages,PASS,pipeline-move,Drag Drop,Cards move between stages
+Contacts,Add New Contact,UNTESTED,contact-add,Create,Button present but missing test ID
+Lenders,Edit Lender,UNTESTED,lender-edit,Modify,Button present but missing test ID
+Users,Create User,UNTESTED,user-create,Create,Button present but missing test ID
+Voice,IVR System,SKIP,voice-ivr,Call Flow,Complex system requires live testing
+SMS,2FA System,SKIP,sms-2fa,Send/Verify,Requires Twilio credentials testing

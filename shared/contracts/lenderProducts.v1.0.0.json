@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "endpoints": [
+    "/api/lender-products",
+    "/api/lender-products/:id"
+  ],
+  "schemas": [
+    "server/routes/lenderProducts.ts",
+    "server/middleware/requireLender.ts"
+  ],
+  "lockTimestamp": "2025-07-27T21:56:46.981Z",
+  "compatibility": "ROLE_BASED_ACCESS",
+  "breaking_changes": false
+}

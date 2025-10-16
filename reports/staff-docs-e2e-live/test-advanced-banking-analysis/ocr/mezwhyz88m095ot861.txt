@@ -1,0 +1,14 @@
+date,description,amount,balance
+2024-08-01,Opening Balance,0,15000
+2024-08-02,Customer Deposit,25000,40000
+2024-08-03,Rent Payment,-3500,36500
+2024-08-05,NSF Fee,-45,36455
+2024-08-07,Customer Payment,18000,54455
+2024-08-10,Equipment Purchase,-12000,42455
+2024-08-12,NSF Reversal,-35,42420
+2024-08-15,Large Customer Payment,35000,77420
+2024-08-18,Supplier Payment,-8500,68920
+2024-08-20,Loan Payment,-2500,66420
+2024-08-25,Customer Deposit,15000,81420
+2024-08-28,Utilities,-450,80970
+2024-08-31,Month End Balance,0,80970

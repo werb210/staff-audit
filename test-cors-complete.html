@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test for SignNow</title>
+</head>
+<body>
+    <h1>CORS Test Results</h1>
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(message) {
+            results.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+        
+        async function testCORS() {
+            log('🧪 Testing CORS from client.boreal.financial to staff.boreal.financial');
+            
+            const applicationId = 'f22c0bc9-40d7-4eaa-b671-7761d8101d50';
+            const staffUrl = 'https://staff.boreal.financial';
+            const endpoint = `${staffUrl}/api/applications/${applicationId}/signnow`;
+            
+            try {
+                log('📡 Making POST request to: ' + endpoint);
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({})
+                });
+                
+                log('✅ Response status: ' + response.status);
+                log('✅ Response OK: ' + response.ok);
+                
+                // Log response headers
+                const headers = {};
+                response.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+                log('📋 Response headers: ' + JSON.stringify(headers, null, 2));
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Response data: ' + JSON.stringify(data, null, 2));
+                } else {
+                    const errorText = await response.text();
+                    log('❌ Error response: ' + errorText);
+                }
+                
+            } catch (error) {
+                log('❌ Request failed: ' + error.message);
+                log('❌ Error type: ' + error.constructor.name);
+            }
+        }
+        
+        // Run test immediately
+        testCORS();
+    </script>
+</body>
+</html>

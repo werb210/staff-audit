@@ -1,0 +1,10 @@
+{
+  "count": 8,
+  "fields": [
+    "country", "product_category", "requested_amount", "industry", 
+    "time_in_business_months", "monthly_revenue", "documents", "applicationId"
+  ],
+  "canonical_usage": "pending",
+  "legacy_usage": "active", 
+  "notes": "Uses lenderRecommendation.ts with ApplicationInput interface for scoring and matching"
+}

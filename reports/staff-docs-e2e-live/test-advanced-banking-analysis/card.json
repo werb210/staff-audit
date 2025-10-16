@@ -1,0 +1,17 @@
+{
+  "id": "test-advanced-banking-analysis",
+  "title": "Advanced Analytics Inc",
+  "subtitle": "Applied 2025-08-31",
+  "doc_count": 1,
+  "banking": {
+    "total_credits": 93000,
+    "total_debits": 27030,
+    "avg_balance": 55647,
+    "nsf_count": 2
+  },
+  "metrics": {
+    "loanAmount": 500000,
+    "country": "CA",
+    "revenue": 2000000
+  }
+}

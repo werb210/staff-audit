@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📞 Inbound Call Test - WebRTC Testing</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; 
+            margin: 20px; 
+            background: #f8fafc; 
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { 
+            background: white; 
+            padding: 24px; 
+            margin: 16px 0; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07); 
+            border: 1px solid #e2e8f0;
+        }
+        .status { 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            margin: 12px 0; 
+            font-weight: 500;
+        }
+        .success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .warning { background: #fffbeb; color: #d97706; border: 1px solid #fed7aa; }
+        .info { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+        
+        button { 
+            padding: 12px 24px; 
+            margin: 8px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        
+        .call-active { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white; 
+            padding: 24px; 
+            border-radius: 12px; 
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(16,185,129,0.3);
+        }
+        
+        pre { 
+            background: #1e293b; 
+            color: #f1f5f9; 
+            padding: 16px; 
+            border-radius: 8px; 
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        
+        .phone-number { 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            color: #ef4444; 
+            background: #fef2f2;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 4px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        
+        .auth-section {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            border: none;
+        }
+        
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+        
+        .device-status {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 16px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        
+        .device-ready { background: #f0fdf4; color: #15803d; border: 2px solid #bbf7d0; }
+        .device-offline { background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; }
+        .device-connecting { background: #fffbeb; color: #d97706; border: 2px solid #fed7aa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📞 Inbound Call Test Suite - Step 2</h1>
+        <p><strong>Objective:</strong> Execute live inbound call testing for BF and SLF with evidence capture.</p>
+
+        <div class="test-section auth-section">
+            <h2>🔐 Authentication Setup</h2>
+            <p>Login to generate WebRTC token for call testing:</p>
+            <input type="email" id="email" placeholder="staff@borealfinancial.com" value="staff@borealfinancial.com">
+            <input type="password" id="password" placeholder="Password" value="">
+            <div>
+                <button class="btn-success" onclick="loginAndSetup()">🚀 Login & Setup WebRTC</button>
+                <button class="btn-primary" onclick="testToken()">🔑 Test Token Only</button>
+            </div>
+            <div id="auth-status"></div>
+        </div>
+
+        <div class="grid">
+            <div class="test-section">
+                <h2>📱 BF Call Test</h2>
+                <div class="phone-number">(825) 451-1768</div>
+                <p><strong>Silo:</strong> BF (Boreal Financial)</p>
+                <button class="btn-warning" onclick="startCallTest('BF', '8254511768')">📹 Start BF Test</button>
+                <div id="bf-results"></div>
+            </div>
+
+            <div class="test-section">
+                <h2>📱 SLF Call Test</h2>
+                <div class="phone-number">(775) 314-6801</div>
+                <p><strong>Silo:</strong> SLF (Site Level Financial)</p>
+                <button class="btn-warning" onclick="startCallTest('SLF', '7753146801')">📹 Start SLF Test</button>
+                <div id="slf-results"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 WebRTC Device Status</h2>
+            <div id="device-status" class="device-status device-offline">🔴 Device Not Initialized</div>
+            <button class="btn-primary" onclick="refreshDeviceStatus()">🔄 Refresh Status</button>
+            <button class="btn-danger" onclick="resetDevice()">🔄 Reset Device</button>
+        </div>
+
+        <div id="incoming-call-ui" style="display: none;" class="call-active">
+            <h3>📞 INCOMING CALL</h3>
+            <p style="font-size: 1.2em;">From: <span id="caller-number">+1234567890</span></p>
+            <p style="font-size: 0.9em;">Silo: <span id="caller-silo">BF</span></p>
+            <div>
+                <button class="btn-success" onclick="acceptCall()" style="font-size: 1.2em; padding: 16px 32px;">✅ ACCEPT</button>
+                <button class="btn-danger" onclick="rejectCall()" style="font-size: 1.2em; padding: 16px 32px;">❌ REJECT</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Test Instructions</h2>
+            <ol>
+                <li><strong>Login:</strong> Use staff credentials to authenticate</li>
+                <li><strong>Setup:</strong> Click "Login & Setup WebRTC" to initialize</li>
+                <li><strong>Record:</strong> Start screen recording on your device</li>
+                <li><strong>Call:</strong> From external phone, call the test numbers</li>
+                <li><strong>Verify:</strong> Incoming call popup → Accept → Audio working</li>
+                <li><strong>Export:</strong> Save HAR file from Network tab</li>
+                <li><strong>Screenshot:</strong> Capture Twilio call logs</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>🛠️ Debug Console</h2>
+            <button class="btn-primary" onclick="clearConsole()">Clear Console</button>
+            <button class="btn-primary" onclick="exportLogs()">Export Logs</button>
+            <button class="btn-primary" onclick="downloadEvidence()">📦 Download Evidence Template</button>
+            <pre id="debug-console"></pre>
+        </div>
+    </div>
+
+    <script src="https://sdk.twilio.com/js/client/releases/1.14.1/twilio.min.js"></script>
+    <script>
+        let twilioDevice = null;
+        let currentConnection = null;
+        let authToken = null;
+        let testResults = [];
+        let currentTest = null;
+        
+        // Logger
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            console.log(logEntry);
+            
+            const debugConsole = document.getElementById('debug-console');
+            debugConsole.textContent += logEntry + '\n';
+            debugConsole.scrollTop = debugConsole.scrollHeight;
+            
+            testResults.push({ timestamp, type, message });
+        }
+
+        // Authentication
+        async function loginAndSetup() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                log('❌ Email and password required', 'error');
+                return;
+            }
+            
+            try {
+                log('🔐 Attempting authentication...', 'info');
+                
+                // Use lender login endpoint
+                const response = await fetch(`/lender-login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    authToken = data.token;
+                    log(`✅ Authentication successful for ${data.user.email}`, 'success');
+                    document.getElementById('auth-status').innerHTML = 
+                        '<div class="status success">✅ Authenticated: ' + data.user.email + ' (' + data.user.role + ')</div>';
+                    
+                    // Setup WebRTC
+                    await setupWebRTC();
+                } else {
+                    throw new Error(data.error || 'Authentication failed');
+                }
+            } catch (error) {
+                log(`❌ Authentication failed: ${error.message}`, 'error');
+                document.getElementById('auth-status').innerHTML = 
+                    '<div class="status error">❌ Authentication Failed: ' + error.message + '</div>';
+            }
+        }
+
+        // Test token generation
+        async function testToken() {
+            if (!authToken) {
+                log('⚠️ Must authenticate first', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/voice/token', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log(`✅ WebRTC token generated: ${data.identity}`, 'success');
+                    log(`🕐 Token expires: ${data.expires}`, 'info');
+                    return data.token;
+                } else {
+                    throw new Error(data.error || 'Token generation failed');
+                }
+            } catch (error) {
+                log(`❌ Token test failed: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        // Setup WebRTC
+        async function setupWebRTC() {
+            log('🔧 Setting up WebRTC Device...', 'info');
+            
+            const token = await testToken();
+            if (!token) {
+                log('❌ Cannot setup WebRTC without token', 'error');
+                return;
+            }
+
+            try {
+                // Initialize Twilio Device
+                twilioDevice = new Twilio.Device();
+                
+                // Event handlers
+                twilioDevice.on('ready', () => {
+                    log('✅ WebRTC Device ready for incoming calls', 'success');
+                    updateDeviceStatus('ready');
+                });
+
+                twilioDevice.on('error', (error) => {
+                    log(`❌ WebRTC Device error: ${error.message}`, 'error');
+                    updateDeviceStatus('error');
+                });
+
+                twilioDevice.on('offline', () => {
+                    log('📴 WebRTC Device offline', 'warning');
+                    updateDeviceStatus('offline');
+                });
+
+                twilioDevice.on('incoming', (connection) => {
+                    log(`📞 INCOMING CALL from: ${connection.parameters.From}`, 'success');
+                    handleIncomingCall(connection);
+                });
+
+                // Setup device
+                await twilioDevice.setup(token);
+                log('✅ WebRTC Device setup completed', 'success');
+                
+            } catch (error) {
+                log(`❌ WebRTC setup failed: ${error.message}`, 'error');
+                updateDeviceStatus('error');
+            }
+        }
+
+        // Update device status display
+        function updateDeviceStatus(status) {
+            const statusDiv = document.getElementById('device-status');
+            statusDiv.className = 'device-status';
+            
+            switch (status) {
+                case 'ready':
+                    statusDiv.className += ' device-ready';
+                    statusDiv.textContent = '🟢 Device Ready - Listening for Calls';
+                    break;
+                case 'offline':
+                    statusDiv.className += ' device-offline';
+                    statusDiv.textContent = '🔴 Device Offline';
+                    break;
+                case 'connecting':
+                    statusDiv.className += ' device-connecting';
+                    statusDiv.textContent = '🟡 Device Connecting...';
+                    break;
+                case 'error':
+                    statusDiv.className += ' device-offline';
+                    statusDiv.textContent = '🔴 Device Error';
+                    break;
+                default:
+                    statusDiv.className += ' device-offline';
+                    statusDiv.textContent = '🔴 Device Not Initialized';
+            }
+        }
+
+        // Start call test
+        function startCallTest(silo, number) {
+            currentTest = { silo, number, startTime: new Date() };
+            
+            log(`🎯 Starting ${silo} call test - Number: +1${number}`, 'info');
+            log(`📹 IMPORTANT: Start screen recording NOW!`, 'warning');
+            log(`📞 Call +1${number} from external phone`, 'info');
+            log(`📋 Expected: Incoming call popup should appear`, 'info');
+            
+            const resultDiv = document.getElementById(silo.toLowerCase() + '-results');
+            resultDiv.innerHTML = `
+                <div class="status warning">
+                    📹 Test Started - Recording Required<br>
+                    📞 Call: +1${number}<br>
+                    ⏰ Started: ${new Date().toLocaleTimeString()}
+                </div>
+            `;
+        }
+
+        // Handle incoming call
+        function handleIncomingCall(connection) {
+            currentConnection = connection;
+            
+            // Show incoming call UI
+            document.getElementById('incoming-call-ui').style.display = 'block';
+            document.getElementById('caller-number').textContent = connection.parameters.From || 'Unknown';
+            document.getElementById('caller-silo').textContent = currentTest ? currentTest.silo : 'Unknown';
+            
+            log(`📱 INCOMING CALL UI DISPLAYED`, 'success');
+            log(`📞 From: ${connection.parameters.From}`, 'info');
+            
+            if (currentTest) {
+                const resultDiv = document.getElementById(currentTest.silo.toLowerCase() + '-results');
+                resultDiv.innerHTML += `
+                    <div class="status success">
+                        ✅ Incoming Call Received!<br>
+                        📞 From: ${connection.parameters.From}<br>
+                        🎯 Test: ${currentTest.silo} successful
+                    </div>
+                `;
+            }
+        }
+
+        // Accept call
+        function acceptCall() {
+            if (currentConnection) {
+                log('✅ Accepting incoming call...', 'success');
+                currentConnection.accept();
+                
+                currentConnection.on('accept', () => {
+                    log('✅ Call accepted - AUDIO SHOULD BE WORKING!', 'success');
+                    
+                    if (currentTest) {
+                        const resultDiv = document.getElementById(currentTest.silo.toLowerCase() + '-results');
+                        resultDiv.innerHTML += `
+                            <div class="status success">
+                                🎉 CALL ACCEPTED - AUDIO ACTIVE<br>
+                                📞 Test: ${currentTest.silo} COMPLETE<br>
+                                📹 Stop recording and export HAR file
+                            </div>
+                        `;
+                    }
+                });
+                
+                document.getElementById('incoming-call-ui').style.display = 'none';
+            }
+        }
+
+        // Reject call
+        function rejectCall() {
+            if (currentConnection) {
+                log('❌ Rejecting incoming call...', 'info');
+                currentConnection.reject();
+                document.getElementById('incoming-call-ui').style.display = 'none';
+                currentConnection = null;
+            }
+        }
+
+        // Refresh device status
+        function refreshDeviceStatus() {
+            if (!twilioDevice) {
+                updateDeviceStatus('not_initialized');
+                log('⚠️ Device not initialized - Login first', 'warning');
+                return;
+            }
+            
+            const status = twilioDevice.status();
+            log(`📊 Device status: ${status}`, 'info');
+            updateDeviceStatus(status);
+        }
+
+        // Reset device
+        function resetDevice() {
+            if (twilioDevice) {
+                twilioDevice.destroy();
+                twilioDevice = null;
+                log('🔄 Device reset - Login again to reinitialize', 'info');
+            }
+            updateDeviceStatus('not_initialized');
+        }
+
+        // Utilities
+        function clearConsole() {
+            document.getElementById('debug-console').textContent = '';
+            testResults = [];
+        }
+
+        function exportLogs() {
+            const logData = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                testResults: testResults,
+                currentTest: currentTest
+            };
+            
+            const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inbound-call-test-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadEvidence() {
+            const evidenceTemplate = {
+                testDate: new Date().toISOString(),
+                phoneNumbers: {
+                    BF: "+18254511768",
+                    SLF: "+17753146801"
+                },
+                requiredFiles: [
+                    "bf-call-test.mp4 (Screen recording of BF call)",
+                    "bf-call-test.har (Network traffic for BF call)",
+                    "bf-twilio-logs.png (Twilio console screenshot)",
+                    "slf-call-test.mp4 (Screen recording of SLF call)",
+                    "slf-call-test.har (Network traffic for SLF call)",
+                    "slf-twilio-logs.png (Twilio console screenshot)"
+                ],
+                testSteps: [
+                    "1. Login to this test page with staff credentials",
+                    "2. Start screen recording",
+                    "3. Call test number from external phone",
+                    "4. Verify incoming call popup appears",
+                    "5. Accept call and confirm audio works",
+                    "6. Export HAR file from browser Network tab",
+                    "7. Screenshot Twilio call logs from console"
+                ],
+                results: testResults
+            };
+            
+            const blob = new Blob([JSON.stringify(evidenceTemplate, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'evidence-template.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-initialize on page load
+        window.addEventListener('load', () => {
+            log('🚀 Inbound Call Test Suite loaded', 'info');
+            log('📞 Ready to test: BF (825) 451-1768, SLF (775) 314-6801', 'info');
+            
+            // Auto-populate email if on staff domain
+            if (window.location.hostname.includes('staff') || window.location.pathname.includes('/portal')) {
+                log('✅ Staff application context detected', 'success');
+            }
+            
+            updateDeviceStatus('not_initialized');
+        });
+    </script>
+</body>
+</html>

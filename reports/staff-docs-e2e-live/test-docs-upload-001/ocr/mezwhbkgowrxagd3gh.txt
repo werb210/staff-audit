@@ -1,0 +1,6 @@
+date,description,amount,balance
+2024-01-01,Opening Balance,0,50000
+2024-01-02,Customer Payment,15000,65000
+2024-01-03,Supplier Payment,-8000,57000
+2024-01-04,Loan Interest,-250,56750
+2024-01-05,Customer Payment,22000,78750

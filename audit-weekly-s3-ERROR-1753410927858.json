@@ -1,0 +1,6 @@
+{
+  "timestamp": "2025-07-25T02:35:27.853Z",
+  "success": false,
+  "error": "syntax error at or near \"null\"",
+  "stack": "error: syntax error at or near \"null\"\n    at file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1345:74\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async NeonPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-serverless/session.ts:102:18)\n    at async runWeeklyAudit (/home/runner/workspace/scripts/s3WeeklyAudit.ts:30:20)"
+}

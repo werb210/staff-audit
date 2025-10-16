@@ -1,0 +1,12 @@
+# Recommended .replit configuration for deployment
+# This bypasses build timeouts by running tsx directly
+
+run = "NODE_ENV=production tsx server/production.ts"
+
+[deployment]
+run = ["sh", "-c", "NODE_ENV=production tsx server/production.ts"]
+build = ["sh", "-c", "echo 'Build bypassed - running server directly with tsx'"]
+
+[env]
+REPL_OWNER = "staffportal"
+REPL_SLUG = "staffportal"

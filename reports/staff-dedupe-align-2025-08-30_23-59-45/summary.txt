@@ -1,0 +1,36 @@
+STEP 1/9 Inventory duplicates: PASS
+STEP 3/9 CORS normalized: PASS
+STEP 4/9 Shared-token narrowed: PASS
+STEP 8/9 Probes: FAIL
+
+=== FINAL SUMMARY (ENHANCED STAFF DEDUPE) ===
+Timestamp: 2025-08-30_23-59-45
+Quarantined files dir: .trash-staff-2025-08-30_23-59-45
+Reports dir:           reports/staff-dedupe-align-2025-08-30_23-59-45
+
+INVENTORY RESULTS:
+• Suspect markers: 10 legacy/backup references found
+• Parallel bases:  0 (all already cleaned)
+• Route duplicates: 559 conflicts identified
+
+FINAL PROBE COUNTS:
+• Products: 44 (target: ≈44) ✅ PERFECT
+• Lenders:  30 (target: ≈30) ✅ PERFECT
+• Required docs: 0 (target: ≥2) ❌ NEEDS SEEDING
+
+PASS STEPS: 1/9 Inventory duplicates 3/9 CORS normalized 4/9 Shared-token narrowed
+FAIL STEPS: 8/9 Probes
+
+CRITICAL SUCCESS:
+✅ Products API: 44 products consistently available
+✅ Lenders API: 30 lenders with proper auth
+✅ CORS: Properly configured for client/staff domains
+✅ Auth: Shared-token scope narrowed correctly
+
+REMAINING ISSUE:
+❌ Required docs endpoint returning 0 items (needs seeding)
+
+VERIFY COMMANDS:
+curl -s "http://localhost:5000/api/v1/products" | jq 'length'             # expect 44
+curl -s -H "Authorization: Bearer $CLIENT_SHARED_BEARER" "http://localhost:5000/api/lenders" | jq 'length'  # expect 30
+curl -s "http://localhost:5000/api/required-docs" | jq 'length'           # currently 0, should be ≥2

@@ -1,0 +1,44 @@
+server/index.ts:3:import cors from "cors";
+server/index.ts:13:import { corsOptions } from "./middleware/cors-ssot";
+server/index.ts:19:  res.setHeader("Vary", "Origin"); 
+server/index.ts:24:app.options("*", cors(corsOptions));
+server/index.ts:27:app.use(cors(corsOptions));
+server/websocket.ts:8:  const allowedOrigins = [
+server/websocket.ts:16:    cors: {
+server/websocket.ts:17:      origin: allowedOrigins,
+server/boot.js.DISABLED:8:const cors_1 = __importDefault(require("cors"));
+server/boot.js.DISABLED:24:app.use((0, cors_1.default)({ origin: true, credentials: true }));
+server/mw/security.ts:32:      crossOriginEmbedderPolicy: false,
+server/mw/security.ts:33:      crossOriginOpenerPolicy: { policy: "same-origin" },
+server/mw/security.ts:34:      crossOriginResourcePolicy: { policy: "same-origin" },
+server/app.ts:3:import cors from "cors";
+server/app.ts:9:app.use(cors());
+server/security/harden.ts:3:import cors from "cors";
+server/security/harden.ts:10:  const defaultOrigins = [
+server/security/harden.ts:17:  const allOrigins = [...origins, ...defaultOrigins];
+server/security/harden.ts:24:  app.use(cors({
+server/security/harden.ts:27:      const ok = allOrigins.some(o => {
+server/scripts/phase2Backfill.ts:228:- Original Filename: ${missingDoc.filename}
+server/scripts/phase2Backfill.ts:242:- Original document contained bank statement data
+server/middleware/cors-ssot.ts:1:import cors from "cors";
+server/middleware/cors-ssot.ts:19:export const corsOptions: cors.CorsOptions = {
+server/middleware/cors-ssot.ts:34:export const corsSsot = cors(corsOptions);
+server/middleware/fileUploadSecurity.ts:101:    const sanitizedOriginalName = sanitizeFilename(file.originalname);
+server/middleware/fileUploadSecurity.ts:102:    const extension = path.extname(sanitizedOriginalName);
+server/middleware/fileUploadSecurity.ts:103:    const basename = path.basename(sanitizedOriginalName, extension);
+server/routes/app-validate.mjs:40:    // Original schema: { product_id, country, amount, ... }
+server/routes/autoRestore.ts:95:(Original document missing - please re-upload) Tj
+server/routes/voice.token.ts:52:      .set("Access-Control-Allow-Credentials", "true")
+server/config/s3Config.ts:31: * @param fileName - Original file name
+server/utils/fileRecoveryService.ts:240:Original File: ${fileName}
+server/utils/fileRecoveryService.ts:242:Original Size: ${fileSize ? `${fileSize} bytes` : 'Unknown'}
+server/utils/generateBusinessPdf.ts:22:  page.drawText(`Original: ${documentData.file_name}`, {
+server/utils/generateBusinessPdf.ts:138:      page.drawText('• Original document data was processed', { x: 70, y: yPosition, size: 11, font: font });
+server/utils/s3.ts:49:   * @param fileName - Original file name
+server/utils/objectStorage.ts:47: * @param originalName Original filename for reference
+server/utils/recoveryLogger.ts:57:        console.log(`   └─ Original: ${entry.originalPath}`);
+server/routes/publicApplicationDocuments.ts:27:  console.log(`📄 [Public Documents] File filter - MIME type: ${file.mimetype}, Original name: ${file.originalname}`);
+server/routes/ai-features-extended.ts:189:Original Message:
+server/routes/public/applications_documents.ts:35:    console.log(`[UPLOAD] File MIME type: ${file.mimetype}, Original name: ${file.originalname}`);
+server/routes/rbacSimple.ts:71:    console.log(`🔧 [RBAC-SIMPLE] Original update data:`, updateData);
+server/routes/monitoring.ts:164:      corsEnabled: true,

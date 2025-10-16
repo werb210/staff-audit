@@ -1,0 +1,25 @@
+{
+  "applicantName": "Tech Solutions Inc",
+  "applicationDate": "2025-08-31",
+  "amount": 750000,
+  "geography": {
+    "country": "CA",
+    "province": "ON"
+  },
+  "financials": {
+    "revenue": 2500000,
+    "timeInBusiness": "3 years"
+  },
+  "raw": {
+    "loanAmount": 750000,
+    "country": "CA",
+    "province": "ON",
+    "revenue": 2500000,
+    "timeInBusiness": "3 years",
+    "industry": "Technology",
+    "employees": 25,
+    "email": "finance@techsolutions.ca",
+    "phone": "416-555-0123",
+    "useOfFunds": "Equipment and expansion"
+  }
+}

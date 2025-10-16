@@ -1,0 +1,9 @@
+{
+  "approx_mapped_fields": [
+    "businessName",
+    "requestedAmount",
+    "contactEmail"
+  ],
+  "out_total": 5,
+  "in_total": 4
+}

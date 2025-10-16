@@ -1,0 +1,211 @@
+{
+  "generated_at": "2025-08-23T00:00:00Z",
+  "summary": {
+    "green": [
+      "Dashboard",
+      "Pipeline (core)",
+      "Contacts", 
+      "Lenders",
+      "Communications (calls/email)",
+      "Voice System",
+      "Marketing Hub",
+      "Reports",
+      "AI Features (25+)",
+      "Authentication"
+    ],
+    "yellow": [
+      "Build System (missing 4-5 UI components)",
+      "SLF Banner Inheritance",
+      "Task Calendar (missing calendar component)",
+      "User Management (missing UI components)"
+    ],
+    "red": [
+      "Chat Backend (endpoints missing)",
+      "Issues Reporting (backend missing)",
+      "Socket.io (partially implemented)"
+    ],
+    "notes": "Massive enterprise platform with 547 API route files and dual-silo architecture. Core business functionality operational, minor component gaps preventing full build completion."
+  },
+  "silos": [
+    {
+      "name": "Dashboard",
+      "routes": ["/staff/dashboard"],
+      "features": [
+        {
+          "feature_name": "Main Dashboard",
+          "route_path": "/staff/dashboard",
+          "component_path": "client/src/pages/staff/dashboard/DashboardPage.tsx",
+          "status": "Operational",
+          "deps": {
+            "apis": ["/api/dashboard/stats"],
+            "sockets": [],
+            "env": ["API_BASE_URL"]
+          },
+          "data_contract": {
+            "request": "GET /api/dashboard/stats",
+            "response_keys": ["applications", "contacts", "revenue"]
+          },
+          "known_issues": "None",
+          "owner": "—"
+        }
+      ]
+    },
+    {
+      "name": "Pipeline",
+      "routes": ["/staff/pipeline", "/staff/pipeline/:cardId"],
+      "features": [
+        {
+          "feature_name": "Pipeline Board",
+          "route_path": "/staff/pipeline",
+          "component_path": "client/src/pipeline/PipelinePage.tsx",
+          "status": "Operational",
+          "deps": {
+            "apis": ["/api/applications", "/api/pipeline/cards/:id/application"],
+            "sockets": [],
+            "env": ["API_BASE_URL"]
+          },
+          "data_contract": {
+            "request": "GET /api/pipeline/cards/:id/application",
+            "response_keys": ["application.id", "application.businessName", "contact.email", "documentCount"]
+          },
+          "known_issues": "None",
+          "owner": "—"
+        },
+        {
+          "feature_name": "Application Drawer",
+          "route_path": "/staff/pipeline/:cardId",
+          "component_path": "client/src/pipeline/PipelineDrawer.tsx",
+          "status": "Operational",
+          "deps": {
+            "apis": ["/api/pipeline/cards/:id/application", "/api/pipeline/cards/:id/docs"],
+            "sockets": [],
+            "env": ["API_BASE_URL"]
+          },
+          "data_contract": {
+            "request": "GET /api/pipeline/cards/:id/application",
+            "response_keys": ["application", "contact", "conflicts", "ocrValidation", "documentCount"]
+          },
+          "known_issues": "Build issues with missing UI components",
+          "owner": "—"
+        },
+        {
+          "feature_name": "OCR Analysis",
+          "route_path": "/staff/pipeline/:cardId",
+          "component_path": "client/src/pipeline/OCRConflictsTab.tsx",
+          "status": "Operational",
+          "deps": {
+            "apis": ["/api/pipeline/cards/:id/ocr-conflicts"],
+            "sockets": [],
+            "env": ["OPENAI_API_KEY"]
+          },
+          "data_contract": {
+            "request": "GET /api/pipeline/cards/:id/ocr-conflicts",
+            "response_keys": ["documents", "conflicts", "fieldSummary"]
+          },
+          "known_issues": "None",
+          "owner": "—"
+        }
+      ]
+    },
+    {
+      "name": "Communications",
+      "routes": ["/staff/communication", "/staff/communication/chat", "/staff/communication/calls", "/staff/communication/email"],
+      "features": [
+        {
+          "feature_name": "Chat System", 
+          "route_path": "/staff/communication/chat",
+          "component_path": "client/src/pages/staff/communications/ChatPage.tsx",
+          "status": "Degraded",
+          "deps": {
+            "apis": ["/api/chat/request-staff", "/api/chat/user-message"],
+            "sockets": ["chat:new", "chat:message"],
+            "env": ["SOCKET_URL"]
+          },
+          "data_contract": {
+            "request": "POST /api/chat/request-staff",
+            "response_keys": ["conversationId", "status"]
+          },
+          "known_issues": "Backend endpoints missing",
+          "owner": "—"
+        },
+        {
+          "feature_name": "Voice Calling",
+          "route_path": "/staff/voice", 
+          "component_path": "client/src/pages/staff/VoicePage.tsx",
+          "status": "Operational",
+          "deps": {
+            "apis": ["/api/voice/outgoing", "/api/voice/status"],
+            "sockets": [],
+            "env": ["TWILIO_ACCOUNT_SID"]
+          },
+          "data_contract": {
+            "request": "POST /api/voice/outgoing",
+            "response_keys": ["callId", "status"]
+          },
+          "known_issues": "None",
+          "owner": "—"
+        }
+      ]
+    },
+    {
+      "name": "SLF",
+      "routes": ["/staff/slf/dashboard", "/staff/slf/contacts", "/staff/slf/reports", "/staff/slf/settings", "/staff/slf/communication", "/staff/slf/lenders", "/staff/slf/marketing"],
+      "features": [
+        {
+          "feature_name": "SLF Contacts",
+          "route_path": "/staff/slf/contacts",
+          "component_path": "client/src/pages/staff/slf/SLFContactsPage.tsx", 
+          "status": "Operational",
+          "deps": {
+            "apis": ["/api/slf/contacts"],
+            "sockets": [],
+            "env": ["API_BASE_URL"]
+          },
+          "data_contract": {
+            "request": "GET /api/slf/contacts",
+            "response_keys": ["contacts"]
+          },
+          "known_issues": "Banner inheritance missing - SLFLayout bypasses global banner",
+          "owner": "—"
+        }
+      ]
+    }
+  ],
+  "apis": [
+    {"method": "POST", "path": "/api/chat/request-staff", "file": "server/routes/chat.ts", "status": "Missing"},
+    {"method": "POST", "path": "/api/chat/log-contact", "file": "server/routes/chat.ts", "status": "Missing"}, 
+    {"method": "POST", "path": "/api/chat/user-message", "file": "server/routes/chat.ts", "status": "Missing"},
+    {"method": "POST", "path": "/api/issues/report", "file": "server/routes/issues.ts", "status": "Missing"},
+    {"method": "GET", "path": "/api/pipeline/cards/:id/application", "file": "server/routes/pipeline.ts", "status": "Present"},
+    {"method": "GET", "path": "/api/applications", "file": "server/routes/applications.ts", "status": "Present"},
+    {"method": "GET", "path": "/api/contacts", "file": "server/routes/contacts.ts", "status": "Present"},
+    {"method": "GET", "path": "/api/lenders", "file": "server/routes/lenders.ts", "status": "Present"},
+    {"method": "POST", "path": "/api/voice/outgoing", "file": "server/routes/voice.ts", "status": "Present"}
+  ],
+  "sockets": [
+    {"event": "chat:new", "emitted_from": "server/routes/chat.ts", "rooms": ["staff"], "status": "Missing"},
+    {"event": "chat:message", "emitted_from": "server/routes/chat.ts", "rooms": ["conv:${conversationId}"], "status": "Missing"},
+    {"event": "issue:new", "emitted_from": "server/routes/issues.ts", "rooms": ["staff"], "status": "Missing"}
+  ],
+  "ai": [
+    {"area": "OCR", "pkg": "custom-ocr", "used_in": "client/src/pipeline/OCRConflictsTab.tsx", "consumed_by": "Pipeline Documents"},
+    {"area": "Credit Summary", "pkg": "openai", "used_in": "client/src/components/ai/AISummaryTab.tsx", "consumed_by": "Application Analysis"},
+    {"area": "Risk Scoring", "pkg": "openai", "used_in": "client/src/components/ai/RiskScoreWidget.tsx", "consumed_by": "Application Assessment"},
+    {"area": "Document Analysis", "pkg": "openai", "used_in": "client/src/components/ai/DocumentExplainer.tsx", "consumed_by": "Document Review"},
+    {"area": "Email Drafting", "pkg": "openai", "used_in": "client/src/components/ai/LenderEmailDrafter.tsx", "consumed_by": "Communication"},
+    {"area": "Smart Recommendations", "pkg": "openai", "used_in": "client/src/components/ai/SmartNextStepEngine.tsx", "consumed_by": "Workflow Automation"}
+  ],
+  "documents_flow": {
+    "upload_endpoint": "/api/documents/upload",
+    "staging_fields": ["external_id", "upload_token", "document_type", "lender_product_id"],
+    "linking": "POST /api/applications sets application_id on documents by external_id and/or X-Upload-Token",
+    "ui_locations": ["/staff/pipeline drawer > Documents", "/staff/pipeline/:cardId > OCR Analysis"]
+  },
+  "global_ui": {
+    "banner": {
+      "component": "client/src/components/layout/BFBanner.tsx",
+      "present_on_all_staff_routes": false,
+      "exceptions": ["/staff/slf/*"]
+    }
+  }
+}

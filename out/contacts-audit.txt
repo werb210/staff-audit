@@ -1,0 +1,7 @@
+## CONTACTS AUDIT (before)
+
+All files named Contacts.tsx:
+client/src/pages/Contacts.tsx
+client/src/pages/staff/sections/Contacts.tsx
+
+## CONTACTS AUDIT (after)

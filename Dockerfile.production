@@ -1,0 +1,23 @@
+# Multi-stage build to reduce image size
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --production --ignore-scripts
+
+FROM node:20-alpine AS runtime
+WORKDIR /app
+
+# Copy only production dependencies
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+
+# Skip browser downloads
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV NODE_ENV=production
+
+# Build client assets
+RUN npm run build
+
+EXPOSE 5000
+CMD ["npm", "run", "start"]

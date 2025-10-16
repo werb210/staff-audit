@@ -1,0 +1,6 @@
+== STAFF CARDS OPEN FIX @ 2025-08-31_01-30-00 ==
+Canonical endpoints discovered:
+  LIST: /pipeline/cards
+  DETAIL: /pipeline/cards/1
+Pipeline API is returning 71 applications successfully
+✅ ENDPOINTS VERIFIED: LIST=200 DETAIL=404

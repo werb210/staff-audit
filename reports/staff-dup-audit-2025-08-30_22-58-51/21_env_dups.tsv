@@ -1,0 +1,15 @@
+O365_REDIRECT_URI	.env,.env.example
+PUBLIC_BASE_URL	.env,.env.example
+DEV_LOGIN_ENABLED	.env,.env.dev
+SHOW_DEBUG_BANNER	.env,.env
+CLIENT_APP_API_KEY	.env,.env
+DEV_NO_AUTH	.env,.env.local
+REQUIRE_MFA_FOR_ALL	.env,.env
+MFA_BYPASS	.env,.env
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD	.env.deployment,.env.example
+NODE_ENV	.env.deployment,.env.dev,.env.example,.env.production,.env.production.example,.env.production.local
+DATABASE_URL	.env.example,.env.production.example
+JWT_SECRET	.env.example,.env.production.example
+TWILIO_ACCOUNT_SID	.env.example,.env.production.example
+TWILIO_AUTH_TOKEN	.env.example,.env.production.example
+TWILIO_PHONE_NUMBER	.env.example,.env.example

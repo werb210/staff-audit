@@ -1,0 +1,3 @@
+== STAFF E2E INTAKE VALIDATION SETUP @ 2025-08-31_16-15-13 ==
+Boot file: server/boot.ts
+Test router: server/routes/test-intake.router.ts

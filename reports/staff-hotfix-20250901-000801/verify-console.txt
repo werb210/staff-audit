@@ -1,0 +1,18 @@
+(async () => {
+  // 1) Board count
+  const board = await fetch('/api/pipeline/board').then(r=>r.json()).catch(()=>null);
+  console.log('[Board]', board?.stages?.map(s=>[s.id,(s.cards||[]).length]));
+  // 2) Open first card via deep link (proves drawer route works)
+  const first = (board?.stages||[]).flatMap(s=>s.cards||[])[0] || { id:'demo_1' };
+  history.pushState({}, '', `/staff/pipeline/${first.id}`);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+  // 3) Confirm detail API
+  const detail = await fetch(`/api/pipeline/cards/${first.id}`).then(r=>r.json()).catch(()=>null);
+  console.log('[Detail]', detail && { id: detail.id, businessName: detail.businessName, amount: detail.fundingAmount });
+  // 4) Click handler check (no overlay stealing clicks)
+  const btn = document.querySelector('[data-card-button]') || document.querySelector('[data-testid="pipeline-card"]');
+  if (!btn) { console.warn('No card button found'); return; }
+  const style = getComputedStyle(btn);
+  console.table({pointerEvents: style.pointerEvents, zIndex: style.zIndex});
+  btn.click(); // open drawer if not already
+})();

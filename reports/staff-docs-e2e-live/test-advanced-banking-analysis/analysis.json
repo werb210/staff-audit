@@ -1,0 +1,9 @@
+{
+  "docs_total": 1,
+  "bank": {
+    "total_credits": 93000,
+    "total_debits": 27030,
+    "avg_balance": 55647,
+    "nsf_count": 2
+  }
+}

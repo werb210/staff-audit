@@ -1,0 +1,27 @@
+{
+  "total_count": 26,
+  "legacy_fields": [
+    "business_name", "amount_requested", "country", "product_category", 
+    "applicant_name", "applicant_email", "applicant_phone",
+    "applicationId", "businessLocation", "headquarters", "headquartersState",
+    "industry", "lookingFor", "fundingAmount", "fundsPurpose", "salesHistory",
+    "revenueLastYear", "averageMonthlyRevenue", "accountsReceivableBalance",
+    "fixedAssetsValue", "equipmentValue", "selectedCategory"
+  ],
+  "canonical_fields": [
+    "application_canon", "application_canon_version", "application_canon_hash"
+  ],
+  "computed_fields": [
+    "application_field_count"
+  ],
+  "all_fields": [
+    "business_name", "amount_requested", "country", "product_category", 
+    "applicant_name", "applicant_email", "applicant_phone",
+    "applicationId", "businessLocation", "headquarters", "headquartersState",
+    "industry", "lookingFor", "fundingAmount", "fundsPurpose", "salesHistory",
+    "revenueLastYear", "averageMonthlyRevenue", "accountsReceivableBalance",
+    "fixedAssetsValue", "equipmentValue", "selectedCategory",
+    "application_canon", "application_canon_version", "application_canon_hash",
+    "application_field_count"
+  ]
+}

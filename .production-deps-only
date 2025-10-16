@@ -1,0 +1,13 @@
+# Production deployment with minimal dependencies
+# This file helps skip unnecessary dev dependencies
+
+# Core runtime dependencies only:
+NODE_ENV=production
+NPM_CONFIG_PRODUCTION=true
+SKIP_BUILD=false
+
+# Skip all optional dependencies
+NPM_CONFIG_OPTIONAL=false
+
+# Skip post-install scripts that download browsers
+NPM_CONFIG_IGNORE_SCRIPTS=true

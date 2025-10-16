@@ -1,0 +1,1 @@
+STEP 1/8  Verify products route returns 44 & headers

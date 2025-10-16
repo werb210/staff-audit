@@ -1,0 +1,12 @@
+{
+  "id": "test-docs-submit-001",
+  "title": "Banking Analysis Corp",
+  "subtitle": "Applied 2024-08-31",
+  "doc_count": 0,
+  "banking": null,
+  "metrics": {
+    "loanAmount": 250000,
+    "country": "CA",
+    "revenue": 1500000
+  }
+}
