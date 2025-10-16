@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Switch } from "wouter";
-import { Layout } from "./components/Layout";
+import { Layout } from "./components/layout/Layout";
 import { Dashboard, CRM, Documents, Communication, Reports, Settings } from "./pages";
 
 const NotFound = () => (
