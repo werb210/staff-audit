@@ -15,12 +15,9 @@ import Settings from "./pages/Settings";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-<<<<<<< Updated upstream
     {/* Use hash-based routing for GitHub Pages */}
     <Router base="/staff-audit" hook={null}>
-=======
     <Router hook={useHashLocation}>
->>>>>>> Stashed changes
       <Layout>
         <Route path="/" component={Dashboard} />
         <Route path="/pipeline" component={Pipeline} />
