@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="refresh" content="0; url=/staff-audit/" />
+    <meta charset="utf-8" />
+    <script type="text/javascript">
+      var redirectTo = window.location.pathname.replace("/staff-audit", "");
+      if (!redirectTo || redirectTo === "/") redirectTo = "/";
+      window.location.replace("/staff-audit/#" + redirectTo);
+    </script>
   </head>
-  <body>
-  </body>
+  <body></body>
 </html>

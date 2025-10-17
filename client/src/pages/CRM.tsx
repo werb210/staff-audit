@@ -1,1 +1,1 @@
-import React from 'react'; export default ()=> <div><h2>CRM</h2><p>✅ Loaded CRM</p></div>;
+export default () => <div><h2>CRM</h2><p>✅ CRM ready</p></div>;

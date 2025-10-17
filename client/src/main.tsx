@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Router, Route } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import { Layout } from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import Pipeline from "./pages/Pipeline";
@@ -14,8 +15,12 @@ import Settings from "./pages/Settings";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+<<<<<<< Updated upstream
     {/* Use hash-based routing for GitHub Pages */}
     <Router base="/staff-audit" hook={null}>
+=======
+    <Router hook={useHashLocation}>
+>>>>>>> Stashed changes
       <Layout>
         <Route path="/" component={Dashboard} />
         <Route path="/pipeline" component={Pipeline} />

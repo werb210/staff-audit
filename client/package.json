@@ -64,5 +64,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "base": "/staff-audit/"
 }

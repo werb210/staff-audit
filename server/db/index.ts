@@ -1,8 +1,11 @@
-// =======================================================
-// Boreal Financial Staff Server — DB Entry Point (index.ts)
-// =======================================================
+import { Pool } from "pg";
 
-import { pool } from "./pool";
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-export { pool };
+pool.on("error", (err) => {
+  console.error("❌ PostgreSQL pool error", err);
+});
+
 export default pool;
