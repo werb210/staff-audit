@@ -1,0 +1,247 @@
+[
+  {
+    "table_name": "applications",
+    "constraint_type": "PRIMARY KEY",
+    "constraint_name": "applications_pkey"
+  },
+  {
+    "table_name": "applications",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16399_7_not_null"
+  },
+  {
+    "table_name": "applications",
+    "constraint_type": "FOREIGN KEY",
+    "constraint_name": "applications_contact_id_contacts_id_fk"
+  },
+  {
+    "table_name": "applications",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16399_1_not_null"
+  },
+  {
+    "table_name": "audits",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16409_4_not_null"
+  },
+  {
+    "table_name": "audits",
+    "constraint_type": "PRIMARY KEY",
+    "constraint_name": "audits_pkey"
+  },
+  {
+    "table_name": "audits",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16409_1_not_null"
+  },
+  {
+    "table_name": "audits",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16409_2_not_null"
+  },
+  {
+    "table_name": "audits",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16409_3_not_null"
+  },
+  {
+    "table_name": "comms",
+    "constraint_type": "PRIMARY KEY",
+    "constraint_name": "comms_pkey"
+  },
+  {
+    "table_name": "comms",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16418_1_not_null"
+  },
+  {
+    "table_name": "comms",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16418_3_not_null"
+  },
+  {
+    "table_name": "comms",
+    "constraint_type": "FOREIGN KEY",
+    "constraint_name": "comms_contact_id_contacts_id_fk"
+  },
+  {
+    "table_name": "contacts",
+    "constraint_type": "PRIMARY KEY",
+    "constraint_name": "contacts_pkey"
+  },
+  {
+    "table_name": "contacts",
+    "constraint_type": "FOREIGN KEY",
+    "constraint_name": "contacts_owner_id_users_id_fk"
+  },
+  {
+    "table_name": "contacts",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16427_1_not_null"
+  },
+  {
+    "table_name": "contacts",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16427_2_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "FOREIGN KEY",
+    "constraint_name": "documents_application_id_applications_id_fk"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "PRIMARY KEY",
+    "constraint_name": "documents_pkey"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_1_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_2_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_3_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_4_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_5_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_6_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_7_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_8_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_9_not_null"
+  },
+  {
+    "table_name": "documents",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16436_11_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_2_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_5_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_6_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_7_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_8_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_9_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_10_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_11_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_1_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "PRIMARY KEY",
+    "constraint_name": "lender_products_pkey"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_3_not_null"
+  },
+  {
+    "table_name": "lender_products",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16447_4_not_null"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "UNIQUE",
+    "constraint_name": "users_phone_unique"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "UNIQUE",
+    "constraint_name": "users_email_unique"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "PRIMARY KEY",
+    "constraint_name": "users_pkey"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16455_5_not_null"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16455_1_not_null"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16455_2_not_null"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16455_3_not_null"
+  },
+  {
+    "table_name": "users",
+    "constraint_type": "CHECK",
+    "constraint_name": "2200_16455_4_not_null"
+  }
+]
