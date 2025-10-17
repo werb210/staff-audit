@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta http-equiv="refresh" content="0; url=/staff-audit/" />
+    <meta charset="UTF-8" />
+    <script>
+      const path = location.pathname.replace("/staff-audit", "");
+      location.replace("/staff-audit/#" + (path.startsWith("/") ? path.slice(1) : path));
+    </script>
   </head>
-  <body>
-  </body>
+  <body></body>
 </html>
