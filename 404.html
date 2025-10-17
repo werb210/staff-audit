@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <script>
       const path = location.pathname.replace("/staff-audit", "");
-      const redirect = "/staff-audit/#" + (path.startsWith("/") ? path.slice(1) : path);
-      location.replace(redirect);
+      location.replace("/staff-audit/#" + (path.startsWith("/") ? path.slice(1) : path));
     </script>
   </head>
   <body></body>
