@@ -13,21 +13,23 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- API routes must come first ---
+// --- Force internal health route before everything ---
+app.get("/api/_int/build", (_, res) => {
+  res.json({ ok: true, build: "staff-audit" });
+});
+
+// --- Mount remaining routers ---
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
-// --- Static frontend last ---
+// --- Static frontend must come last ---
 const clientDist = path.join(process.cwd(), "client/dist");
-app.use("/staff-audit", express.static(clientDist));
-
-// fallback only for SPA routes
-app.get("/staff-audit/*", (_, res) => {
+app.use(express.static(clientDist));
+app.get("*", (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Staff App backend running on http://0.0.0.0:${PORT}`);
-  console.log("🧩 API routes mounted: /api/_int, /api/contacts, /api/pipeline");
 });
