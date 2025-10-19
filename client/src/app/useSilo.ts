@@ -1,3 +1,4 @@
+import { API_BASE } from "../config";
 import { useQuery } from "@tanstack/react-query";
 
 export type Silo = "bf" | "slf";
@@ -11,7 +12,7 @@ export function useSilo() {
     queryKey:["silo-status"],
     queryFn: async () => {
       try {
-        const r = await fetch("/api/slf/status", {});
+        const r = await fetch(`${API_BASE}/slf/status", {});
         if (r.ok) return (await r.json()).active ? "slf" as Silo : getSilo();
       } catch {}
       return getSilo();

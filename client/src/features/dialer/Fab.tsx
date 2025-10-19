@@ -1,3 +1,4 @@
+import { API_BASE } from "../config";
 import { createPortal } from "react-dom";
 import { loadTwilioSdk } from "./loadTwilioSdk";
 
@@ -6,7 +7,7 @@ export default function DialerFab() {
     console.log("[Dialer] FAB clicked");
     try {
       await loadTwilioSdk();
-      const response = await fetch("/api/twilio/token");
+      const response = await fetch(`${API_BASE}/twilio/token");
       const data = await response.json();
       const token = data.token || data;
       new (window as any).Twilio.Device(token, { codecPreferences: ["opus","pcmu"] });

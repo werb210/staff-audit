@@ -1,3 +1,4 @@
+import { API_BASE } from "../config";
 import { Device } from "@twilio/voice-sdk";
 
 declare global { interface Window { twilioDevice?: any; twilioInit?: Promise<any>; } }
@@ -7,7 +8,7 @@ export async function getTwilioDevice() {
   if (window.twilioInit)   return window.twilioInit;
 
   window.twilioInit = (async () => {
-    const r = await fetch("/api/twilio/token", { credentials: "include" });
+    const r = await fetch(`${API_BASE}/twilio/token", { credentials: "include" });
     if (!r.ok) throw new Error(`Token fetch failed: ${r.status}`);
     const { token } = await r.json();
     if (!token || typeof token !== "string") throw new Error("Empty token");
@@ -50,7 +51,7 @@ export async function getTwilioDevice() {
     });
     
     device.on("tokenWillExpire", async () => {
-      const r2 = await fetch("/api/twilio/token", { credentials: "include" });
+      const r2 = await fetch(`${API_BASE}/twilio/token", { credentials: "include" });
       const { token: t2 } = await r2.json();
       device.updateToken(t2);
     });

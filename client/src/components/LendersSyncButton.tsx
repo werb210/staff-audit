@@ -1,3 +1,4 @@
+import { API_BASE } from "../config";
 import { useState } from "react";
 
 export default function LendersSyncButton() {
@@ -7,7 +8,7 @@ export default function LendersSyncButton() {
   async function doSync(){
     setLoading(true); setMsg(null);
     try{
-      const r = await fetch("/api/_admin/push-products", { method:"POST" });
+      const r = await fetch(`${API_BASE}/_admin/push-products", { method:"POST" });
       const j = await r.json();
       if(!r.ok) throw new Error(j?.error || `HTTP ${r.status}`);
       const ca = (j.by_country||[]).find(x=>x.k==="CA")?.n||0;

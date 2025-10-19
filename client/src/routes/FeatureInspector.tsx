@@ -1,3 +1,4 @@
+import { API_BASE } from "../config";
 import React, { useEffect, useState } from "react";
 type FeatureId =
   | "pipeline"
@@ -29,7 +30,7 @@ export default function FeatureInspector() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const res = await fetch("/api/features");
+      const res = await fetch(`${API_BASE}/features");
       const json = await res.json();
       setRows(json.features || []);
       setLoading(false);
@@ -98,7 +99,7 @@ export default function FeatureInspector() {
 function BankingVerbosity(props: { id: FeatureId; current: string }) {
   const [value, setValue] = React.useState(props.current);
   async function save() {
-    await fetch("/api/features/config", {
+    await fetch(`${API_BASE}/features/config", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: props.id, key: "verbosity", value })

@@ -1,9 +1,10 @@
+import { API_BASE } from "../config";
 import { useEffect, useState } from "react";
 
 export default function DebugBuild(){
   const [s,setS] = useState<any>(null);
   useEffect(()=>{ 
-    fetch("/api/_int/build", {})
+    fetch(`${API_BASE}/_int/build", {})
       .then(r=>r.json())
       .then(setS)
       .catch(()=>{}); 
