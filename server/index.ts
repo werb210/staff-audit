@@ -13,17 +13,17 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- Force internal health route before everything ---
+// --- TOP PRIORITY HEALTH CHECK ---
 app.get("/api/_int/build", (_, res) => {
-  res.json({ ok: true, build: "staff-audit" });
+  res.status(200).json({ ok: true, source: "direct health check" });
 });
 
-// --- Mount remaining routers ---
+// --- Other API routes ---
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
-// --- Static frontend must come last ---
+// --- Serve frontend last ---
 const clientDist = path.join(process.cwd(), "client/dist");
 app.use(express.static(clientDist));
 app.get("*", (_, res) => {
