@@ -1,6 +1,6 @@
 export async function startLogin(email: string, password: string) {
   console.log('[AUTH-API] Starting login request to /api/auth/login');
-  const r = await fetch('/api/auth/login', {
+  const r = await fetch(`${API_BASE}/auth/login', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ email, password })
@@ -26,7 +26,7 @@ export async function startLogin(email: string, password: string) {
 }
 
 export async function verifyLogin(email: string, code: string) {
-  const r = await fetch('/api/auth/login/verify', {
+  const r = await fetch(`${API_BASE}/auth/login/verify', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ email, code })

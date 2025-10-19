@@ -13,7 +13,7 @@ const Dialer: React.FC<DialerProps> = ({ contact, onClose }) => {
   const startCall = async () => {
     try {
       setIsCalling(true);
-      const res = await fetch('/api/dialer/call', {
+      const res = await fetch(`${API_BASE}/dialer/call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

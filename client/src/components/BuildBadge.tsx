@@ -13,7 +13,7 @@ export default function BuildBadge() {
   useEffect(() => {
     const fetchBuildInfo = async () => {
       try {
-        const response = await fetch('/api/_int/build', {});
+        const response = await fetch(`${API_BASE}/_int/build', {});
         if (response.ok) {
           const buildInfo = await response.json();
           setInfo(buildInfo);

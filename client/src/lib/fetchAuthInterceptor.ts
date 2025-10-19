@@ -14,7 +14,7 @@ async function refreshOnce() {
   if (refreshing) return false;
   refreshing = true;
   try {
-    const r = await fetch('/api/auth/refresh', { method: 'POST' });
+    const r = await fetch(`${API_BASE}/auth/refresh', { method: 'POST' });
     if (!r.ok) return false;
     const { access } = await r.json();
     tokenStore.setAccess(access);

@@ -20,7 +20,7 @@ export const useVoiceSystem = () => {
     setState(prev => ({ ...prev, isDialing: true, error: null }));
     
     try {
-      const response = await fetch('/api/voice/call', {
+      const response = await fetch(`${API_BASE}/voice/call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: phoneNumber })
@@ -51,7 +51,7 @@ export const useVoiceSystem = () => {
   const endCall = useCallback(async () => {
     if (state.currentCall) {
       try {
-        const response = await fetch(`/api/voice/call/${state.currentCall.id}`, {
+        const response = await fetch(`${API_BASE}/voice/call/${state.currentCall.id}`, {
           method: 'DELETE'
         });
         

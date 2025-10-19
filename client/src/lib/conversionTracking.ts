@@ -33,7 +33,7 @@ export async function uploadConversion(data: ConversionData): Promise<boolean> {
       hasClickIds: !!(clickIds.gclid || clickIds.gbraid || clickIds.wbraid)
     });
 
-    const response = await fetch('/api/offline-conversion', {
+    const response = await fetch(`${API_BASE}/offline-conversion', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

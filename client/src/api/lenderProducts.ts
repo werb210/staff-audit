@@ -3,15 +3,15 @@ import { ProductWithRules } from "@/types/lenderProduct";
 export async function getProductWithRules(productId: string): Promise<ProductWithRules> {
   // Prefer a combined endpoint if present; fall back to two calls
   try {
-    const res = await fetch(`/api/lender-products/${productId}?expand=rules`, {});
+    const res = await fetch(`${API_BASE}/lender-products/${productId}?expand=rules`, {});
     if (res.ok) return res.json();
   } catch (e) {
     console.warn('Combined endpoint not available, falling back to separate calls');
   }
 
   const [prodRes, rulesRes] = await Promise.all([
-    fetch(`/api/lender-products/${productId}`, {}),
-    fetch(`/api/lender-products/${productId}/rules`, {}).catch(() => ({ ok: false }))
+    fetch(`${API_BASE}/lender-products/${productId}`, {}),
+    fetch(`${API_BASE}/lender-products/${productId}/rules`, {}).catch(() => ({ ok: false }))
   ]);
 
   const prod = await prodRes.json();
@@ -73,7 +73,7 @@ export async function upsertProductWithRules(payload: ProductWithRules) {
   };
 
   if (!payload.id) {
-    const created = await fetch(`/api/v1/lenders/products`, {
+    const created = await fetch(`${API_BASE}/v1/lenders/products`, {
       method: "POST",  
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify(legacyPayload),
@@ -81,7 +81,7 @@ export async function upsertProductWithRules(payload: ProductWithRules) {
     
     // Try to save rules if endpoint exists
     try {
-      await fetch(`/api/lender-products/${created.id}/rules`, {
+      await fetch(`${API_BASE}/lender-products/${created.id}/rules`, {
         method:"PUT",  
         headers:{ "Content-Type":"application/json" },
         body: JSON.stringify(payload.rules || {}),
@@ -92,7 +92,7 @@ export async function upsertProductWithRules(payload: ProductWithRules) {
     
     return created;
   } else {
-    await fetch(`/api/v1/lenders/products/${payload.id}`, {
+    await fetch(`${API_BASE}/v1/lenders/products/${payload.id}`, {
       method:"PUT",  
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify(legacyPayload),
@@ -100,7 +100,7 @@ export async function upsertProductWithRules(payload: ProductWithRules) {
     
     // Try to save rules if endpoint exists
     try {
-      await fetch(`/api/lender-products/${payload.id}/rules`, {
+      await fetch(`${API_BASE}/lender-products/${payload.id}/rules`, {
         method:"PUT",  
         headers:{ "Content-Type":"application/json" },
         body: JSON.stringify(payload.rules || {}),
