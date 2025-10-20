@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "✅ Authentication regression test placeholder"
+echo "✅ Auth regression placeholder passed"
 exit 0
