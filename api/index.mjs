@@ -12,4 +12,6 @@ app.get("/api/pipeline/cards", (_, res) =>
   ])
 );
 
-export default app;
+export default (req, res) => {
+  app(req, res); // ✅ pass to Express request handler
+};
