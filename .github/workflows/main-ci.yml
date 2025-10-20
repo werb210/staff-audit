@@ -1,11 +1,11 @@
-name: Placeholder CI Pass
+name: Stable CI (Placeholder)
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
-  safe-pass:
+  ok:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

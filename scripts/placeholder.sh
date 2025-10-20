@@ -1,3 +1,2 @@
 #!/bin/bash
-echo "✅ Placeholder test executed successfully"
-exit 0
+echo "✅ Placeholder CI executed successfully"; exit 0
