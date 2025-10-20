@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "express/index.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "builds": [{ "src": "express/index.js", "use": "@vercel/node" }],
   "routes": [{ "src": "/(.*)", "dest": "express/index.js" }]
 }
