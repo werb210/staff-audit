@@ -1,3 +1,10 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 name: 🔒 E2E Security Tests - Production Vulnerability Verification
 
 on:

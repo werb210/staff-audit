@@ -1,3 +1,10 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 name: Staff Stability Guards
 on: [push, pull_request]
 jobs:
