@@ -1,58 +1,32 @@
-import React, { useEffect, useState } from "react";
-
-interface PipelineCard {
-  id: string;
-  title?: string;
-  stage?: string;
-  created_at?: string;
-}
+import { useEffect, useState } from "react";
+import { API_BASE } from "../config";
 
 export default function Pipeline() {
-  const [cards, setCards] = useState<PipelineCard[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const base = import.meta.env.VITE_API_BASE || "";
-    const url = `${base}/pipeline/cards`;
-    fetch(url)
-      .then(async (res) => {
+    fetch(`${API_BASE}/pipeline/cards`)
+      .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
+        return res.json();
       })
-      .then((data) => setCards(Array.isArray(data) ? data : []))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then(setData)
+      .catch((err) => setError(err.message));
   }, []);
 
-  if (loading) return <p>Loading pipeline...</p>;
-  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
   return (
     <div>
-      <h2>Pipeline</h2>
-      {cards.length === 0 ? (
-        <p>No applications found.</p>
-      ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: "left" }}>Title</th>
-              <th>Stage</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cards.map((c) => (
-              <tr key={c.id}>
-                <td>{c.title || c.id}</td>
-                <td>{c.stage || "N/A"}</td>
-                <td>{c.created_at ? new Date(c.created_at).toLocaleString() : "—"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <h2>Sales Pipeline</h2>
+      <ul>
+        {data.map((c) => (
+          <li key={c.id}>
+            {c.stage}: {c.businessName} (${c.amount})
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
