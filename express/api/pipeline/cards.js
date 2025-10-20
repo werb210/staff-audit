@@ -1,5 +1,5 @@
 export default function handler(req, res) {
-  // Allow all origins for testing
+  // Allow both GitHub Pages and localhost
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
