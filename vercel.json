@@ -1,7 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "api/**/*.mjs": { "runtime": "nodejs20" }
+    "api/**/*.mjs": { "runtime": "vercel-node@20.0.0" }
   },
   "buildCommand": "npm run build",
   "installCommand": "npm install",
