@@ -1,6 +1,8 @@
 {
   "version": 2,
-  "functions": { "api/**/*.mjs": { "runtime": "nodejs20.x" } },
+  "functions": {
+    "api/**/*.mjs": { "runtime": "nodejs20" }
+  },
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "outputDirectory": "dist/public",
