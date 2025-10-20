@@ -270,5 +270,8 @@
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
   },
-  "base": "/staff-audit/"
+  "base": "/staff-audit/",
+  "engines": {
+    "node": "18.x"
+  }
 }
