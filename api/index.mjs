@@ -1,17 +1,7 @@
-import express from "express";
-import cors from "cors";
-
-const app = express();
-app.use(cors());
-
-app.get("/api/health", (_, res) => res.json({ ok: true }));
-app.get("/api/pipeline/cards", (_, res) =>
-  res.json([
-    { id: 1, businessName: "Sample Business", amount: 50000 },
-    { id: 2, businessName: "Test Co", amount: 25000 }
-  ])
-);
-
 export default (req, res) => {
-  app(req, res); // ✅ pass to Express request handler
+  if (req.url === "/api/health") {
+    res.status(200).json({ ok: true });
+  } else {
+    res.status(404).json({ error: "Not Found" });
+  }
 };
