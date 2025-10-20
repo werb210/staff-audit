@@ -152,3 +152,4 @@ dist/
 node_modules/.vite/
 
 \!client/dist
+.vercel
