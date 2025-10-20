@@ -1,15 +1,12 @@
+name: Placeholder CI Pass
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
-name: Security and Audit Checks
-on: [push, pull_request]
+    branches: [ main ]
 jobs:
-  security_audit:
+  safe-pass:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "✅ Security and audit placeholder passed"
+      - run: bash scripts/placeholder.sh
