@@ -1,4 +1,5 @@
 // server/index.ts
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import cors from "cors";
@@ -15,6 +16,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// --- Verify required env vars ---
+if (!process.env.DATABASE_URL) {
+  console.error("❌ DATABASE_URL missing from environment");
+  process.exit(1);
+}
 
 app.use(cors());
 app.use(bodyParser.json());
