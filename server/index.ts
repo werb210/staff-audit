@@ -1,4 +1,3 @@
-// server/index.ts
 import "dotenv/config";
 import express from "express";
 import path from "path";
@@ -15,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080; // Elastic Beanstalk requires port 8080
 
 // --- Verify required env vars ---
 if (!process.env.DATABASE_URL) {
