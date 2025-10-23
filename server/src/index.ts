@@ -9,8 +9,7 @@ import { Pool } from "pg";
 dotenv.config();
 
 const app = express();
-const port = Number(process.env.PORT || 3001);
-const host = "0.0.0.0";
+const PORT = process.env.PORT ? Number(process.env.PORT) : 8081;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -20,15 +19,12 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Correct dynamic import for tsx
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const contactsRouter = (await import(path.join(__dirname, "routes", "contacts.ts"))).default;
 
-// ✅ Mount contacts router
 app.use("/api/contacts", contactsRouter);
 
-// ✅ Root page
 app.get("/", (_req, res) => {
   res.type("html").send(`
     <html><body>
@@ -41,12 +37,11 @@ app.get("/", (_req, res) => {
         <li><a href="/api/env-check" target="_blank">/api/env-check</a></li>
         <li><a href="/__routes" target="_blank">/__routes</a></li>
       </ul>
-      <p>Port: ${port}</p>
+      <p>Port: ${PORT}</p>
     </body></html>
   `);
 });
 
-// ✅ Simple routes
 app.get("/api/health", (_req, res) =>
   res.json({ status: "ok", environment: process.env.NODE_ENV || "development" })
 );
@@ -64,7 +59,6 @@ app.get("/api/env-check", (_req, res) => {
   });
 });
 
-// ✅ Debug route list
 app.get("/__routes", (_req, res) => {
   const out: string[] = [];
   (app as any)._router.stack.forEach((layer: any) => {
@@ -78,11 +72,10 @@ app.get("/__routes", (_req, res) => {
   res.json(out);
 });
 
-// ✅ 404 fallback
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 
-// ✅ Start server
-app.listen(port, host, () => {
+// ✅ Start server for AWS Elastic Beanstalk
+app.listen(PORT, "0.0.0.0", () => {
   console.log("✅ Contacts table ready");
-  console.log(`✅ Server running on http://${host}:${port}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
