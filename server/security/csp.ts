@@ -59,7 +59,7 @@ export const permissionsPolicy =
     "publickey-credentials-get=(self)"
   ].join(", ");
 
-export const corsAllowlist: (string|RegExp)[] = [
+export const corsAllowlist: (string | RegExp)[] = [
   "http://localhost:3000",
   "http://localhost:5000",
   /\.replit\.dev$/,
@@ -69,5 +69,4 @@ export const corsAllowlist: (string|RegExp)[] = [
 
 // Valid sandbox flags only
 export const iframeSandbox =
-  // Remove invalid 'allow-downloads-without-user-activation'
   "allow-scripts allow-same-origin allow-forms allow-popups allow-downloads";
