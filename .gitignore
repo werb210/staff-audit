@@ -158,3 +158,5 @@ node_modules/.vite/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+!codex/
+!reports/
