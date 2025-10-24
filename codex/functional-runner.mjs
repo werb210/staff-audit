@@ -53,7 +53,7 @@ async function ensureLocalProbe() {
       port: baseUrl.port || 80,
       path: "/api/__probe",
       protocol: baseUrl.protocol,
-      rejectUnauthorized: false,
+      ,
     });
     if ((response.statusCode ?? 500) < 500) {
       return;
@@ -112,7 +112,7 @@ function check(url) {
           target.port || (target.protocol === "https:" ? 443 : 80),
         path: `${target.pathname}${target.search}`,
         protocol: target.protocol,
-        rejectUnauthorized: false,
+        ,
       },
       (response) => {
         response.resume();
