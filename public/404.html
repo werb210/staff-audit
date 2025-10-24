@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      const path = location.pathname.replace("/staff-audit", "");
+      location.replace("/staff-audit/#" + (path.startsWith("/") ? path.slice(1) : path));
+    </script>
+  </head>
+  <body></body>
+</html>
