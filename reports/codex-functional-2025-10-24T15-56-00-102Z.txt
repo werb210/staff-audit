@@ -1,0 +1,6 @@
+[2025-10-24T15:56:00.106Z] Functional run complete
+[PASS] /api/auth/login
+[PASS] /api/pipeline
+[PASS] /api/documents
+[PASS] /api/twilio
+[PASS] /api/s3

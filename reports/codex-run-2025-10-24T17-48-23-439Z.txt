@@ -1,0 +1,12 @@
+CODEx Hygiene Audit
+2025-10-24T17:48:23.442Z
+
+✅ All required packages present
+⚠️ Missing environment variables: SENDGRID_API_KEY, MS_CLIENT_ID, MS_TENANT_ID, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+❌ Duplicate route scan
+❌ Invalid iframe sandbox flag — found outside canonical location(s):
+   ./server/security/csp.ts:72:  // Remove invalid 'allow-downloads-without-user-activation'
+
+⛔ De-dupe scan FAILED. Remove the items above or move them into the canonical file(s).
+✅ S3 health check
+✅ Document audit

@@ -1,0 +1,1 @@
+[2025-10-24T15:55:16.618Z] Codex full run failed: Command failed: npm run codex:functional
