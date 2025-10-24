@@ -1,0 +1,53 @@
+{
+  "core": [
+    "Route consolidation via guardedRegisterUse",
+    "Schema/type parity (Drizzle + Zod + DB)",
+    "S3 encryption + audit system",
+    "Recovery logger + audit logs",
+    "Daily Codex audits + reports"
+  ],
+  "crm": [
+    "Contacts/Companies CRUD",
+    "Sales Pipeline (drag + drawer)",
+    "Tasks + Activity log"
+  ],
+  "documents": [
+    "OCR + Banking analysis auto-trigger",
+    "AI Insights tab grouping by doc type",
+    "Signed-application PDF generation + storage",
+    "Versioning + re-upload workflow"
+  ],
+  "lenders": [
+    "Lender CRUD + Product CRUD",
+    "Lender Matching Engine",
+    "Send-to-Lender API payload"
+  ],
+  "communications": [
+    "Twilio SMS two-way chat",
+    "Twilio Voice call logging",
+    "SendGrid email integration",
+    "Office 365 email/calendar/tasks"
+  ],
+  "ai_features": [
+    "AI Risk Scoring",
+    "AI Credit Summary (Word→PDF)",
+    "AI Recommendations",
+    "Smart Next Step Engine"
+  ],
+  "marketing": [
+    "LinkedIn sequence automation",
+    "Google Ads + GA4 dashboards",
+    "Campaign ROI reporting"
+  ],
+  "integrations": [
+    "Connected Accounts UI (Office, Google, LinkedIn)",
+    "OAuth token storage/refresh",
+    "Admin dashboard for tokens"
+  ],
+  "security_compliance": [
+    "Role-based access (Admin, Staff, Lender, Referrer)",
+    "2FA/OTP + JWT rotation",
+    "Daily backup + consistency audit",
+    "SHA256 checksum + recovery dashboard"
+  ]
+}

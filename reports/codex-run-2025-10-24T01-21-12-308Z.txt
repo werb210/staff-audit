@@ -1,0 +1,45 @@
+CODEx Hygiene Audit
+2025-10-24T01:21:12.313Z
+
+✅ All required packages present
+⚠️ Missing environment variables: TWILIO_AUTH_TOKEN, TWILIO_ACCOUNT_SID, AWS_REGION, S3_BUCKET, SENDGRID_API_KEY, MS_CLIENT_ID, MS_TENANT_ID, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+❌ Duplicate route scan
+❌ React Router providers — found outside canonical location(s):
+   ./tools/dedup-check.sh:41:if rg -n --hidden -S "<BrowserRouter|<HashRouter" client --glob '!node_modules' --no-messages >/dev/null; then
+   ./client/lender-portal/LenderPortalApp.tsx:30:        <BrowserRouter basename="/lender-portal">
+
+❌ Invalid iframe sandbox flag — found outside canonical location(s):
+   ./tools/dedup-check.sh:91:if rg -n --hidden -S "allow-downloads-without-user-activation" --glob '!node_modules' --no-messages >/dev/null; then
+   ./tools/dedup-check.sh:92:  hit "Invalid iframe sandbox flag 'allow-downloads-without-user-activation' present."
+   ./server/security/csp.ts:72:  // Remove invalid 'allow-downloads-without-user-activation'
+
+❌ Bad CSP tokens — found outside canonical location(s):
+   ./tools/dedup-check.sh:30:if rg -n --hidden -S "'unsafe-dynamic'" --glob '!node_modules' --no-messages >/dev/null; then
+   ./tools/dedup-check.sh:31:  hit "CSP contains 'unsafe-dynamic' (invalid here). Remove it."
+   ./tools/dedup-check.sh:33:if rg -n --hidden -S "default-src[^;]*report-uri" --glob '!node_modules' --no-messages >/dev/null; then
+   ./tools/dedup-check.sh:34:  hit "CSP has 'report-uri' inside default-src. Must be its own directive."
+   ./cors_csp.txt:8:Content-Security-Policy: default-src 'self';base-uri 'self';connect-src 'self' https://api.launchdarkly.com https://events.launchdarkly.com https://www.googletagmanager.com https://sdk.twilio.com https://media.twiliocdn.com https://static.twilio.com https://www.recaptcha.net https://www.google.com;img-src 'self' data: blob:;font-src 'self' data:;style-src 'self' https://fonts.googleapis.com;script-src 'self' https://www.googletagmanager.com https://sdk.twilio.com https://media.twiliocdn.com https://static.twilio.com https://www.recaptcha.net https://www.google.com;frame-ancestors 'self';frame-src 'self' https://www.google.com https://www.recaptcha.net;object-src 'none';upgrade-insecure-requests;report-to default;report-uri /csp-report
+   ./server/security/csp.ts:7: * - Removes invalid tokens (there is NO 'unsafe-dynamic' in CSP)
+   ./server/security/csp.ts:8: * - Moves reporting to its own directive (report-uri) instead of listing as a source
+   ./server/security/csp.ts:31:    `report-uri /csp-report`,
+   ./server/security/applySecurity.ts:33:/** Build a lean, standards-compliant CSP (no 'unsafe-dynamic', no query paths in sources) */
+   ./server/security/applySecurity.ts:52:    // NOTE: 'report-uri' is its own directive, not a source inside default-src
+   ./server/security/applySecurity.ts:53:    "report-uri /csp-report;"
+
+❌ Legacy security dir — found outside canonical location(s):
+   ./.eslintrc.cjs:29:        { 'group': ['server/security/*'], 'message': 'Legacy security dir is forbidden' }
+   ./server/security/productionLogging.ts:1:// server/security/productionLogging.ts - Production-safe logging
+   ./server/security/permissions.ts:1:// server/security/permissions.ts
+   ./server/mw/devPreview.ts:13:    // CSP now handled by unified configuration in server/security/csp.ts
+
+⛔ De-dupe scan FAILED. Remove the items above or move them into the canonical file(s).
+❌ S3 health check
+🔍 [S3-HEALTH] Starting S3 health check...
+📦 [S3-HEALTH] Bucket: boreal-documents
+🌍 [S3-HEALTH] Region: ca-central-1
+
+1. 📡 Testing bucket accessibility...
+❌ [S3-HEALTH] S3 health check failed:
+   Error: Could not load credentials from any providers
+   Code: undefined
+✅ Document audit

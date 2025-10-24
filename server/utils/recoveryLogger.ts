@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { pool } from '../db';
 
 /**
  * AUTO-RECOVERY AUTOMATION 2: Recovery Status Logging System
@@ -44,6 +45,8 @@ export class RecoveryLogger {
     try {
       const logLine = this.formatLogEntry(entry);
       await fs.appendFile(this.logFile, logLine + '\n');
+
+      await this.logToDatabase(entry);
       
       // Console logging with recovery status
       console.log(`📝 [AUTO-RECOVERY 2] LOGGED: ${entry.status}`);
@@ -76,7 +79,6 @@ export class RecoveryLogger {
    */
   private async logToDatabase(entry: RecoveryLogEntry): Promise<void> {
     try {
-      const { pool } = await import('../db.js');
       await pool.query(`
         INSERT INTO recovery_logs (
           document_id, file_name, application_id, legal_business_name, 

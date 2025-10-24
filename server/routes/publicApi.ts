@@ -217,7 +217,7 @@ router.post('/s3-upload/:applicationId',
     }
 
     // Import and use pure S3 upload utility
-    const { uploadDocumentToS3 } = await import('../utils/pureS3Upload.js');
+    const { uploadDocumentToS3 } = await import('../utils/pureS3Upload');
     
     const result = await uploadDocumentToS3({
       applicationId,

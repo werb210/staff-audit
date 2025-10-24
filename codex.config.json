@@ -1,5 +1,51 @@
 {
-  "version": "1.0",
-  "scope": ["core","crm","documents","lenders","communications","ai","marketing","integrations","security"],
-  "registry": "reports/v1-todo-registry.json"
+  "auditTargets": {
+    "routes": "server/routes/*.ts",
+    "schemas": "shared/**/*.ts",
+    "types": "server/**/*.ts",
+    "documents": [
+      "server/utils/pdfGenerator.ts",
+      "server/utils/pureS3Upload.ts",
+      "server/utils/s3DirectStorage.ts"
+    ],
+    "recovery": "server/utils/recoveryLogger.ts",
+    "dependencies": "package.json",
+    "security": "server/utils/security-validation.ts",
+    "scripts": [
+      "scripts/scan-dupes.mjs",
+      "scripts/s3HealthCheck.js",
+      "scripts/audit-documents.js"
+    ],
+    "features": [
+      "server/routes/crm",
+      "server/routes/lenders",
+      "server/routes/ai",
+      "server/routes/communications",
+      "server/routes/marketing",
+      "server/routes/reports",
+      "server/routes/settings"
+    ]
+  },
+  "requiredPackages": [
+    "@aws-sdk/client-s3",
+    "@aws-sdk/s3-request-presigner",
+    "jsdom",
+    "libphonenumber-js",
+    "@microsoft/microsoft-graph-client",
+    "googleapis",
+    "twilio",
+    "@sendgrid/mail"
+  ],
+  "reportsDir": "reports",
+  "envChecks": [
+    "TWILIO_AUTH_TOKEN",
+    "TWILIO_ACCOUNT_SID",
+    "AWS_REGION",
+    "S3_BUCKET",
+    "SENDGRID_API_KEY",
+    "MS_CLIENT_ID",
+    "MS_TENANT_ID",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET"
+  ]
 }

@@ -44,12 +44,12 @@ export const insertApplicantSessionSchema = createInsertSchema(applicantSessions
   sessionId: true,
   createdAt: true,
   updatedAt: true,
-});
+} as any);
 
 export const insertSessionMessageSchema = createInsertSchema(sessionMessages).omit({
   id: true,
   timestamp: true,
-});
+} as any);
 
 export const selectApplicantSessionSchema = createSelectSchema(applicantSessions);
 export const selectSessionMessageSchema = createSelectSchema(sessionMessages);

@@ -8,21 +8,6 @@ import { db } from '../db.js';
 import { applications, businesses, documents } from '../../shared/schema.js';
 import { eq } from 'drizzle-orm';
 
-interface ApplicationData {
-  id: string;
-  business_name: string;
-  requested_amount: number;
-  use_of_funds: string;
-  status: string;
-  created_at: Date;
-  documents: Array<{
-    id: string;
-    file_name: string;
-    document_type: string;
-    file_size: number;
-  }>;
-}
-
 export async function generateSignedApplicationPDF(applicationId: string): Promise<string> {
   try {
     console.log(`🔧 [PDF GENERATOR] Starting PDF generation for application: ${applicationId}`);
@@ -31,11 +16,12 @@ export async function generateSignedApplicationPDF(applicationId: string): Promi
     const applicationResults = await db
       .select({
         id: applications.id,
-        business_name: businesses.businessName,
-        requested_amount: applications.requested_amount,
-        use_of_funds: applications.use_of_funds,
+        businessName: businesses.businessName,
+        fallbackBusinessName: applications.business_name,
+        requestedAmount: applications.requested_amount,
+        useOfFunds: applications.use_of_funds,
         status: applications.status,
-        created_at: applications.createdAt
+        createdAt: applications.created_at
       })
       .from(applications)
       .leftJoin(businesses, eq(applications.business_id, businesses.id))
@@ -46,14 +32,23 @@ export async function generateSignedApplicationPDF(applicationId: string): Promi
     }
 
     const application = applicationResults[0];
+
+    const displayBusinessName =
+      application.businessName ||
+      application.fallbackBusinessName ||
+      "N/A";
+
+    const requestedAmountNumber = application.requestedAmount
+      ? Number(application.requestedAmount)
+      : null;
     
     // Fetch documents
     const applicationDocuments = await db
       .select({
-        id: documents.id,  
-        file_name: documents.fileName,
-        document_type: documents.documentType,
-        file_size: documents.fileSize
+        id: documents.id,
+        fileName: documents.fileName,
+        documentType: documents.documentType,
+        fileSize: documents.fileSize
       })
       .from(documents)
       .where(eq(documents.applicationId, applicationId));
@@ -70,20 +65,36 @@ export async function generateSignedApplicationPDF(applicationId: string): Promi
     // Application Details
     doc.setFontSize(12);
     doc.text(`Application ID: ${application.id}`, 20, 50);
-    doc.text(`Business Name: ${application.businessName || 'N/A'}`, 20, 60);
-    doc.text(`Requested Amount: $${application.requested_amount?.toLocaleString() || 'N/A'}`, 20, 70);
-    doc.text(`Use of Funds: ${application.use_of_funds || 'N/A'}`, 20, 80);
-    doc.text(`Status: ${application.status}`, 20, 90);
-    doc.text(`Submitted: ${application.createdAt?.toLocaleDateString() || 'N/A'}`, 20, 100);
+    doc.text(`Business Name: ${displayBusinessName}`, 20, 60);
+    doc.text(
+      `Requested Amount: $${
+        requestedAmountNumber !== null
+          ? requestedAmountNumber.toLocaleString()
+          : "N/A"
+      }`,
+      20,
+      70
+    );
+    doc.text(`Use of Funds: ${application.useOfFunds || 'N/A'}`, 20, 80);
+    doc.text(`Status: ${application.status || 'N/A'}`, 20, 90);
+    doc.text(
+      `Submitted: ${
+        application.createdAt ? application.createdAt.toLocaleDateString() : 'N/A'
+      }`,
+      20,
+      100
+    );
     
     // Documents Section
     doc.text('SUBMITTED DOCUMENTS:', 20, 120);
     
     let yPos = 130;
     if (applicationDocuments.length > 0) {
-      applicationDocuments.forEach((doc_item, index) => {
-        doc.text(`${index + 1}. ${doc_item.fileName} (${doc_item.documentType})`, 25, yPos);
-        doc.text(`   Size: ${(doc_item.fileSize / 1024).toFixed(1)} KB`, 25, yPos + 8);
+      applicationDocuments.forEach((docItem, index) => {
+        doc.text(`${index + 1}. ${docItem.fileName} (${docItem.documentType})`, 25, yPos);
+        if (typeof docItem.fileSize === 'number' && Number.isFinite(docItem.fileSize)) {
+          doc.text(`   Size: ${(docItem.fileSize / 1024).toFixed(1)} KB`, 25, yPos + 8);
+        }
         yPos += 18;
       });
     } else {
@@ -123,12 +134,14 @@ export async function generateSignedApplicationPDF(applicationId: string): Promi
     const pdfDocumentResult = await db
       .insert(documents)
       .values({
-        application_id: applicationId,
-        file_name: pdfFileName,
-        file_path: pdfPath,
-        file_size: pdfBuffer.byteLength,
-        document_type: 'signed_application',
-        uploaded_by: 'system_pdf_generator',
+        applicationId,
+        fileName: pdfFileName,
+        filePath: pdfPath,
+        storageKey: pdfPath,
+        fileSize: pdfBuffer.byteLength,
+        documentType: 'signed_application',
+        mimeType: 'application/pdf',
+        uploadedBy: 'system_pdf_generator',
         status: 'pending'
       })
       .returning({ id: documents.id });
@@ -161,8 +174,8 @@ export async function generatePDFForApplication(applicationId: string): Promise<
 
 export async function regenerateSignedApplicationPDF(applicationId: string): Promise<string> {
   // First remove any existing signed application PDF
-  const { db } = await import('../db.js');
-  const { documents } = await import('../../shared/schema.js');
+  const { db } = await import('../db');
+  const { documents } = await import('../../shared/schema');
   const { eq, and } = await import('drizzle-orm');
   
   await db.delete(documents).where(
@@ -177,8 +190,8 @@ export async function regenerateSignedApplicationPDF(applicationId: string): Pro
 }
 
 export async function hasSignedApplicationPDF(applicationId: string): Promise<boolean> {
-  const { db } = await import('../db.js');
-  const { documents } = await import('../../shared/schema.js');
+  const { db } = await import('../db');
+  const { documents } = await import('../../shared/schema');
   const { eq, and } = await import('drizzle-orm');
   
   const existingPdf = await db.select()

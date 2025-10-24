@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, Router as ExpressRouter } from "express";
 import { z } from "zod";
 import express from "express";
 import jwt from "jsonwebtoken";
@@ -32,9 +32,32 @@ const isProd = process.env.NODE_ENV === "production";
 const USE_AWS = !!(process.env.S3_BUCKET && process.env.AWS_REGION);
 const DOCS_JWT_SECRET = process.env.JWT_SECRET || process.env.DOCS_JWT_SECRET || "dev-docs-secret";
 
-export function mountDocumentRoutes(app: Express) {
+type MountTarget = Express | ExpressRouter;
+
+function joinPaths(basePath: string, routePath: string) {
+  const base = basePath.replace(/\/+$/, "");
+  const route = routePath.replace(/^\/+/, "");
+
+  if (!base && !route) {
+    return "/";
+  }
+
+  if (!base) {
+    return `/${route}`;
+  }
+
+  if (!route) {
+    return base || "/";
+  }
+
+  return `${base}/${route}`;
+}
+
+export function mountDocumentRoutes(app: MountTarget, basePath = "/api") {
+  const pathFor = (suffix: string) => joinPaths(basePath, suffix);
+
   // POST /api/documents/presign
-  app.post("/api/documents/presign", async (req: Request, res: Response) => {
+  app.post(pathFor("/documents/presign"), async (req: Request, res: Response) => {
     const parsed = PresignBody.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ ok: false, error: "INVALID_BODY", details: parsed.error.flatten() });
@@ -76,12 +99,12 @@ export function mountDocumentRoutes(app: Express) {
 
     // DEV / STAGING fallback: local disk upload
     // PUT the file to this URL; we'll save it to /tmp/storage under the same key
-    const baseUrl = 'http://localhost:5000';  // For audit compatibility
+    const baseUrl = "http://localhost:5000";  // For audit compatibility
     return res.json({
       ok: true,
       storage: "local",
       key,
-      url: `${baseUrl}/api/dev/mock-upload/${encodeURIComponent(key)}`,
+      url: `${baseUrl}${pathFor(`/dev/mock-upload/${encodeURIComponent(key)}`)}`,
       method: "PUT",
       headers: { "Content-Type": contentType },
       confirmToken
@@ -91,7 +114,7 @@ export function mountDocumentRoutes(app: Express) {
   // DEV upload sink (no auth), writes raw body to /tmp/storage/<key>
   if (!isProd) {
     import("fs/promises").then(({ mkdir, writeFile }) => {
-      app.put("/api/dev/mock-upload/:key", express.raw({ type: "*/*", limit: "25mb" }), async (req: any, res: any) => {
+      app.put(pathFor("/dev/mock-upload/:key"), express.raw({ type: "*/*", limit: "25mb" }), async (req: any, res: any) => {
         try {
           const key = decodeURIComponent(req.params.key);
           const fullPath = `/tmp/storage/${key}`;
@@ -106,7 +129,7 @@ export function mountDocumentRoutes(app: Express) {
   }
 
   // POST /api/documents/complete - Register document in database after successful upload
-  app.post("/api/documents/complete", async (req: Request, res: Response) => {
+  app.post(pathFor("/documents/complete"), async (req: Request, res: Response) => {
     const parsed = CompleteBody.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ ok: false, error: "INVALID_BODY", details: parsed.error.flatten() });
@@ -152,7 +175,7 @@ export function mountDocumentRoutes(app: Express) {
   });
 
   // GET /api/documents/list?applicationId=UUID  (lists stored objects quickly)
-  app.get("/api/documents/list", async (req: Request, res: Response) => {
+  app.get(pathFor("/documents/list"), async (req: Request, res: Response) => {
     const applicationId = `${req.query.applicationId || ""}`;
     if (!applicationId) return res.status(400).json({ ok: false, error: "MISSING_APPLICATION_ID" });
 

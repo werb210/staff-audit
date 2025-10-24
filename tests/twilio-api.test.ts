@@ -1,9 +1,10 @@
 import request from "supertest";
 import app from "../server/index";
+import { TWILIO_TOKEN_ENDPOINT } from "../shared/apiRoutes";
 
 describe("Twilio API", () => {
   it("returns a valid token", async () => {
-    const res = await request(app).get("/api/twilio/token?identity=tester");
+    const res = await request(app).get(`${TWILIO_TOKEN_ENDPOINT}?identity=tester`);
     expect(res.status).toBe(200);
     expect(res.body.token).toBeDefined();
   });

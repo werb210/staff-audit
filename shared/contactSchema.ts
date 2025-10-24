@@ -74,27 +74,27 @@ export const insertContactSchema = createInsertSchema(contacts).omit({
   id: true,
   created_at: true,
   updated_at: true
-});
+} as any);
 
 export const insertContactActivitySchema = createInsertSchema(contactActivities).omit({
   id: true,
   created_at: true
-});
+} as any);
 
 export const insertContactNoteSchema = createInsertSchema(contactNotes).omit({
   id: true,
   created_at: true
-});
+} as any);
 
 export const insertContactTaskSchema = createInsertSchema(contactTasks).omit({
   id: true,
   created_at: true
-});
+} as any);
 
 export const insertContactDocumentSchema = createInsertSchema(contactDocuments).omit({
   id: true,
   created_at: true
-});
+} as any);
 
 // Types
 export type Contact = typeof contacts.$inferSelect;

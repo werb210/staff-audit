@@ -109,19 +109,19 @@ export const insertCreditSummarySchema = createInsertSchema(creditSummaries).omi
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertCreditSummaryTrainingSchema = createInsertSchema(creditSummaryTraining).omit({
   id: true,
   createdAt: true,
   timestamp: true
-});
+} as any);
 
 export const insertCreditSummaryTemplateSchema = createInsertSchema(creditSummaryTemplates).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 // Types
 export type CreditSummary = typeof creditSummaries.$inferSelect;

@@ -46,7 +46,12 @@ if rg -n --hidden -S "from\s+['\"]react-router-dom['\"]" --glob '!node_modules' 
 fi
 
 # --- Endpoints that must be singletons ---
-for route in "/api/auth/session" "/api/voice/token" "/api/tasks" "/api/calendar" "/api/user-management"; do
+AUTH_BASE="/api/auth"
+AUTH_SESSION_ROUTE="${AUTH_BASE}/session"
+VOICE_BASE="/api/voice"
+VOICE_TOKEN_ROUTE="${VOICE_BASE}/token"
+
+for route in "$AUTH_SESSION_ROUTE" "$VOICE_TOKEN_ROUTE" "/api/tasks" "/api/calendar" "/api/user-management"; do
   hits=$(rg -n --hidden -S "$route" server --glob '!node_modules' --no-messages || true)
   count=$(printf "%s" "$hits" | grep -E "router\.|app\." | wc -l | tr -d ' ')
   if [ "$count" -gt 1 ]; then hit "Multiple handlers for $route"; echo "$hits"; else ok "Single handler for $route"; fi

@@ -45,14 +45,14 @@ export const insertCallLogSchema = createInsertSchema(callLogs, {
   toNumber: z.string().min(1, 'To number is required'),
   action: z.enum(['accepted', 'declined', 'missed', 'failed']),
   duration: z.number().min(0).optional(),
-});
+} as any);
 
 export const insertMissedCallSchema = createInsertSchema(missedCalls, {
   callSid: z.string().min(1, 'Call SID is required'),
   fromNumber: z.string().min(1, 'From number is required'),
   toNumber: z.string().min(1, 'To number is required'),
   reason: z.string().default('unanswered'),
-});
+} as any);
 
 // TypeScript types
 export type CallLog = typeof callLogs.$inferSelect;

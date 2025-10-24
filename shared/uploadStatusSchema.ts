@@ -31,7 +31,7 @@ export const insertUploadLogSchema = createInsertSchema(documentUploadLogs).omit
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const selectUploadLogSchema = createSelectSchema(documentUploadLogs);
 

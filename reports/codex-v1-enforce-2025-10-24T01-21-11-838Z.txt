@@ -1,0 +1,57 @@
+Boreal Staff App V1 Enforcement Run
+2025-10-24T01:21:11.839Z
+✅ Codex System Audit
+✅ Codex Functional Verification
+
+Feature Coverage Check:
+
+[CORE]
+- [ ] Route consolidation via guardedRegisterUse
+- [ ] Schema/type parity (Drizzle + Zod + DB)
+- [ ] S3 encryption + audit system
+- [ ] Recovery logger + audit logs
+- [ ] Daily Codex audits + reports
+
+[CRM]
+- [ ] Contacts/Companies CRUD
+- [ ] Sales Pipeline (drag + drawer)
+- [ ] Tasks + Activity log
+
+[DOCUMENTS]
+- [ ] OCR + Banking analysis auto-trigger
+- [ ] AI Insights tab grouping by doc type
+- [ ] Signed-application PDF generation + storage
+- [ ] Versioning + re-upload workflow
+
+[LENDERS]
+- [ ] Lender CRUD + Product CRUD
+- [ ] Lender Matching Engine
+- [ ] Send-to-Lender API payload
+
+[COMMUNICATIONS]
+- [ ] Twilio SMS two-way chat
+- [ ] Twilio Voice call logging
+- [ ] SendGrid email integration
+- [ ] Office 365 email/calendar/tasks
+
+[AI_FEATURES]
+- [ ] AI Risk Scoring
+- [ ] AI Credit Summary (Word→PDF)
+- [ ] AI Recommendations
+- [ ] Smart Next Step Engine
+
+[MARKETING]
+- [ ] LinkedIn sequence automation
+- [ ] Google Ads + GA4 dashboards
+- [ ] Campaign ROI reporting
+
+[INTEGRATIONS]
+- [ ] Connected Accounts UI (Office, Google, LinkedIn)
+- [ ] OAuth token storage/refresh
+- [ ] Admin dashboard for tokens
+
+[SECURITY_COMPLIANCE]
+- [ ] Role-based access (Admin, Staff, Lender, Referrer)
+- [ ] 2FA/OTP + JWT rotation
+- [ ] Daily backup + consistency audit
+- [ ] SHA256 checksum + recovery dashboard
