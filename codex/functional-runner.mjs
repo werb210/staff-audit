@@ -53,8 +53,7 @@ async function ensureLocalProbe() {
       port: baseUrl.port || 80,
       path: "/api/__probe",
       protocol: baseUrl.protocol,
-      ,
-    });
+      });
     if ((response.statusCode ?? 500) < 500) {
       return;
     }
@@ -112,8 +111,7 @@ function check(url) {
           target.port || (target.protocol === "https:" ? 443 : 80),
         path: `${target.pathname}${target.search}`,
         protocol: target.protocol,
-        ,
-      },
+        },
       (response) => {
         response.resume();
         if (response.statusCode === 200) {
@@ -123,8 +121,7 @@ function check(url) {
           console.error("❌", url, response.statusCode);
           settle(`[FAIL] ${url} (${response.statusCode})`, true);
         }
-      },
-    );
+      });
 
     req.on("error", (error) => {
       settle(`[FAIL] ${url} (${error.message})`, true);
