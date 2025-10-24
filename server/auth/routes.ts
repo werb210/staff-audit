@@ -31,7 +31,7 @@ function normalizeUser(u: DbUser): JwtUser {
   return { id: String(u.id), email: u.email, role: (u.role as string) || "user" };
 }
 
-export function setupAuth(app: Express) {
+export function createAuthRouter() {
   const r = Router();
 
   // POST /api/auth/login
@@ -79,7 +79,15 @@ export function setupAuth(app: Express) {
     res.json({ ok: true, user: req.user });
   });
 
-  app.use("/api/auth", r);
+  return r;
 }
 
-export default setupAuth;
+export function setupAuth(app: Express) {
+  const router = createAuthRouter();
+  app.use("/api/auth", router);
+  return router;
+}
+
+const authRouter = createAuthRouter();
+
+export default authRouter;

@@ -1,11 +1,9 @@
 // server/middleware/csp.ts
 import type { Request, Response, NextFunction } from "express";
-import { buildCsp, permissionsPolicy } from "../security/csp";
+import { permissionsPolicy } from "../security/csp.js";
 
-export function csp(req: Request, res: Response, next: NextFunction) {
-  // CSP is now set in server/index.ts - avoiding duplicate headers
-  // res.setHeader("Content-Security-Policy", buildCsp());
-  // res.setHeader("Permissions-Policy", permissionsPolicy);
+export function csp(_req: Request, res: Response, next: NextFunction) {
+  res.setHeader("Permissions-Policy", permissionsPolicy);
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
