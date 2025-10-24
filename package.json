@@ -5,8 +5,12 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx --watch server/index.ts",
+<<<<<<< HEAD
     "build": "npm run build:server && npm run build:client",
     "build:server": "tsc -p tsconfig.json",
+=======
+    "build": "npm run build:client",
+>>>>>>> 130ef91 (init: Codex + V1 registry setup 2025-10-24_01:45:56)
     "start": "node dist/server/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push",

@@ -1,0 +1,5 @@
+{
+  "version": "1.0",
+  "scope": ["core","crm","documents","lenders","communications","ai","marketing","integrations","security"],
+  "registry": "reports/v1-todo-registry.json"
+}
