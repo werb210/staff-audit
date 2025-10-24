@@ -14,7 +14,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 8080; // Elastic Beanstalk requires port 8080
+
+// Elastic Beanstalk automatically injects PORT
+const PORT = process.env.PORT || 8081; // fallback for local dev
 
 // --- Verify required env vars ---
 if (!process.env.DATABASE_URL) {
@@ -44,5 +46,5 @@ app.get("*", (_, res) => {
 
 // --- Start Server ---
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Staff App backend running on http://0.0.0.0:${PORT}`);
+  console.log(`✅ Staff App backend running on port ${PORT}`);
 });
