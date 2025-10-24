@@ -1,4 +1,12 @@
-import AWS from 'aws-sdk';
+import {
+  S3Client,
+  ListBucketsCommand,
+  HeadBucketCommand,
+  CreateBucketCommand,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand
+} from '@aws-sdk/client-s3';
 
 export interface CredentialValidation {
   success: boolean;
@@ -60,50 +68,36 @@ export async function validateAWSCredentials(): Promise<CredentialValidation> {
     }
     result.secretKeyValid = true;
 
-    // Configure AWS SDK
-    AWS.config.update({
-      accessKeyId,
-      secretAccessKey,
-      region
-    });
+    const credentials = { accessKeyId, secretAccessKey };
+    const s3 = new S3Client({ region, credentials });
 
-    const s3 = new AWS.S3();
-    const sts = new AWS.STS();
-
-    // Test 1: Verify credentials work with STS
+    // Test 1: List buckets permission (also validates credentials)
     try {
-      await sts.getCallerIdentity().promise();
-      console.log(`✅ [CREDENTIAL CHECK] STS identity verification passed`);
-    } catch (error: any) {
-      result.error = `STS verification failed: ${error.code}`;
-      result.guidance = 'Credentials are invalid or expired. Please check your AWS Access Key ID and Secret Access Key';
-      return result;
-    }
-
-    // Test 2: List buckets permission
-    try {
-      await s3.listBuckets().promise();
+      await s3.send(new ListBucketsCommand({}));
       result.permissions.s3ListBuckets = true;
       console.log(`✅ [CREDENTIAL CHECK] S3 ListBuckets permission verified`);
     } catch (error: any) {
       console.log(`❌ [CREDENTIAL CHECK] S3 ListBuckets failed: ${error.code}`);
+      result.error = `S3 ListBuckets failed: ${error.code}`;
+      result.guidance = 'Credentials are invalid or lack S3 ListBuckets permission';
+      return result;
     }
 
-    // Test 3: Check if boreal-documents bucket exists
+    // Test 2: Check if boreal-documents bucket exists
     try {
-      await s3.headBucket({ Bucket: 'boreal-documents' }).promise();
+      await s3.send(new HeadBucketCommand({ Bucket: 'boreal-documents' }));
       console.log(`✅ [CREDENTIAL CHECK] boreal-documents bucket exists`);
     } catch (error: any) {
       console.log(`⚠️ [CREDENTIAL CHECK] boreal-documents bucket does not exist: ${error.code}`);
-      
-      // Test 4: Create bucket permission (if bucket doesn't exist)
+
+      // Test 3: Create bucket permission (if bucket doesn't exist)
       try {
-        await s3.createBucket({
-          Bucket: 'boreal-documents',
-          CreateBucketConfiguration: {
-            LocationConstraint: region === 'us-east-1' ? undefined : region
-          }
-        }).promise();
+        await s3.send(
+          new CreateBucketCommand({
+            Bucket: 'boreal-documents',
+            CreateBucketConfiguration: region === 'us-east-1' ? undefined : { LocationConstraint: region }
+          })
+        );
         result.permissions.s3CreateBucket = true;
         console.log(`✅ [CREDENTIAL CHECK] Created boreal-documents bucket successfully`);
       } catch (createError: any) {
@@ -111,26 +105,30 @@ export async function validateAWSCredentials(): Promise<CredentialValidation> {
       }
     }
 
-    // Test 5: Put object permission (test with small object)
+    // Test 4: Put object permission (test with small object)
     try {
-      await s3.putObject({
-        Bucket: 'boreal-documents',
-        Key: 'test-permission.txt',
-        Body: 'Permission test',
-        ContentType: 'text/plain'
-      }).promise();
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: 'boreal-documents',
+          Key: 'test-permission.txt',
+          Body: 'Permission test',
+          ContentType: 'text/plain'
+        })
+      );
       result.permissions.s3PutObject = true;
       console.log(`✅ [CREDENTIAL CHECK] S3 PutObject permission verified`);
     } catch (error: any) {
       console.log(`❌ [CREDENTIAL CHECK] S3 PutObject failed: ${error.code}`);
     }
 
-    // Test 6: Get object permission
+    // Test 5: Get object permission
     try {
-      await s3.getObject({
-        Bucket: 'boreal-documents',
-        Key: 'test-permission.txt'
-      }).promise();
+      await s3.send(
+        new GetObjectCommand({
+          Bucket: 'boreal-documents',
+          Key: 'test-permission.txt'
+        })
+      );
       result.permissions.s3GetObject = true;
       console.log(`✅ [CREDENTIAL CHECK] S3 GetObject permission verified`);
     } catch (error: any) {
@@ -139,10 +137,12 @@ export async function validateAWSCredentials(): Promise<CredentialValidation> {
 
     // Clean up test file
     try {
-      await s3.deleteObject({
-        Bucket: 'boreal-documents',
-        Key: 'test-permission.txt'
-      }).promise();
+      await s3.send(
+        new DeleteObjectCommand({
+          Bucket: 'boreal-documents',
+          Key: 'test-permission.txt'
+        })
+      );
       console.log(`🧹 [CREDENTIAL CHECK] Cleaned up test file`);
     } catch (error: any) {
       console.log(`⚠️ [CREDENTIAL CHECK] Could not clean up test file: ${error.code}`);

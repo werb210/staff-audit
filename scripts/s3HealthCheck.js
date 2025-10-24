@@ -5,12 +5,25 @@
  * Verifies S3 configuration and bucket accessibility
  */
 
-import AWS from 'aws-sdk';
+import {
+  S3Client,
+  HeadBucketCommand,
+  ListObjectsV2Command,
+  GetBucketEncryptionCommand,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION || 'ca-central-1'
+const s3 = new S3Client({
+  region: process.env.AWS_REGION || 'ca-central-1',
+  credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+    ? {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+      }
+    : undefined
 });
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME || 'boreal-documents';
@@ -23,21 +36,21 @@ async function runS3HealthCheck() {
   try {
     // Check if bucket exists and is accessible
     console.log('\n1. 📡 Testing bucket accessibility...');
-    const headResult = await s3.headBucket({ Bucket: BUCKET_NAME }).promise();
+    await s3.send(new HeadBucketCommand({ Bucket: BUCKET_NAME }));
     console.log('   ✅ Bucket accessible');
 
     // List objects to verify permissions
     console.log('\n2. 📋 Testing list permissions...');
-    const listResult = await s3.listObjectsV2({ 
+    const listResult = await s3.send(new ListObjectsV2Command({
       Bucket: BUCKET_NAME,
       MaxKeys: 5
-    }).promise();
+    }));
     console.log(`   ✅ List permission verified (${listResult.Contents.length} objects found)`);
 
     // Test bucket encryption
     console.log('\n3. 🔐 Checking bucket encryption...');
     try {
-      const encryptionResult = await s3.getBucketEncryption({ Bucket: BUCKET_NAME }).promise();
+      const encryptionResult = await s3.send(new GetBucketEncryptionCommand({ Bucket: BUCKET_NAME }));
       console.log('   ✅ Bucket encryption configured:');
       encryptionResult.ServerSideEncryptionConfiguration.Rules.forEach(rule => {
         rule.ApplyServerSideEncryptionByDefault && console.log(`      Algorithm: ${rule.ApplyServerSideEncryptionByDefault.SSEAlgorithm}`);
@@ -51,28 +64,31 @@ async function runS3HealthCheck() {
     const testKey = `health-check-${Date.now()}.txt`;
     const testContent = 'S3 health check test file';
     
-    await s3.putObject({
+    await s3.send(new PutObjectCommand({
       Bucket: BUCKET_NAME,
       Key: testKey,
       Body: testContent,
       ServerSideEncryption: 'AES256'
-    }).promise();
+    }));
     console.log(`   ✅ Upload permission verified (test file: ${testKey})`);
 
     // Clean up test file
-    await s3.deleteObject({
+    await s3.send(new DeleteObjectCommand({
       Bucket: BUCKET_NAME,
       Key: testKey
-    }).promise();
+    }));
     console.log('   ✅ Test file cleaned up');
 
     // Test pre-signed URL generation
     console.log('\n5. 🔗 Testing pre-signed URL generation...');
-    const presignedUrl = s3.getSignedUrl('getObject', {
-      Bucket: BUCKET_NAME,
-      Key: 'test-key',
-      Expires: 3600
-    });
+    const presignedUrl = await getSignedUrl(
+      s3,
+      new GetObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: 'test-key'
+      }),
+      { expiresIn: 3600 }
+    );
     console.log('   ✅ Pre-signed URL generation working');
 
     console.log('\n✅ [S3-HEALTH] All S3 health checks passed!');

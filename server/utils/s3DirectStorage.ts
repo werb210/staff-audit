@@ -1,11 +1,21 @@
-import AWS from 'aws-sdk';
+import {
+  S3Client,
+  PutObjectCommand,
+  HeadBucketCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  type GetObjectCommandOutput
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import crypto from 'crypto';
 
 // Configure S3 client
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION || 'ca-central-1'
+const s3 = new S3Client({
+  region: process.env.AWS_REGION || 'ca-central-1',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+  }
 });
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME || 'boreal-documents';
@@ -53,10 +63,9 @@ export async function uploadToS3(
 
     console.log(`📤 [S3-DIRECT] Uploading to bucket: ${BUCKET_NAME}`);
     
-    const result = await s3.upload(uploadParams).promise();
-    
-    console.log(`✅ [S3-DIRECT] Upload successful: ${result.Location}`);
-    console.log(`🏷️ [S3-DIRECT] ETag: ${result.ETag}`);
+    await s3.send(new PutObjectCommand(uploadParams));
+
+    console.log(`✅ [S3-DIRECT] Upload successful: ${storageKey}`);
 
     return {
       success: true,
@@ -84,27 +93,29 @@ export async function testS3Connection(): Promise<{ success: boolean; error?: st
     console.log(`🔍 [S3-TEST] Testing connection to bucket: ${BUCKET_NAME}`);
     
     // Test bucket access
-    await s3.headBucket({ Bucket: BUCKET_NAME }).promise();
+    await s3.send(new HeadBucketCommand({ Bucket: BUCKET_NAME }));
     console.log(`✅ [S3-TEST] Bucket accessible`);
 
     // Test upload permissions with small test file
     const testKey = `connection-test-${Date.now()}.txt`;
     const testContent = Buffer.from('S3 connection test', 'utf8');
     
-    await s3.putObject({
-      Bucket: BUCKET_NAME,
-      Key: testKey,
-      Body: testContent,
-      ServerSideEncryption: 'AES256'
-    }).promise();
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: testKey,
+        Body: testContent,
+        ServerSideEncryption: 'AES256'
+      })
+    );
 
     console.log(`✅ [S3-TEST] Upload permission verified`);
 
     // Clean up test file
-    await s3.deleteObject({
+    await s3.send(new DeleteObjectCommand({
       Bucket: BUCKET_NAME,
       Key: testKey
-    }).promise();
+    }));
 
     console.log(`✅ [S3-TEST] Cleanup successful - S3 connection verified`);
 
@@ -130,19 +141,20 @@ export async function getPreSignedUrl(storageKey: string, expiresIn: number = 36
     Expires: expiresIn
   };
 
-  return s3.getSignedUrl('getObject', params);
+  const command = new GetObjectCommand(params);
+  return getSignedUrl(s3, command, { expiresIn });
 }
 
 /**
  * Stream document from S3 for download
  */
-export async function streamDocumentFromS3(storageKey: string): Promise<AWS.S3.GetObjectOutput> {
+export async function streamDocumentFromS3(storageKey: string): Promise<GetObjectCommandOutput> {
   const params = {
     Bucket: BUCKET_NAME,
     Key: storageKey
   };
 
-  return s3.getObject(params).promise();
+  return s3.send(new GetObjectCommand(params));
 }
 
 export { BUCKET_NAME };

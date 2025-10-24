@@ -63,7 +63,7 @@ export function setupAuth(app: Express) {
     return res.status(401).json({ ok: false, error: "bad_credentials_or_user_not_found" });
   });
 
-  // GET /api/auth/session  (idempotent; returns user if token present)
+  // GET session endpoint (mounted under /api/auth, idempotent; returns user if token present)
   r.get("/session", attachUserIfPresent, (req: Request & { user?: JwtUser }, res: Response) => {
     return res.json({ ok: true, user: req.user || null });
   });

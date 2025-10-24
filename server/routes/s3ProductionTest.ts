@@ -52,7 +52,7 @@ router.post('/test-upload', upload.single('document'), async (req: any, res: any
   try {
     const file = req.file;
     const applicationId = req.body.applicationId || 'test-app-123';
-    const documentType = req.body.documentType || 'test_document';
+    const documentType = req.body.documentType || 'other';
 
     if (!file) {
       return res.status(400).json({

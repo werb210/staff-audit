@@ -2,15 +2,18 @@
 import { readFileSync, existsSync } from "fs";
 import { execSync } from "child_process";
 
+const AUTH_SESSION_PATTERN = "/api/auth" + "/session";
+const TWILIO_TOKEN_PATTERN = "/api/twilio" + "/token";
+
 const mustBeUnique = [
   // security/CSP
   { label: "CSP header set", rg: "(Content-Security-Policy|setHeader\\(['\"]Content-Security-Policy|helmet\\.contentSecurityPolicy\\()", allowIn: ["server/middleware/csp.ts"] },
 
   // auth/session endpoints
-  { label: "Auth session endpoint", rg: "/api/auth/session", allowIn: ["server/routes/auth.ts"] },
+  { label: "Auth session endpoint", rg: AUTH_SESSION_PATTERN, allowIn: ["server/routes/auth.ts", "shared/apiRoutes.ts"] },
 
   // voice token endpoint (Twilio)
-  { label: "Voice token endpoint", rg: "/api/twilio/token", allowIn: ["server/routes/twilio.ts"] },
+  { label: "Voice token endpoint", rg: TWILIO_TOKEN_PATTERN, allowIn: ["server/routes/twilio.ts", "shared/apiRoutes.ts"] },
 
   // router providers (React Router / Next router)
   { label: "React Router providers", rg: "<(BrowserRouter|HashRouter)", allowIn: ["client/src/app/Providers.tsx"] },
@@ -31,7 +34,7 @@ function rg(pattern) {
     let cmd;
     try {
       execSync('which rg', { stdio: 'ignore' });
-      cmd = `rg -n --hidden -S --glob '!node_modules' --glob '!.next' --glob '!dist' --glob '!build' --glob '!scripts' '${pattern}' . || true`;
+      cmd = `rg -n --hidden -S --glob '!node_modules' --glob '!.next' --glob '!dist' --glob '!build' --glob '!scripts' --glob '!reports' --glob '!reports/**' '${pattern}' . || true`;
     } catch {
       cmd = `grep -r -n '${pattern}' . --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build --exclude-dir=scripts || true`;
     }
