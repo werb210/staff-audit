@@ -8,7 +8,7 @@ import { AddProduct } from './pages/AddProduct';
 import { Reports } from './pages/Reports';
 import { LenderLogin } from './pages/LenderLogin';
 import { LenderAuthProvider } from './auth/LenderAuthProvider';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import ProtectedRoute from '../src/auth/ProtectedRoute';
 
 const queryClient = new QueryClient({
   defaultOptions: {
