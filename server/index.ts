@@ -5,9 +5,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 
-import contactsRouter from "./routes/contacts.js";
-import pipelineRouter from "./routes/pipeline.js";
-import healthRouter from "./routes/_int/index.js";
+import { registerRoutes } from "./registerRoutes.js";
 
 // --- Fix for __dirname in ESM environments ---
 const __filename = fileURLToPath(import.meta.url);
@@ -25,15 +23,8 @@ if (!process.env.DATABASE_URL) {
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- TOP PRIORITY HEALTH CHECK ---
-app.get("/api/_int/build", (_, res) => {
-  res.status(200).json({ ok: true, source: "direct health check" });
-});
-
-// --- Other API routes ---
-app.use("/api/_int", healthRouter);
-app.use("/api/contacts", contactsRouter);
-app.use("/api/pipeline", pipelineRouter);
+// --- Canonical API routes ---
+registerRoutes(app);
 
 // --- Serve frontend last ---
 const clientDist = path.join(__dirname, "../client/dist");

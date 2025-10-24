@@ -4,12 +4,17 @@
  */
 
 import validator from 'validator';
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+import sanitizeHtml from 'sanitize-html';
 
-// Initialize DOMPurify with JSDOM for server-side usage
-const window = new JSDOM('').window;
-const purify = DOMPurify(window as any);
+const SANITIZE_OPTIONS = {
+  allowedTags: [],
+  allowedAttributes: {},
+  disallowedTagsMode: 'discard' as const
+};
+
+function stripHtml(input: string): string {
+  return sanitizeHtml(input, SANITIZE_OPTIONS);
+}
 
 // Input length limits
 export const INPUT_LIMITS = {
@@ -71,11 +76,7 @@ export function validateMessage(message: any): string {
   }
 
   // Sanitize HTML/XSS
-  const sanitized = purify.sanitize(trimmed, { 
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-    ALLOW_DATA_ATTR: false
-  });
+  const sanitized = stripHtml(trimmed);
 
   return sanitized;
 }
@@ -99,11 +100,7 @@ export function validateName(name: any): string {
   }
 
   // Remove HTML tags and sanitize
-  const sanitized = purify.sanitize(trimmed, { 
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-    ALLOW_DATA_ATTR: false
-  });
+  const sanitized = stripHtml(trimmed);
 
   // Basic name validation (letters, spaces, hyphens, apostrophes)
   if (!/^[a-zA-Z\s\-'.]+$/.test(sanitized)) {
@@ -236,11 +233,5 @@ export function sanitizeText(text: any, maxLength: number = 1000): string {
   }
 
   // Remove HTML tags and sanitize
-  const sanitized = purify.sanitize(trimmed, { 
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-    ALLOW_DATA_ATTR: false
-  });
-
-  return sanitized;
+  return stripHtml(trimmed);
 }

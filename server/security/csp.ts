@@ -1,73 +1,92 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Express } from "express";
+import helmet, { type IHelmetContentSecurityPolicyDirectives } from "helmet";
+
+const GOOGLE = [
+  "https://www.googletagmanager.com",
+  "https://www.google-analytics.com",
+  "https://fonts.googleapis.com",
+  "https://fonts.gstatic.com",
+];
+
+const TWILIO = [
+  "https://sdk.twilio.com",
+  "https://static.twilio.com",
+  "https://media.twiliocdn.com",
+  "wss://*.twilio.com",
+];
+
+const REPLIT = [
+  "https://*.replit.dev",
+  "https://*.janeway.replit.dev",
+  "https://*.picard.replit.dev",
+];
+
+const PROD_FRAME_ANCESTORS = [
+  "'self'",
+  "https://staff.boreal.financial",
+  "https://*.boreal.financial",
+];
+
+const DEV_FRAME_ANCESTORS = [
+  "'self'",
+  "https://replit.com",
+  "https://*.replit.com",
+];
 
 const isProd = process.env.NODE_ENV === "production";
 
-/**
- * Single source of truth for CSP. No meta tags, no other setters.
- * - Removes invalid tokens (there is NO 'unsafe-dynamic' in CSP)
- * - Moves reporting to its own directive (report-uri) instead of listing as a source
- * - Avoids paths/queries in source lists (not allowed by spec)
- */
-export function csp(req: Request, res: Response, next: NextFunction) {
-  // Allow Replit iframe to embed us in dev, and your domain in prod.
-  const frameAncestors = isProd
-    ? ["'self'", "https://staff.boreal.financial", "https://*.boreal.financial"]
-    : ["'self'", "https://replit.com", "https://*.replit.com"];
+export function applyCSP(app: Express) {
+  const directives: IHelmetContentSecurityPolicyDirectives = {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'", ...GOOGLE, ...TWILIO.slice(0, 3)],
+    styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+    imgSrc: ["'self'", "data:", "blob:", "https://www.google-analytics.com"],
+    fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+    connectSrc: ["'self'", ...GOOGLE, ...TWILIO, ...REPLIT],
+    frameSrc: ["'self'", "https://accounts.google.com", "https://*.twilio.com"],
+    frameAncestors: isProd ? PROD_FRAME_ANCESTORS : DEV_FRAME_ANCESTORS,
+    baseUri: ["'self'"],
+    formAction: ["'self'"],
+    objectSrc: ["'none'"],
+    workerSrc: ["'self'", "blob:"],
+    reportUri: ["/csp-report"],
+  };
 
-  // Staff runs inside an iframe; keep it modest so features work without wildcards.
-  const policy = [
-    `default-src 'self'`,
-    // Keep inline for Next/Vite dev and a few vendor origins explicitly listed.
-    `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://sdk.twilio.com blob:`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-    `img-src 'self' data: blob: https://www.google-analytics.com`,
-    `font-src 'self' https://fonts.gstatic.com`,
-    // Replit preview uses *.replit.dev; Twilio needs wss + https.
-    `connect-src 'self' https://*.replit.dev wss://*.twilio.com https://sdk.twilio.com https://www.google-analytics.com`,
-    // If you open Twilio/Google auth popups or iframes, list them here:
-    `frame-src 'self' https://*.twilio.com https://accounts.google.com`,
-    `frame-ancestors ${frameAncestors.join(" ")}`,
-    // Optional: turn on reporting (endpoint below).
-    `report-uri /csp-report`,
-  ].join("; ");
-
-  res.setHeader("Content-Security-Policy", policy);
-  next();
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives,
+      },
+      crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+      referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    })
+  );
 }
 
-/** Accepts browser CSP violation reports (kept very light). */
-export function cspReportEndpoint(req: Request, res: Response) {
-  try {
-    // Reports may come as application/csp-report or application/json
-    // Do not log full body in prod; it's often PII-ish.
-    if (!isProd) {
-      // eslint-disable-next-line no-console
-      console.warn("[CSP-REPORT]", JSON.stringify(req.body || {}, null, 2));
-    }
-  } catch {}
-  res.status(204).end();
-}
+export const permissionsPolicy = [
+  "geolocation=()",
+  "camera=()",
+  "microphone=()",
+  "payment=()",
+  "fullscreen=(self)",
+  "publickey-credentials-get=(self)",
+].join(", ");
 
-export const permissionsPolicy =
-  // Only recognized tokens; remove the noisy ones from the console
-  [
-    "geolocation=()",
-    "camera=()",
-    "microphone=()",
-    "payment=()",
-    "fullscreen=(self)",
-    "publickey-credentials-get=(self)"
-  ].join(", ");
-
-export const corsAllowlist: (string|RegExp)[] = [
+export const corsAllowlist: Array<string | RegExp> = [
+  "https://staff.boreal.financial",
+  "https://www.boreal.financial",
+  "https://client.boreal.financial",
   "http://localhost:3000",
   "http://localhost:5000",
-  /\.replit\.dev$/,
-  /\.janeway\.replit\.dev$/,
-  /\.picard\.replit\.dev$/,
+  "http://localhost:5173",
+  "http://127.0.0.1:5000",
+  /^https:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]?\.replit\.app$/,
+  /^https:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]?\.replit\.dev$/,
+  /^https:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]?\.janeway\.replit\.dev$/,
+  /^https:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]?\.picard\.replit\.dev$/,
+  "https://5b94728b-d7a4-4765-992e-926f94929109-00-3c18d2x352sp0.picard.replit.dev",
 ];
 
-// Valid sandbox flags only
 export const iframeSandbox =
-  // Remove invalid 'allow-downloads-without-user-activation'
   "allow-scripts allow-same-origin allow-forms allow-popups allow-downloads";

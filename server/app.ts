@@ -1,7 +1,7 @@
 // Express app instance for testing (without starting server)
 import express from "express";
 import cors from "cors";
-import { registerRoutes } from "./routes";
+import { registerRoutes } from "./registerRoutes.js";
 
 const app = express();
 

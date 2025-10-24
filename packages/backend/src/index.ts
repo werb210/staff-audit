@@ -6,9 +6,9 @@ import routes from "./routes/index.js";
 const app = express();
 
 // Middleware
-
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.REPLIT_DOMAINS?.split(',').map(domain => `https://${domain}`) 
+app.use(cors({
+  origin: process.env.NODE_ENV === "production"
+    ? process.env.REPLIT_DOMAINS?.split(",").map(domain => `https://${domain}`)
     : true,
   credentials: true,
 }));
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 await setupAuth(app);
 
 // API routes
-app.use('/api', routes);
+app.use("/api", routes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -1,5 +1,4 @@
 import type { Application, Request, Response, NextFunction } from 'express';
-import express from 'express';
 
 export function configureSecurity(app: Application) {
   const profile = (process.env.SECURITY_PROFILE || 'off').toLowerCase();
@@ -19,10 +18,8 @@ export function configureSecurity(app: Application) {
       next();
     });
   }
-  const r = express.Router();
-  r.get('/_int/security-profile', (_req: Request, res: Response) =>
+  app.get('/api/_int/security-profile', (_req: Request, res: Response) =>
     res.json({ profile, nodeEnv: process.env.NODE_ENV || 'dev', ts: Date.now() })
   );
-  app.use('/api', r);
   return profile;
 }

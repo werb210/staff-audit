@@ -1,0 +1,212 @@
+version: 1
+application: staff
+phase: month1
+description: >
+  Full Month-1 automation plan for the Staff Application.
+  Covers infrastructure stabilization, reliability, communications, AI features,
+  and deployment. Excludes all V2 and V3 scope items.
+
+weeks:
+  - name: "Week 1 — Infrastructure & Stabilization"
+    days:
+      - name: Monday – Environment / DB / S3
+        tasks:
+          - id: env_postgres_perms
+            desc: Confirm PostgreSQL starts locally and fix /var/run/postgresql permissions
+            verify: psql -U postgres -c '\l'
+          - id: drizzle_push
+            desc: Run drizzle-kit push or migrations
+            verify: npx drizzle-kit push
+          - id: env_check
+            desc: Verify .env loads correctly
+            verify: npx tsx scripts/check-env.ts
+          - id: s3_upload_test
+            desc: Test AWS S3 credentials by uploading a dummy file
+            verify: aws s3 cp test.txt s3://$S3_BUCKET/test.txt
+          - id: health_endpoints
+            desc: Check /api/_int/db-health and /api/_int/build return OK
+
+      - name: Tuesday – Schema Audit
+        tasks:
+          - id: schema_review
+            desc: Review server/config/db.ts and ORM setup
+          - id: table_verify
+            desc: Ensure all core tables exist (applications, contacts, documents, lenders, lender_products)
+          - id: sanity_check
+            desc: Confirm /api/_int/db-sanity shows all tables healthy
+
+      - name: Wednesday – Document System
+        tasks:
+          - id: s3_put_object
+            desc: Verify upload uses S3 PutObjectCommand
+          - id: post_doc
+            desc: POST test file to /api/v1/applications/:id/documents
+          - id: doc_metadata
+            desc: Confirm metadata written and visible in S3
+          - id: presigned_download
+            desc: Test pre-signed URL download
+          - id: no_local_fallback
+            desc: Ensure no local storage fallback active
+
+      - name: Thursday – CRM & Pipeline
+        tasks:
+          - id: contacts_crud
+            desc: Test /api/contacts CRUD endpoints
+          - id: pipeline_app_docs
+            desc: Verify /api/pipeline/cards/:id/application and /documents return data
+          - id: requires_docs_logic
+            desc: Check “Requires Docs” column logic for missing or rejected documents
+          - id: react_query_backend
+            desc: Confirm React Query hooks hit backend correctly
+
+      - name: Friday – Integrations
+        tasks:
+          - id: twilio_check
+            desc: Verify /api/_int/twilio-check returns true
+          - id: o365_oauth
+            desc: Test Office 365 OAuth and /api/o365/* routes
+          - id: internal_health
+            desc: Validate all /api/_int/* health endpoints
+
+  - name: "Week 2 — Core Feature Hardening"
+    days:
+      - name: Monday – Document Reliability
+        tasks:
+          - id: sha256_enable
+            desc: Enable SHA-256 checksum verification
+          - id: version_history
+            desc: Activate document version history and rollback
+          - id: reupload_checksum
+            desc: Test re-upload checksum match
+
+      - name: Tuesday – Predictive Failure & Retry Queue
+        tasks:
+          - id: retry_dashboard
+            desc: Ensure retry queue dashboard online
+          - id: simulate_fail
+            desc: Simulate failed upload to trigger auto-retry
+          - id: audit_logs
+            desc: Verify audit logs record failures
+
+      - name: Wednesday – Communication Center
+        tasks:
+          - id: sms_test
+            desc: Twilio SMS inbound/outbound test
+          - id: email_test
+            desc: SendGrid email send and receive validation
+          - id: voice_log
+            desc: Verify Twilio voice call logs visible in UI
+
+      - name: Thursday – Office 365 Sync
+        tasks:
+          - id: o365_calendar
+            desc: Verify Calendar, Tasks, Email tabs display synced data
+          - id: token_refresh
+            desc: Token refresh functioning
+          - id: oauth_reconnect
+            desc: OAuth disconnect and reconnect flow verified
+
+      - name: Friday – Connected Accounts UI
+        tasks:
+          - id: integrations_ui
+            desc: /settings/integrations lists Google Ads and LinkedIn
+          - id: token_store_refresh
+            desc: Tokens stored and refreshed correctly
+          - id: admin_access
+            desc: Confirm admin role access controls
+
+  - name: "Week 3 — AI & Automation"
+    days:
+      - name: Monday – AI Summary Tab
+        tasks:
+          - id: ai_summary_generate
+            desc: Generate credit summary from OCR + form
+          - id: ai_summary_pdf
+            desc: Save summary PDF to S3
+          - id: ai_summary_edit_train
+            desc: Allow edit and retrain model
+
+      - name: Tuesday – AI Risk Scoring + OCR Insights
+        tasks:
+          - id: ocr_group_by_doc
+            desc: Group OCR fields by document type
+          - id: cross_doc_conflicts
+            desc: Highlight cross-document value conflicts
+          - id: risk_score_display
+            desc: Display AI risk score per application
+
+      - name: Wednesday – Lender Recommendation Engine
+        tasks:
+          - id: lender_match
+            desc: Return best lender matches by criteria
+          - id: lender_attach
+            desc: Attach results to application card
+          - id: lender_weights
+            desc: Log matching weights and scores
+
+      - name: Thursday – CRM Automation
+        tasks:
+          - id: smart_tags
+            desc: Auto-populate Smart Tags from behavior
+          - id: next_step_engine
+            desc: Show Next-Step engine on card
+          - id: ai_task_generator
+            desc: Enable AI-generated task creation
+
+      - name: Friday – Analytics Dashboard
+        tasks:
+          - id: ga4_ads_connect
+            desc: Connect GA4 and Google Ads
+          - id: roi_cpa_metrics
+            desc: Display ROI/CPA metrics
+          - id: ad_sync
+            desc: Verify ad spend and conversion sync
+
+  - name: "Week 4 — QA & Deployment"
+    days:
+      - name: Monday – Integration Testing
+        tasks:
+          - id: client_staff_e2e
+            desc: Test Client→Staff submission end-to-end
+          - id: s3_consistency
+            desc: Run S3 consistency audit
+          - id: retry_checksum_prod
+            desc: Verify retry and checksum logic in production
+
+      - name: Tuesday – Security & RBAC
+        tasks:
+          - id: auth_verify
+            desc: Verify JWT, 2FA, and WebAuthn login
+          - id: cors_allowlist
+            desc: Confirm CORS allowlist
+          - id: role_permissions
+            desc: Validate Admin/Staff/Lender/Referrer permissions
+
+      - name: Wednesday – Playwright E2E
+        tasks:
+          - id: e2e_button_coverage
+            desc: Ensure 100% button coverage
+          - id: dead_links
+            desc: Detect and remove dead links or dummy UI
+          - id: pipeline_drag_drawer
+            desc: Test pipeline drag/drop and drawer flows
+
+      - name: Thursday – Backups & Snapshots
+        tasks:
+          - id: daily_backups
+            desc: Verify daily S3 and DB backups run
+          - id: snapshot_rotation
+            desc: Confirm 7-day rotation policy active
+          - id: restore_sim
+            desc: Test restore simulation
+
+      - name: Friday – Production Deployment
+        tasks:
+          - id: ci_cd
+            desc: CI/CD workflow runs clean
+          - id: aws_deploy
+            desc: Server and client deployed to AWS
+          - id: smoke_tests
+            desc: Run smoke tests
+          - id: final_audit
+            desc: Save final audit report to /reports

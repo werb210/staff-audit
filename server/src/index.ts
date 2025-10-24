@@ -2,9 +2,8 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
 import { Pool } from "pg";
+import { registerRoutes } from "../registerRoutes";
 
 dotenv.config();
 
@@ -20,13 +19,8 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Correct dynamic import for tsx
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const contactsRouter = (await import(path.join(__dirname, "routes", "contacts.ts"))).default;
-
-// ✅ Mount contacts router
-app.use("/api/contacts", contactsRouter);
+// ✅ Canonical routes
+registerRoutes(app);
 
 // ✅ Root page
 app.get("/", (_req, res) => {

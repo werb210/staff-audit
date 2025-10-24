@@ -1,4 +1,5 @@
 import type { Application, Request, Response, NextFunction } from 'express';
+import { AUTH_SESSION_ENDPOINT } from '../../shared/apiRoutes';
 export function installDevAuthBypass(app: Application) {
   const on = process.env.SECURITY_PROFILE === 'off' || process.env.NODE_ENV !== 'production';
   console.log(`🔓 [DEV-BYPASS] Security profile: ${process.env.SECURITY_PROFILE}, NODE_ENV: ${process.env.NODE_ENV}, Bypass active: ${on}`);
@@ -6,7 +7,7 @@ export function installDevAuthBypass(app: Application) {
   if (!on) return;
   
   // Override any existing auth session routes with dev bypass
-  app.get('/api/auth/session', (_req: Request, res: Response) => {
+  app.get(AUTH_SESSION_ENDPOINT, (_req: Request, res: Response) => {
     console.log('✅ [DEV-BYPASS] Returning dev admin session');
     res.json({ ok: true, user: { id: 'dev-admin', role: 'Admin', name: 'Dev Admin' } });
   });

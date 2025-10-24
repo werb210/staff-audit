@@ -1,0 +1,9 @@
+CODEx Functional Coverage Test
+2025-10-24T15:36:35.128Z
+❌ CRM Endpoints → failed
+❌ AI OCR Endpoint → failed
+❌ Lender Matching → failed
+❌ Communication Center → failed
+❌ Marketing Tab → failed
+❌ Reports Tab → failed
+❌ Settings Integrations → failed

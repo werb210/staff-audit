@@ -1,6 +1,7 @@
 import { pgTable, uuid, text, integer, timestamp, boolean, varchar, jsonb, pgEnum, decimal, real } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { DOCUMENT_TYPES } from './documentTypes';
 
 // Import enum lock validation
 import { validateEnumModification } from '../server/db/schema/documentLock';
@@ -9,17 +10,7 @@ import { validateEnumModification } from '../server/db/schema/documentLock';
 validateEnumModification('document_type');
 
 // Create enums for status fields
-export const documentTypeEnum = pgEnum('document_type', [
-  'bank_statements',
-  'financial_statements', 
-  'tax_returns',
-  'business_license',
-  'articles_of_incorporation',
-  'account_prepared_financials',
-  'pnl_statement',
-  'application_summary_pdf',
-  'other'
-]);
+export const documentTypeEnum = pgEnum('document_type', DOCUMENT_TYPES);
 
 export const statusEnum = pgEnum('status', [
   'pending',
@@ -401,7 +392,7 @@ export const insertDeviceRegistrationSchema = createInsertSchema(deviceRegistrat
   createdAt: true,
   updatedAt: true,
   lastUsed: true
-});
+} as any);
 
 
 
@@ -409,24 +400,24 @@ export const insertApplicationSchema = createInsertSchema(applications).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertBusinessSchema = createInsertSchema(businesses).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertDocumentSchema = createInsertSchema(documents).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertRetryUploadLogSchema = createInsertSchema(retryUploadLogs).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 // Email Messages table
 export const emailMessages = pgTable('email_messages', {
@@ -465,7 +456,7 @@ export const insertEmailMessageSchema = createInsertSchema(emailMessages).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 // New tables for Staff Application Full Upgrade
 
@@ -528,23 +519,23 @@ export const insertScheduledNotificationSchema = createInsertSchema(scheduledNot
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertDocumentBackupSchema = createInsertSchema(documentBackups).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 export const insertDocumentAnalysisSchema = createInsertSchema(documentAnalysis).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertChatTranscriptSchema = createInsertSchema(chatTranscripts).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 // Enhanced CRM Contact Management Tables
 export const contacts: any = pgTable('contacts', {
@@ -819,31 +810,31 @@ export const insertSiloSchema = createInsertSchema(silos).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertContactSchema = createInsertSchema(contacts).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertContactLogSchema = createInsertSchema(contactLogs).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertNoteSchema = createInsertSchema(notes).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertLenderUserSchema = createInsertSchema(lenderUsers).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 // Clean Lender validation schema
 export const insertLenderSchema = createInsertSchema(lenders, {
@@ -856,11 +847,11 @@ export const insertLenderSchema = createInsertSchema(lenders, {
   mainContactEmail: z.string().email().optional().or(z.literal("")),
   url: z.string().url().optional().or(z.literal("")),
   description: z.string().optional()
-}).omit({
+} as any).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-});
+} as any);
 
 export type InsertLender = z.infer<typeof insertLenderSchema>;
 
@@ -882,62 +873,62 @@ export const insertLenderProductSchema = createInsertSchema(lenderProducts, {
   country: z.string().optional(),
   requiredDocuments: z.string().optional(),
   isActive: z.boolean().default(true)
-}).omit({
+} as any).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-});
+} as any);
 
 export type InsertLenderProduct = z.infer<typeof insertLenderProductSchema>;
 
 export const insertCallLogSchema = createInsertSchema(callLogs).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 export const insertCallSchema = createInsertSchema(calls).omit({
   id: true,
   startedAt: true
-});
+} as any);
 
 export const insertCallParticipantSchema = createInsertSchema(callParticipants).omit({
   id: true
-});
+} as any);
 
 export const insertCallRecordingSchema = createInsertSchema(callRecordings).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 export const insertCallTranscriptSchema = createInsertSchema(callTranscripts).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertSmsMessageSchema = createInsertSchema(smsMessages).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertEmailAccountSchema = createInsertSchema(emailAccounts).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertEmailThreadSchema = createInsertSchema(emailThreads).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertEmailMessage2Schema = createInsertSchema(emailMessages2).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 // Office 365 Integration Table
 export const o365Tokens = pgTable('o365_tokens', {
@@ -958,7 +949,7 @@ export const insertO365TokenSchema = createInsertSchema(o365Tokens).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 // Connected Accounts table for OAuth integrations (replaces o365Tokens)
 export const connectedAccounts = pgTable('connected_accounts', {
@@ -989,7 +980,7 @@ export const insertConnectedAccountSchema = createInsertSchema(connectedAccounts
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export type InsertConnectedAccount = z.infer<typeof insertConnectedAccountSchema>;
 export type ConnectedAccount = typeof connectedAccounts.$inferSelect;
@@ -1019,7 +1010,7 @@ export const insertOauthTokenSchema = createInsertSchema(oauthTokens).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export type InsertOauthToken = z.infer<typeof insertOauthTokenSchema>;
 export type OauthToken = typeof oauthTokens.$inferSelect;
@@ -1027,19 +1018,19 @@ export type OauthToken = typeof oauthTokens.$inferSelect;
 // Enhanced User types for production-ready User Management
 export const insertUserSchema = createInsertSchema(users, {
   firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"), 
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required"),
   mobilePhone: z.string().min(10, "Valid mobile phone is required for SMS 2FA"),
   role: z.enum(['admin', 'staff', 'marketing', 'lender', 'referrer']),
   department: z.string().optional(),
   is2FAEnabled: z.boolean().default(true),
   isActive: z.boolean().default(true)
-}).omit({
+} as any).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
   passwordHash: true
-});
+} as any);
 
 export const updateUserSchema = insertUserSchema.partial().extend({
   id: z.string().uuid()
@@ -1068,7 +1059,7 @@ export const insertLeadSourceSchema = createInsertSchema(leadSources).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 // Deletion logs table for audit trail
 export const deletionLogs = pgTable('deletion_logs', {
@@ -1199,34 +1190,34 @@ export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 export const insertChatEscalationSchema = createInsertSchema(chatEscalations).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertChatIssueReportSchema = createInsertSchema(chatIssueReports).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertRecommendationLogSchema = createInsertSchema(recommendationLogs).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 // Types
 export type InsertSilo = z.infer<typeof insertSiloSchema>;
@@ -1336,17 +1327,17 @@ export const ocrDocuments = pgTable('ocr_documents', {
 });
 
 // Schema and types for ApprovalRequest
-export const insertApprovalRequestSchema = createInsertSchema(approvalRequests).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertApprovalRequestSchema = createInsertSchema(approvalRequests).omit({ id: true, createdAt: true, updatedAt: true } as any);
 export type InsertApprovalRequest = z.infer<typeof insertApprovalRequestSchema>;
 export type ApprovalRequest = typeof approvalRequests.$inferSelect;
 
 // Schema and types for Activities
-export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, at: true });
+export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, at: true } as any);
 export type InsertActivity = z.infer<typeof insertActivitySchema>;
 export type Activity = typeof activities.$inferSelect;
 
 // Schema and types for OCRDocument
-export const insertOcrDocumentSchema = createInsertSchema(ocrDocuments).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertOcrDocumentSchema = createInsertSchema(ocrDocuments).omit({ id: true, createdAt: true, updatedAt: true } as any);
 export type InsertOcrDocument = z.infer<typeof insertOcrDocumentSchema>;
 export type OcrDocument = typeof ocrDocuments.$inferSelect;
 
@@ -1363,7 +1354,7 @@ export const userAuditLog = pgTable('user_audit_log', {
 });
 
 // Schema and types for User Audit Log
-export const insertUserAuditLogSchema = createInsertSchema(userAuditLog).omit({ id: true, createdAt: true });
+export const insertUserAuditLogSchema = createInsertSchema(userAuditLog).omit({ id: true, createdAt: true } as any);
 export type InsertUserAuditLog = z.infer<typeof insertUserAuditLogSchema>;
 export type UserAuditLog = typeof userAuditLog.$inferSelect;
 
@@ -1522,75 +1513,75 @@ export const insertBankConnectionSchema = createInsertSchema(bankConnections).om
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertBankAccountSchema = createInsertSchema(bankAccounts).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertBankTransactionSchema = createInsertSchema(bankTransactions).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 export const insertBankingAnalysisSchema = createInsertSchema(bankingAnalysis).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 // Recommendation Engine schemas
 export const insertRecommendationRuleSchema = createInsertSchema(recommendationRules).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertRecommendationRunSchema = createInsertSchema(recommendationRuns).omit({
   id: true,
   startedAt: true
-});
+} as any);
 
 export const insertRecommendationResultSchema = createInsertSchema(recommendationResults).omit({
   id: true
-});
+} as any);
 
 // OCR Jobs schema
 export const insertOcrJobSchema = createInsertSchema(ocrJobs).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 // Provider & System schemas
 export const insertProviderAccountSchema = createInsertSchema(providerAccounts).omit({
   id: true,
   createdAt: true,
   updatedAt: true
-});
+} as any);
 
 export const insertWebhookSubscriptionSchema = createInsertSchema(webhookSubscriptions).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 export const insertWebhookEventSchema = createInsertSchema(webhookEvents).omit({
   id: true,
   receivedAt: true
-});
+} as any);
 
 export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit({
   updatedAt: true
-});
+} as any);
 
 export const insertFeatureFlagSchema = createInsertSchema(featureFlags).omit({
   updatedAt: true
-});
+} as any);
 
 export const insertAuditLogSystemSchema = createInsertSchema(auditLogsSystem).omit({
   id: true,
   createdAt: true
-});
+} as any);
 
 // ===== TYPES FOR NEW BACKEND PARITY TABLES =====
 

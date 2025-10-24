@@ -1,21 +1,7 @@
-import express from "express";
-import analyticsRouter from "./analytics/index.js";
-import clientRouter from "./client/index.js";
-import staffRouter from "./staff/index.js";
-import twilioRouter from "./twilio/index.js";
+import { createRouter, registerRoutes } from "../registerRoutes.js";
 
-const router = express.Router();
+const router = createRouter();
 
-router.use("/analytics", analyticsRouter);
-router.use("/client", clientRouter);
-router.use("/staff", staffRouter);
-router.use("/twilio", twilioRouter);
-
-router.get("/", (_req, res) => {
-  res.json({
-    ok: true,
-    routes: ["analytics", "client", "staff", "twilio"],
-  });
-});
+export { registerRoutes, createRouter };
 
 export default router;

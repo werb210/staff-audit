@@ -13,6 +13,7 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { db } from '../db';
 import { documents } from '../../shared/schema';
+import { DocumentType, DOCUMENT_TYPES, isValidDocumentType } from '../../shared/documentTypes';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
@@ -44,6 +45,14 @@ export async function uploadDocumentToS3(params: {
   success: boolean;
 }> {
   const { applicationId, fileBuffer, fileName, documentType, mimeType } = params;
+
+  if (!isValidDocumentType(documentType)) {
+    const message = `Unsupported document type '${documentType}'. Expected one of: ${DOCUMENT_TYPES.join(', ')}`;
+    console.error(`[S3] Rejecting upload with invalid document type. ${message}`);
+    throw new Error(message);
+  }
+
+  const canonicalDocumentType: DocumentType = documentType;
   
   // Generate unique document ID
   const documentId = uuidv4();
@@ -86,19 +95,19 @@ export async function uploadDocumentToS3(params: {
     // Save to database with S3 storage key
     await db.insert(documents).values({
       id: documentId,
-      application_id: applicationId,
-      document_type: documentType,
-      file_name: fileName,
-      file_path: null, // No local file path
-      storage_key: storageKey, // S3 key for cloud access
-      file_size: fileBuffer.length,
-      file_type: mimeType,
-      checksum: checksum,
-      file_exists: true,
-      is_required: false,
-      is_verified: false,
-      created_at: new Date(),
-      updated_at: new Date()
+      applicationId,
+      documentType: canonicalDocumentType,
+      fileName,
+      filePath: null,
+      storageKey, // S3 key for cloud access
+      fileSize: fileBuffer.length,
+      fileType: mimeType,
+      checksum,
+      fileExists: true,
+      isRequired: false,
+      isVerified: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
 
     console.log(`[S3] Database record created: ${documentId}`);

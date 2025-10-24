@@ -1,5 +1,9 @@
 // ts-node server/tools/route-dump.ts
 import type { Application } from "express";
+import {
+  AUTH_SESSION_ENDPOINT,
+  TWILIO_TOKEN_ENDPOINT,
+} from "../../shared/apiRoutes";
 
 function list(app: Application) {
   const routes: { method: string; path: string }[] = [];
@@ -26,8 +30,8 @@ export function verifyRoutes(app: Application) {
 
   // Enforce uniqueness for critical endpoints
   const mustBeUnique = [
-    { method: "GET", path: "/api/auth/session" },
-    { method: "GET", path: "/api/twilio/token" },
+    { method: "GET", path: AUTH_SESSION_ENDPOINT },
+    { method: "GET", path: TWILIO_TOKEN_ENDPOINT },
   ];
 
   let failed = false;

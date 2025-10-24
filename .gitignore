@@ -146,7 +146,9 @@ docs/draft/
 # Playwright authentication state (generated during tests)
 auth.json
 tests/.auth/# Build artifacts
+# Allow committed ambient type declarations under types/
 *.d.ts
+!types/**/*.d.ts
 dist/
 .vite/
 node_modules/.vite/

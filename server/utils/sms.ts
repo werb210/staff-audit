@@ -1,4 +1,3 @@
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import twilio from 'twilio';
 
 const {
@@ -22,11 +21,31 @@ export function toE164(raw: string) {
     return raw;
   }
   
-  const p = parsePhoneNumberFromString(raw, 'US');
-  if (!p?.isValid()) {
+  const normalized = raw.trim();
+
+  if (!normalized) {
     throw new Error('Invalid phone number');
   }
-  return p.number;           // +15878881837
+
+  const digitsOnly = normalized.replace(/[^0-9+]/g, '');
+
+  if (digitsOnly.startsWith('+')) {
+    if (/^\+1\d{10}$/.test(digitsOnly)) {
+      return digitsOnly;
+    }
+    throw new Error('Invalid phone number');
+  }
+
+  const digits = digitsOnly.replace(/[^0-9]/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+${digits}`;
+  }
+
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+
+  throw new Error('Invalid phone number');
 }
 
 export async function sendSMS(to: string, body: string) {

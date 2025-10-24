@@ -1,5 +1,5 @@
 import cors from "cors";
-import { corsAllowlist } from "../security/csp";
+import { corsAllowlist } from "../security/csp.js";
 
 export const corsOptions: cors.CorsOptions = {
   origin: (origin, cb) => {

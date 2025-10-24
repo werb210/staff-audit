@@ -2,6 +2,7 @@ import express from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { AUTH_BASE_PATH } from "../shared/apiRoutes";
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
@@ -41,9 +42,9 @@ export async function setupAuth(app: express.Express) {
   //   ... (disabled to avoid conflicts)
   // });
 
-  // DISABLED: Conflicting with devBypass - causes auth session failures  
-  // Session check endpoint
-  // app.get("/api/auth/session", (req, res) => {
+  // DISABLED: Conflicting with devBypass - causes auth session failures
+  // Session check endpoint (handled by main auth router)
+  // app.get('<auth-session-endpoint>', (req, res) => {
   //   if ((req as any).session?.user?.claims?.sub) {
   //     res.json({ authenticated: true, user: (req as any).session.user });
   //   } else {
@@ -51,7 +52,7 @@ export async function setupAuth(app: express.Express) {
   //   }
   // });
 
-  app.post("/api/auth/logout", (req, res) => {
+  app.post(`${AUTH_BASE_PATH}/logout`, (req, res) => {
     req.session.destroy(() => {
       res.json({ success: true, message: "Logged out" });
     });
