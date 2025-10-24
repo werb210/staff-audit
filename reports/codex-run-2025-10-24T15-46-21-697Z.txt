@@ -1,0 +1,54 @@
+CODEx Hygiene Audit
+2025-10-24T15:46:21.703Z
+
+✅ All required packages present
+⚠️ Missing environment variables: TWILIO_AUTH_TOKEN, TWILIO_ACCOUNT_SID, AWS_REGION, S3_BUCKET, SENDGRID_API_KEY, MS_CLIENT_ID, MS_TENANT_ID, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+❌ Duplicate route scan
+❌ React Router providers — found outside canonical location(s):
+   ./client/lender-portal/LenderPortalApp.tsx:30:        <BrowserRouter basename="/lender-portal">
+   ./tools/dedup-check.sh:41:if rg -n --hidden -S "<BrowserRouter|<HashRouter" client --glob '!node_modules' --no-messages >/dev/null; then
+
+❌ Invalid iframe sandbox flag — found outside canonical location(s):
+   ./server/security/csp.ts:72:  // Remove invalid 'allow-downloads-without-user-activation'
+   ./tools/dedup-check.sh:91:if rg -n --hidden -S "allow-downloads-without-user-activation" --glob '!node_modules' --no-messages >/dev/null; then
+   ./tools/dedup-check.sh:92:  hit "Invalid iframe sandbox flag 'allow-downloads-without-user-activation' present."
+
+❌ Bad CSP tokens — found outside canonical location(s):
+   ./cors_csp.txt:8:Content-Security-Policy: default-src 'self';base-uri 'self';connect-src 'self' https://api.launchdarkly.com https://events.launchdarkly.com https://www.googletagmanager.com https://sdk.twilio.com https://media.twiliocdn.com https://static.twilio.com https://www.recaptcha.net https://www.google.com;img-src 'self' data: blob:;font-src 'self' data:;style-src 'self' https://fonts.googleapis.com;script-src 'self' https://www.googletagmanager.com https://sdk.twilio.com https://media.twiliocdn.com https://static.twilio.com https://www.recaptcha.net https://www.google.com;frame-ancestors 'self';frame-src 'self' https://www.google.com https://www.recaptcha.net;object-src 'none';upgrade-insecure-requests;report-to default;report-uri /csp-report
+   ./server/security/csp.ts:7: * - Removes invalid tokens (there is NO 'unsafe-dynamic' in CSP)
+   ./server/security/csp.ts:8: * - Moves reporting to its own directive (report-uri) instead of listing as a source
+   ./server/security/csp.ts:31:    `report-uri /csp-report`,
+   ./server/security/applySecurity.ts:33:/** Build a lean, standards-compliant CSP (no 'unsafe-dynamic', no query paths in sources) */
+   ./server/security/applySecurity.ts:52:    // NOTE: 'report-uri' is its own directive, not a source inside default-src
+   ./server/security/applySecurity.ts:53:    "report-uri /csp-report;"
+   ./tools/dedup-check.sh:30:if rg -n --hidden -S "'unsafe-dynamic'" --glob '!node_modules' --no-messages >/dev/null; then
+   ./tools/dedup-check.sh:31:  hit "CSP contains 'unsafe-dynamic' (invalid here). Remove it."
+   ./tools/dedup-check.sh:33:if rg -n --hidden -S "default-src[^;]*report-uri" --glob '!node_modules' --no-messages >/dev/null; then
+   ./tools/dedup-check.sh:34:  hit "CSP has 'report-uri' inside default-src. Must be its own directive."
+
+❌ Legacy security dir — found outside canonical location(s):
+   ./.eslintrc.cjs:29:        { 'group': ['server/security/*'], 'message': 'Legacy security dir is forbidden' }
+   ./server/mw/devPreview.ts:13:    // CSP now handled by unified configuration in server/security/csp.ts
+   ./server/security/productionLogging.ts:1:// server/security/productionLogging.ts - Production-safe logging
+   ./server/security/permissions.ts:1:// server/security/permissions.ts
+
+⛔ De-dupe scan FAILED. Remove the items above or move them into the canonical file(s).
+❌ S3 health check
+node:internal/modules/esm/resolve:873
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@aws-sdk/client-s3' imported from /workspace/staff-audit/scripts/s3HealthCheck.js
+    at packageResolve (node:internal/modules/esm/resolve:873:9)
+    at moduleResolve (node:internal/modules/esm/resolve:946:18)
+    at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:642:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:591:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:574:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:236:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:130:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v20.19.4
+✅ Document audit

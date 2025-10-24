@@ -1,28 +1,26 @@
-name: Codex Enforcement
-
+name: Codex CI Audit
+permissions:
+  contents: read
 on:
   push:
-  pull_request:
-
+    branches: [ main ]
 jobs:
   codex:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-
       - name: Install dependencies
         run: npm ci
-
       - name: Run Codex full verification
         run: npm run codex:full
-
       - name: Upload Codex reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -30,17 +28,16 @@ jobs:
           name: codex-reports
           path: reports
           if-no-files-found: warn
-
       - name: Summarize Codex output
         if: always()
         run: |
-          echo "## Codex Reports" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Codex Reports" >> "$GITHUB_STEP_SUMMARY"
           if [ -d reports ]; then
-            for file in reports/*.txt; do
-              [ -e "$file" ] || continue
-              echo "### $(basename "$file")" >> "$GITHUB_STEP_SUMMARY"
+            for f in reports/*.txt; do
+              [ -e "$f" ] || continue
+              echo "#### $(basename "$f")" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
-              tail -n 200 "$file" >> "$GITHUB_STEP_SUMMARY"
+              tail -n 200 "$f" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             done
           else

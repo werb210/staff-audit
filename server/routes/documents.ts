@@ -100,11 +100,12 @@ export function mountDocumentRoutes(app: MountTarget, basePath = "/api") {
     // DEV / STAGING fallback: local disk upload
     // PUT the file to this URL; we'll save it to /tmp/storage under the same key
     const baseUrl = "http://localhost:5000";  // For audit compatibility
+    const uploadPath = joinPaths(req.baseUrl || "", `/dev/mock-upload/${encodeURIComponent(key)}`);
     return res.json({
       ok: true,
       storage: "local",
       key,
-      url: `${baseUrl}${pathFor(`/dev/mock-upload/${encodeURIComponent(key)}`)}`,
+      url: `${baseUrl}${uploadPath}`,
       method: "PUT",
       headers: { "Content-Type": contentType },
       confirmToken

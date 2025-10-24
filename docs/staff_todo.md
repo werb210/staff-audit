@@ -1,0 +1,5 @@
+- Sales Pipeline drag-and-drop
+- Document versioning
+- LinkedIn integration
+- AI risk scoring
+- WebAuthn login
