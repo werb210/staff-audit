@@ -2,8 +2,12 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { requireAuth, requireAdmin } from "../../middleware/authMiddleware";
 
 const router = express.Router();
+
+router.use(requireAuth);
+router.use(requireAdmin);
 
 type IssueStatus = "pass" | "fail" | "unknown";
 interface AuditHistoryEntry {
