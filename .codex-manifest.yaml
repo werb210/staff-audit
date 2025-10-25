@@ -1,0 +1,61 @@
+codex:
+  project: Boreal Financial — Staff Application
+  scope: full
+  purpose: Complete and verify every subsystem to 100% operational status
+  deploy: false
+  reporting: true
+
+  modules:
+    - CRM:
+        tasks:
+          - Ensure 3-pane contact CRM with full add/edit/delete/search/filter.
+          - Verify timeline view, tags, notes, tasks, AI sentiment, and sync to contacts DB.
+          - Confirm SLF and BF silo isolation.
+    - SalesPipeline:
+        tasks:
+          - Restore drag/drop Kanban board and drawer view.
+          - Verify Application, Banking, Financials, Documents, Lenders, AI tabs.
+          - Ensure new apps route correctly to “Requires Docs” when missing files.
+          - Confirm ZIP download endpoint works.
+    - Lenders:
+        tasks:
+          - Enable CRUD for lender and lender_products tables.
+          - Confirm separate Lender Portal login.
+          - Ensure “Send to Lender” workflow transmits data via API.
+    - Documents:
+        tasks:
+          - Implement S3-only upload, preview, download.
+          - Add SHA256 verification and version history.
+          - Restore OCR + Banking Analysis auto-run.
+          - Enable real-time recovery warnings and UI updates.
+    - Communication:
+        tasks:
+          - Full Twilio integration (SMS, Voice, Email).
+          - Ensure SMS two-way chat and Call logs.
+          - Add Verify for OTP/2FA.
+          - Implement Office365 email send and thread logging.
+    - AI_Features:
+        tasks:
+          - Integrate all 25 AI features (risk scoring, OCR summary, lender match, etc.).
+          - Verify Smart Suggestions, Next Steps, and AI Reports.
+    - Analytics:
+        tasks:
+          - GA4 + Google Ads + LinkedIn metrics dashboards.
+          - Add Lender Funnel Report, Conversion Reports, and AI insights.
+    - Marketing:
+        tasks:
+          - Campaign manager with templates, sequences, ad sync, and attribution.
+    - Security:
+        tasks:
+          - RBAC enforcement (Admin, Staff, Lender, Referrer).
+          - Passkey (WebAuthn) + OTP login.
+          - Audit logs, daily S3 audits, SHA256 checksum validation.
+    - Infrastructure:
+        tasks:
+          - Ensure health endpoints, retry queue, transmission logs.
+          - Backup rotation and audit consistency checks.
+    - Testing:
+        tasks:
+          - Run codex:pipeline, codex:documents, codex:communication, codex:lenders, codex:ai, codex:security, codex:analytics, codex:marketing, codex:infra, codex:todo, codex:master sequentially.
+          - Auto-generate pass/fail summaries for each under /reports/.
+
