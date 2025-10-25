@@ -1,30 +1,12 @@
 {
-  "name": "Boreal Staff App (Stable Boot)",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": { "version": "20" },
-    "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  "forwardPorts": [5000, 3001],
-  "postCreateCommand": "pkill -9 -f node || true && npm install",
-  "hostRequirements": {
-    "memory": "8gb",
-    "cpus": "4"
-  },
-  "remoteUser": "node",
+  "name": "Boreal Staff Audit",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bullseye",
   "customizations": {
     "vscode": {
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "editor.formatOnSave": true
-      },
-      "extensions": [
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
-        "ms-vscode.vscode-typescript-next"
-      ]
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
     }
   },
-  "postStartCommand": "pkill -9 -f node || true"
+  "postCreateCommand": "npm ci || npm install",
+  "features": {},
+  "remoteUser": "node"
 }
