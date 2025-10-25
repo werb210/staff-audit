@@ -41,7 +41,7 @@ app.use("/api/pipeline", pipelineRouter);
 const clientDist = path.join(__dirname, "../client/dist");
 app.use(express.static(clientDist));
 app.get("*", (_, res) => {
-  res.sendFile(path.join(clientDist, "index.html"));
+  res.sendFile(path.join(clientDist, "staff-portal.html"));
 });
 
 // --- Start Server ---
