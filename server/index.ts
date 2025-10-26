@@ -15,13 +15,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Elastic Beanstalk automatically injects PORT
-const PORT = process.env.PORT || 8081; // fallback for local dev
+// Elastic Beanstalk injects PORT=8080 automatically
+const PORT = process.env.PORT || 8080;
 
 // --- Verify required env vars ---
 if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL missing from environment");
-  process.exit(1);
+  console.warn("⚠️ DATABASE_URL not found — continuing for testing only.");
 }
 
 // --- Explicit CORS configuration ---
@@ -30,7 +29,7 @@ app.use(
     origin: [
       "https://staff.boreal.financial",
       "https://boreal.financial",
-      "http://localhost:5173"
+      "http://localhost:5173",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -40,24 +39,24 @@ app.use(
 
 app.use(bodyParser.json());
 
-// --- TOP PRIORITY HEALTH CHECK ---
+// --- Health check for EB ---
 app.get("/api/_int/build", (_, res) => {
-  res.status(200).json({ ok: true, source: "direct health check" });
+  res.status(200).json({ ok: true, source: "elasticbeanstalk" });
 });
 
-// --- Other API routes ---
+// --- Routes ---
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
-// --- Serve frontend last ---
+// --- Serve frontend build ---
 const clientDist = path.join(__dirname, "../client/dist");
 app.use(express.static(clientDist));
 app.get("*", (_, res) => {
   res.sendFile(path.join(clientDist, "staff-portal.html"));
 });
 
-// --- Start Server ---
+// --- Start server ---
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Staff App backend running on port ${PORT}`);
+  console.log(`✅ Staff backend running on port ${PORT}`);
 });
