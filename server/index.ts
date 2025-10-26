@@ -24,7 +24,20 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-app.use(cors());
+// --- Explicit CORS configuration ---
+app.use(
+  cors({
+    origin: [
+      "https://staff.boreal.financial",
+      "https://boreal.financial",
+      "http://localhost:5173"
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 app.use(bodyParser.json());
 
 // --- TOP PRIORITY HEALTH CHECK ---
