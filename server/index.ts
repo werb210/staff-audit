@@ -5,25 +5,31 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 
+// Routers
 import contactsRouter from "./routes/contacts.js";
 import pipelineRouter from "./routes/pipeline.js";
 import healthRouter from "./routes/_int/index.js";
 
-// --- Fix for __dirname in ESM environments ---
+// ==================================================
+// PATH + ENV SETUP
+// ==================================================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const app = express();
 
-// Elastic Beanstalk injects PORT=8080 automatically
-const PORT = process.env.PORT || 8080;
+// Elastic Beanstalk sets PORT automatically to 8080
+const PORT = parseInt(process.env.PORT || "8080", 10);
 
-// --- Verify required env vars ---
+// ==================================================
+// ENV VALIDATION
+// ==================================================
 if (!process.env.DATABASE_URL) {
-  console.warn("⚠️ DATABASE_URL not found — continuing for testing only.");
+  console.warn("⚠️ DATABASE_URL not set. Running in degraded mode (testing only).");
 }
 
-// --- Explicit CORS configuration ---
+// ==================================================
+// GLOBAL MIDDLEWARE
+// ==================================================
 app.use(
   cors({
     origin: [
@@ -37,31 +43,43 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "25mb" }));
 
-// --- Root health check for Elastic Beanstalk ---
-app.get("/", (_, res) => {
-  res.status(200).send("OK");
-});
+// ==================================================
+// HEALTH ENDPOINTS (MANDATORY FOR EB)
+// ==================================================
+app.get("/", (_, res) => res.status(200).send("OK"));
+app.get("/api/_int/build", (_, res) =>
+  res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
+);
 
-// --- Health check for EB ---
-app.get("/api/_int/build", (_, res) => {
-  res.status(200).json({ ok: true, source: "elasticbeanstalk" });
-});
-
-// --- Routes ---
+// ==================================================
+// ROUTES
+// ==================================================
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
-// --- Serve frontend build ---
-const clientDist = path.join(__dirname, "../client/dist");
+// ==================================================
+// STATIC FRONTEND SERVE (SPA)
+// ==================================================
+const clientDist = path.resolve(__dirname, "../client/dist");
 app.use(express.static(clientDist));
+
+// fallback to index.html for client-side routing
 app.get("*", (_, res) => {
-  res.sendFile(path.join(clientDist, "staff-portal.html"));
+  res.sendFile(path.join(clientDist, "index.html"));
 });
 
-// --- Start server ---
+// ==================================================
+// SERVER START
+// ==================================================
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Staff backend running on port ${PORT}`);
+  console.log(`✅ Staff backend running on port ${PORT} (${process.env.NODE_ENV})`);
+});
+
+// graceful shutdown for EB
+process.on("SIGTERM", () => {
+  console.log("🛑 SIGTERM received, shutting down gracefully...");
+  process.exit(0);
 });
