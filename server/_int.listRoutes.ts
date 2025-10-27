@@ -30,6 +30,6 @@ console.log("\n✅ Test GET /api/contacts/seed ...");
 import http from "http";
 const server = http.createServer(app);
 
-server.listen(4000, "0.0.0.0", () => {
+server.listen(process.env.PORT || 8080, "0.0.0.0", () => {
   console.log("🧪 Route listing server on http://0.0.0.0:4000");
 });
