@@ -39,6 +39,11 @@ app.use(
 
 app.use(bodyParser.json());
 
+// --- Root health check for Elastic Beanstalk ---
+app.get("/", (_, res) => {
+  res.status(200).send("OK");
+});
+
 // --- Health check for EB ---
 app.get("/api/_int/build", (_, res) => {
   res.status(200).json({ ok: true, source: "elasticbeanstalk" });
