@@ -46,7 +46,7 @@ app.use(
 app.use(bodyParser.json({ limit: "25mb" }));
 
 // ==================================================
-// HEALTH ENDPOINTS (MANDATORY FOR EB)
+// HEALTH ENDPOINTS
 // ==================================================
 app.get("/", (_, res) => res.status(200).send("OK"));
 app.get("/api/_int/build", (_, res) =>
@@ -61,12 +61,14 @@ app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
 // ==================================================
-// STATIC FRONTEND SERVE (SPA) — FIXED PATH
+// STATIC FRONTEND SERVE (SPA FIXED)
 // ==================================================
-const clientPath = path.resolve("client/dist");
-app.use(express.static(clientPath));
+const clientDist = path.resolve(process.cwd(), "client/dist");
+console.log("Serving static files from:", clientDist);
+
+app.use(express.static(clientDist));
 app.get("*", (_, res) => {
-  res.sendFile(path.join(clientPath, "index.html"));
+  res.sendFile(path.join(clientDist, "index.html"));
 });
 
 // ==================================================
