@@ -1,12 +1,12 @@
 {
-  "name": "Boreal Staff (Node 22 + Azure CLI + PostgreSQL Client)",
+  "name": "Boreal Staff Audit",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bullseye",
   "remoteUser": "node",
 
   "features": {
-    "azure-cli": "latest",
-    "postgresql-client": "latest",
-    "git": "latest"
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/postgres:1": {}
   },
 
   "customizations": {
@@ -20,5 +20,5 @@
     }
   },
 
-  "postCreateCommand": "set -eux; npm ci || npm i; az --version || true; psql --version || true"
+  "postCreateCommand": "npm ci || npm i"
 }
