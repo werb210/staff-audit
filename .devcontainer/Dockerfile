@@ -9,5 +9,5 @@ RUN apt-get update && \
 USER node
 WORKDIR /workspaces/staff-audit
 
-# ✅ No npm install or COPY during build
-CMD [ "sleep", "infinity" ]
+# no npm install here — repo not yet mounted
+CMD ["sleep", "infinity"]
