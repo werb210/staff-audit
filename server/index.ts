@@ -46,7 +46,7 @@ app.use(
 app.use(bodyParser.json({ limit: "25mb" }));
 
 // ==================================================
-// API ROUTES
+// ROUTES
 // ==================================================
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
@@ -59,12 +59,12 @@ const clientDist = path.resolve(process.cwd(), "client/dist");
 console.log("Serving static files from:", clientDist);
 app.use(express.static(clientDist));
 
-// Health check for Elastic Beanstalk / Codespaces
+// Health probe for platforms
 app.get("/api/_int/build", (_, res) =>
   res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
 );
 
-// ✅ Fallback route to serve React SPA (includes "/")
+// ✅ SPA fallback for all non-API routes, including "/"
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
