@@ -61,14 +61,12 @@ app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
 // ==================================================
-// STATIC FRONTEND SERVE (SPA)
+// STATIC FRONTEND SERVE (SPA) — FIXED PATH
 // ==================================================
-const clientDist = path.resolve(__dirname, "../client/dist");
-app.use(express.static(clientDist));
-
-// fallback to index.html for client-side routing
+const clientPath = path.resolve("client/dist");
+app.use(express.static(clientPath));
 app.get("*", (_, res) => {
-  res.sendFile(path.join(clientDist, "index.html"));
+  res.sendFile(path.join(clientPath, "index.html"));
 });
 
 // ==================================================
