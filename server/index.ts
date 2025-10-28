@@ -46,28 +46,26 @@ app.use(
 app.use(bodyParser.json({ limit: "25mb" }));
 
 // ==================================================
-// HEALTH ENDPOINTS
-// ==================================================
-app.get("/", (_, res) => res.status(200).send("OK"));
-app.get("/api/_int/build", (_, res) =>
-  res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
-);
-
-// ==================================================
-// ROUTES
+// ROUTES (API)
 // ==================================================
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
 // ==================================================
-// STATIC FRONTEND SERVE (SPA FIXED)
+// STATIC FRONTEND SERVE (SPA)
 // ==================================================
 const clientDist = path.resolve(process.cwd(), "client/dist");
 console.log("Serving static files from:", clientDist);
-
 app.use(express.static(clientDist));
-app.get("*", (_, res) => {
+
+// Health endpoint for Codespaces/Azure/AWS probes
+app.get("/api/_int/build", (_, res) =>
+  res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
+);
+
+// Serve SPA for everything except /api/*
+app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
