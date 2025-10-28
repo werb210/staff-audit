@@ -46,25 +46,25 @@ app.use(
 app.use(bodyParser.json({ limit: "25mb" }));
 
 // ==================================================
-// ROUTES (API)
+// ROUTES (API ONLY)
 // ==================================================
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
 // ==================================================
-// STATIC FRONTEND SERVE (SPA)
+// STATIC FRONTEND SERVE (SPA FIX)
 // ==================================================
 const clientDist = path.resolve(process.cwd(), "client/dist");
 console.log("Serving static files from:", clientDist);
 app.use(express.static(clientDist));
 
-// Health endpoint for Codespaces/Azure/AWS probes
+// Codespaces/Azure health probes
 app.get("/api/_int/build", (_, res) =>
   res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
 );
 
-// Serve SPA for everything except /api/*
+// Serve React app for everything except /api/*
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
@@ -76,7 +76,7 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Staff backend running on port ${PORT} (${process.env.NODE_ENV})`);
 });
 
-// graceful shutdown for EB
+// graceful shutdown for EB/Azure
 process.on("SIGTERM", () => {
   console.log("🛑 SIGTERM received, shutting down gracefully...");
   process.exit(0);
