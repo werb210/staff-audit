@@ -59,12 +59,12 @@ const clientDist = path.resolve(process.cwd(), "client/dist");
 console.log("Serving static files from:", clientDist);
 app.use(express.static(clientDist));
 
-// Health probe for Codespaces/Azure
+// Health check for Elastic Beanstalk / Codespaces
 app.get("/api/_int/build", (_, res) =>
   res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
 );
 
-// ✅ SPA fallback — serves React app for everything except /api/*
+// ✅ Fallback route to serve React SPA (includes "/")
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
