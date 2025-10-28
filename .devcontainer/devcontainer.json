@@ -2,14 +2,9 @@
   "name": "Boreal Staff Audit",
   "build": {
     "dockerfile": "Dockerfile",
-    "context": "."
+    "context": ".."
   },
   "workspaceFolder": "/workspaces/staff-audit",
-  "features": {},
-  "updateContentCommand": "",
-  "overrideCommand": false,
-  "postCreateCommand": "npm install",
-  "initializeCommand": "echo 'Disable Codespaces auto npm install' > /tmp/skip-auto-npm",
   "customizations": {
     "vscode": {
       "extensions": [
