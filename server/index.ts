@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
-// Elastic Beanstalk / Codespaces sets PORT automatically to 8080
+// Elastic Beanstalk or Codespaces sets PORT automatically
 const PORT = parseInt(process.env.PORT || "8080", 10);
 
 // ==================================================
@@ -42,6 +42,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(bodyParser.json({ limit: "25mb" }));
 
 // ==================================================
@@ -58,12 +59,12 @@ const clientDist = path.resolve(process.cwd(), "client/dist");
 console.log("Serving static files from:", clientDist);
 app.use(express.static(clientDist));
 
-// Health probe for platform checks
+// Health probe for Codespaces/Azure
 app.get("/api/_int/build", (_, res) =>
   res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
 );
 
-// ✅ Catch-all handler for SPA (including "/")
+// ✅ SPA fallback — serves React app for everything except /api/*
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
@@ -75,7 +76,9 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Staff backend running on port ${PORT} (${process.env.NODE_ENV})`);
 });
 
-// Graceful shutdown
+// ==================================================
+// GRACEFUL SHUTDOWN
+// ==================================================
 process.on("SIGTERM", () => {
   console.log("🛑 SIGTERM received, shutting down gracefully...");
   process.exit(0);
