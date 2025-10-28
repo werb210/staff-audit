@@ -1,8 +1,8 @@
 {
   "name": "Boreal Staff Audit",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bullseye",
-  "remoteUser": "node",
-
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,7 +12,5 @@
         "ms-azuretools.vscode-azurestaticwebapps"
       ]
     }
-  },
-
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y postgresql-client azure-cli && npm ci || npm i"
+  }
 }
