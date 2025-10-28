@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
-// Elastic Beanstalk sets PORT automatically to 8080
+// Elastic Beanstalk / Codespaces sets PORT automatically to 8080
 const PORT = parseInt(process.env.PORT || "8080", 10);
 
 // ==================================================
@@ -42,29 +42,28 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(bodyParser.json({ limit: "25mb" }));
 
 // ==================================================
-// ROUTES (API ONLY)
+// API ROUTES
 // ==================================================
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
 // ==================================================
-// STATIC FRONTEND SERVE (SPA FIX)
+// STATIC FRONTEND SERVE (SPA FIXED)
 // ==================================================
 const clientDist = path.resolve(process.cwd(), "client/dist");
 console.log("Serving static files from:", clientDist);
 app.use(express.static(clientDist));
 
-// Codespaces/Azure health probes
+// Health probe for platform checks
 app.get("/api/_int/build", (_, res) =>
   res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
 );
 
-// Serve React app for everything except /api/*
+// ✅ Catch-all handler for SPA (including "/")
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
@@ -76,7 +75,7 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Staff backend running on port ${PORT} (${process.env.NODE_ENV})`);
 });
 
-// graceful shutdown for EB/Azure
+// Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("🛑 SIGTERM received, shutting down gracefully...");
   process.exit(0);
