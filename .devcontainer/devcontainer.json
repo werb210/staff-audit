@@ -2,7 +2,7 @@
   "name": "Boreal Staff Audit",
   "build": {
     "dockerfile": "Dockerfile",
-    "context": ".."
+    "context": "."
   },
   "workspaceFolder": "/workspaces/staff-audit",
   "customizations": {
