@@ -5,6 +5,7 @@
     "context": "."
   },
   "workspaceFolder": "/workspaces/staff-audit",
+  "postCreateCommand": "if [ -f package.json ]; then npm ci || npm i; else echo 'No package.json found, skipping install'; fi",
   "customizations": {
     "vscode": {
       "extensions": [
