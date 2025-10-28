@@ -1,4 +1,3 @@
-# .devcontainer/Dockerfile
 FROM mcr.microsoft.com/devcontainers/javascript-node:22-bullseye
 
 # Root setup
@@ -11,11 +10,5 @@ RUN apt-get update && \
 USER node
 WORKDIR /workspaces/staff-audit
 
-# ✅ Copy dependency manifests into build context before install
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci || npm i
-
-# Default command for dev container
-CMD ["bash"]
+# Do not copy or install yet — repo isn’t mounted during build
+CMD [ "sleep", "infinity" ]
