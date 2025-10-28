@@ -5,7 +5,11 @@
     "context": "."
   },
   "workspaceFolder": "/workspaces/staff-audit",
-  "postCreateCommand": "if [ -f package.json ]; then npm ci || npm i; else echo 'No package.json found, skipping install'; fi",
+  "features": {},
+  "updateContentCommand": "",
+  "overrideCommand": false,
+  "postCreateCommand": "npm install",
+  "initializeCommand": "echo 'Disable Codespaces auto npm install' > /tmp/skip-auto-npm",
   "customizations": {
     "vscode": {
       "extensions": [
