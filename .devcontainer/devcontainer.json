@@ -1,25 +1,21 @@
 // .devcontainer/devcontainer.json
 {
   "name": "Boreal Staff (Node 22 + Azure CLI + psql)",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bullseye",
   "remoteUser": "node",
-
   "features": {
     "ghcr.io/devcontainers/features/azure-cli:1": {},
     "ghcr.io/devcontainers/features/postgres-client:1": {},
     "ghcr.io/devcontainers/features/git:1": {}
   },
-
   "customizations": {
     "vscode": {
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "ms-azuretools.vscode-azureaccount",
-        "ms-azuretools.vscode-azurestaticwebapps"
+        "ms-azuretools.vscode-azureaccount"
       ]
     }
   },
-
-  "postCreateCommand": "set -eux; npm ci || npm i; az --version >/dev/null || true; psql --version >/dev/null || true"
+  "postCreateCommand": "set -eux; npm ci || npm i; az --version || true; psql --version || true"
 }
