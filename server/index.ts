@@ -14,6 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = parseInt(process.env.PORT || "8080", 10);
+const HOST = "0.0.0.0"; // required for Codespaces/GitHub Dev ports
 
 // --- Middleware ---
 app.use(
@@ -22,6 +23,7 @@ app.use(
       "https://staff.boreal.financial",
       "https://boreal.financial",
       "http://localhost:5173",
+      /\.github\.dev$/,
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -35,20 +37,25 @@ app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
-// --- Serve client ---
-const clientDist = path.resolve(__dirname, "../client/dist");
+// --- Serve built client ---
+const clientDist = path.resolve(process.cwd(), "client/dist");
 app.use(express.static(clientDist));
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
-// --- Health ---
+// --- Health endpoints ---
 app.get("/health", (_, res) => res.status(200).send("OK"));
 app.get("/api/_int/build", (_, res) =>
-  res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
+  res.status(200).json({
+    ok: true,
+    env: process.env.NODE_ENV || "unknown",
+    clientDist,
+  })
 );
 
 // --- Start server ---
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Staff backend running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`✅ Staff backend running at http://${HOST}:${PORT}`);
+  console.log(`🧩 Serving static files from: ${clientDist}`);
 });
