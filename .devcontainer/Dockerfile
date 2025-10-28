@@ -1,4 +1,3 @@
-# .devcontainer/Dockerfile
 FROM mcr.microsoft.com/devcontainers/javascript-node:22-bullseye
 
 USER root
@@ -9,5 +8,5 @@ RUN apt-get update && \
 USER node
 WORKDIR /workspaces/staff-audit
 
-# no npm install here — repo not yet mounted
+# don't install here — repo not mounted yet
 CMD ["sleep", "infinity"]
