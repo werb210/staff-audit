@@ -1,3 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd /workspaces/staff-audit
+
+# --- Overwrite server/index.ts with corrected version ---
+cat > server/index.ts <<'EOF'
 import "dotenv/config";
 import express from "express";
 import path from "path";
@@ -15,7 +21,6 @@ import healthRouter from "./routes/_int/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
-
 const PORT = parseInt(process.env.PORT || "8080", 10);
 
 // ==================================================
@@ -40,31 +45,34 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(bodyParser.json({ limit: "25mb" }));
 
 // ==================================================
-// ROUTES
+// API ROUTES
 // ==================================================
 app.use("/api/_int", healthRouter);
 app.use("/api/contacts", contactsRouter);
 app.use("/api/pipeline", pipelineRouter);
 
 // ==================================================
-// STATIC FRONTEND SERVE (SPA FIXED)
+// STATIC FRONTEND (SPA FIXED)
 // ==================================================
 const clientDist = path.resolve(__dirname, "../client/dist");
 console.log("✅ Serving static files from:", clientDist);
 app.use(express.static(clientDist));
 
-app.get("/api/_int/build", (_, res) =>
-  res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
-);
-
-// ✅ Catch-all for SPA
+// ✅ Catch-all AFTER static (so '/' hits index.html)
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
+
+// ==================================================
+// HEALTH ENDPOINTS (move BELOW SPA to avoid intercept)
+// ==================================================
+app.get("/health", (_, res) => res.status(200).send("OK"));
+app.get("/api/_int/build", (_, res) =>
+  res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
+);
 
 // ==================================================
 // SERVER START
@@ -77,3 +85,8 @@ process.on("SIGTERM", () => {
   console.log("🛑 SIGTERM received, shutting down gracefully...");
   process.exit(0);
 });
+EOF
+
+# --- Build client and run ---
+cd client && npm run build && cd ..
+PORT=8080 npx tsx server/index.ts
