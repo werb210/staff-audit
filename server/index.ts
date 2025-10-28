@@ -5,7 +5,6 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 
-// Routers
 import contactsRouter from "./routes/contacts.js";
 import pipelineRouter from "./routes/pipeline.js";
 import healthRouter from "./routes/_int/index.js";
@@ -17,7 +16,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
-// Elastic Beanstalk or Codespaces sets PORT automatically
 const PORT = parseInt(process.env.PORT || "8080", 10);
 
 // ==================================================
@@ -55,16 +53,15 @@ app.use("/api/pipeline", pipelineRouter);
 // ==================================================
 // STATIC FRONTEND SERVE (SPA FIXED)
 // ==================================================
-const clientDist = path.resolve(process.cwd(), "client/dist");
-console.log("Serving static files from:", clientDist);
+const clientDist = path.resolve(__dirname, "../client/dist");
+console.log("✅ Serving static files from:", clientDist);
 app.use(express.static(clientDist));
 
-// Health probe for platforms
 app.get("/api/_int/build", (_, res) =>
   res.status(200).json({ ok: true, env: process.env.NODE_ENV || "unknown" })
 );
 
-// ✅ SPA fallback for all non-API routes, including "/"
+// ✅ Catch-all for SPA
 app.get(/^\/(?!api).*/, (_, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
@@ -76,9 +73,6 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Staff backend running on port ${PORT} (${process.env.NODE_ENV})`);
 });
 
-// ==================================================
-// GRACEFUL SHUTDOWN
-// ==================================================
 process.on("SIGTERM", () => {
   console.log("🛑 SIGTERM received, shutting down gracefully...");
   process.exit(0);
