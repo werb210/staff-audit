@@ -14,31 +14,31 @@ export default function QuickEmailCompose() {
 
   const sendEmail = async () => {
     if (!to.trim() || !subject.trim() || !message.trim()) return;
-    
+
     setSending(true);
     try {
-      await api('/api/o365/mail/send', {
-        method: 'POST',
-        body: { 
-          to: to.trim(), 
+      await api("/api/o365/mail/send", {
+        method: "POST",
+        body: {
+          to: to.trim(),
           subject: subject.trim(),
-          body: message.trim()
-        }
+          body: message.trim(),
+        },
       });
-      
+
       setTo("");
       setSubject("");
       setMessage("");
       toast({
         title: "Email sent successfully!",
-        description: `Email sent to ${to}`
+        description: `Email sent to ${to}`,
       });
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error("Failed to send email:", error);
       toast({
         title: "Failed to send email",
         description: "Please check the email address and try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setSending(false);
@@ -65,7 +65,7 @@ export default function QuickEmailCompose() {
           rows={6}
           placeholder="Type your email message..."
         />
-        <Button 
+        <Button
           onClick={sendEmail}
           disabled={sending || !to.trim() || !subject.trim() || !message.trim()}
           className="w-full bg-blue-600 hover:bg-blue-700"

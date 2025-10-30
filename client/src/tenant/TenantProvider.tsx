@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 type Tenant = "bf" | "slf";
 const TenantCtx = createContext<Tenant>("bf");
@@ -12,9 +18,13 @@ function getTenantFromPath(pathname: string): Tenant {
  * - Does NOT call useLocation() (prevents "reading 'location'" crash)
  * - Tracks URL changes via popstate + pushState/replaceState monkey-patch
  */
-export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [tenant, setTenant] = useState<Tenant>(() =>
-    typeof window !== "undefined" ? getTenantFromPath(window.location.pathname) : "bf"
+    typeof window !== "undefined"
+      ? getTenantFromPath(window.location.pathname)
+      : "bf",
   );
 
   useEffect(() => {

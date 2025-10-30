@@ -60,7 +60,7 @@ r.post("/:id/replace", async (req: any, res: any) => {
     // For now, return success without actual file handling
     // TODO: Implement actual file upload with multer or similar
     const newDoc = {
-      application_id: (old as any).application_id,
+      applicationId: (old as any).applicationId,
       category: (old as any).category,
       name: (old as any).name,
       s3_key: `${(old as any).s3_key}.v${nextVer}`,
@@ -73,8 +73,8 @@ r.post("/:id/replace", async (req: any, res: any) => {
     };
 
     const insertResult = await db.execute(sql`
-      INSERT INTO documents (application_id, category, name, s3_key, content_type, size_bytes, version, status, uploaded_by, group_id)
-      VALUES (${newDoc.application_id}, ${newDoc.category}, ${newDoc.name}, ${newDoc.s3_key}, ${newDoc.content_type}, ${newDoc.size_bytes}, ${newDoc.version}, ${newDoc.status}, ${newDoc.uploaded_by}, ${newDoc.group_id})
+      INSERT INTO documents (applicationId, category, name, s3_key, content_type, size_bytes, version, status, uploaded_by, group_id)
+      VALUES (${newDoc.applicationId}, ${newDoc.category}, ${newDoc.name}, ${newDoc.s3_key}, ${newDoc.content_type}, ${newDoc.size_bytes}, ${newDoc.version}, ${newDoc.status}, ${newDoc.uploaded_by}, ${newDoc.group_id})
       RETURNING *
     `);
     
@@ -92,7 +92,7 @@ r.get("/:id/audit", async (req: any, res: any) => {
     const auditResult = await db.execute(sql`
       SELECT * FROM documents 
       WHERE group_id = (SELECT group_id FROM documents WHERE id = ${req.params.id})
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `);
     
     res.json({ ok: true, items: auditResult.rows || auditResult });

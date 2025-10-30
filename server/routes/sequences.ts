@@ -7,7 +7,7 @@ const router = Router();
 // List all sequences
 router.get("/", async (req: any, res: any) => {
   try {
-    const result = await pool.query("SELECT * FROM sequences ORDER BY created_at DESC");
+    const result = await pool.query("SELECT * FROM sequences ORDER BY createdAt DESC");
     res.json(result.rows);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

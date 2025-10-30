@@ -51,8 +51,8 @@ export function validateBusinessRules(payload: ApplicationPayload): string[] {
 export const ApplicationRecordSchema = ApplicationPayloadSchema.extend({
   id: z.string(),
   status: z.enum(["RECEIVED", "PROCESSING", "APPROVED", "REJECTED"]),
-  created_at: z.string(),
-  updated_at: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
 });
 
 export type ApplicationRecord = z.infer<typeof ApplicationRecordSchema>;

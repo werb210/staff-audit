@@ -60,8 +60,8 @@ router.get("/overview", async (req: any, res: any) => {
     // Storage analytics
     const storageStats = await db
       .select({
-        totalSize: sql<number>`sum(file_size)`,
-        avgSize: sql<number>`avg(file_size)`,
+        totalSize: sql<number>`sum(size)`,
+        avgSize: sql<number>`avg(size)`,
         withBackup: sql<number>`count(case when storage_key is not null then 1 end)`,
         withChecksum: sql<number>`count(case when checksum is not null then 1 end)`
       })
@@ -70,13 +70,13 @@ router.get("/overview", async (req: any, res: any) => {
     // Daily upload trends
     const dailyTrends = await db
       .select({
-        date: sql<string>`date(created_at)`,
+        date: sql<string>`date(createdAt)`,
         uploads: sql<number>`count(*)`
       })
       .from(documents)
       .where(gte(documents.createdAt, startDate))
-      .groupBy(sql`date(created_at)`)
-      .orderBy(sql`date(created_at)`);
+      .groupBy(sql`date(createdAt)`)
+      .orderBy(sql`date(createdAt)`);
     
     // Application completion rates
     const applicationStats = await db

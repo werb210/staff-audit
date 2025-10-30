@@ -7,7 +7,7 @@ type Table = "lenders" | "lender_products" | "applications" | "users" | "contact
 const MAP: Record<Table, { model: keyof PrismaClientMap; defaultOrder?: string; expand?: Record<string, any> }> = {
   lenders:         { model: "lender",          defaultOrder: "name" },
   lender_products: { model: "lenderProduct",   defaultOrder: "name",        expand: { lender: true } },
-  applications:    { model: "applications",     defaultOrder: "-created_at",  expand: { businesses: true, users: true, lender: true } },
+  applications:    { model: "applications",     defaultOrder: "-createdAt",  expand: { businesses: true, users: true, lender: true } },
   users:           { model: "users",            defaultOrder: "email" },
   contacts:        { model: "contacts",         defaultOrder: "full_name" },
   ads_campaigns:   { model: "adsCampaign",      defaultOrder: "name" },

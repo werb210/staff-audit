@@ -205,8 +205,8 @@ router.get("/applications/:id/documents", async (req: any, res: any) => {
       documents: documents.map(doc => ({
         id: doc.id,
         document_type: doc.document_type,
-        file_name: doc.file_name,
-        file_size: doc.file_size,
+        name: doc.name,
+        size: doc.size,
         upload_date: doc.upload_date,
         status: doc.status,
         s3_url: doc.s3_url,
@@ -252,8 +252,8 @@ router.get("/applications/:id/status", async (req: any, res: any) => {
       id: application.id,
       status: application.status,
       stage: application.stage,
-      created_at: application.created_at,
-      updated_at: application.updated_at,
+      createdAt: application.createdAt,
+      updatedAt: application.updatedAt,
       business_name: application.business,
       amount_requested: application.amount,
       progress: {

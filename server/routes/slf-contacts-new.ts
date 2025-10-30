@@ -50,8 +50,8 @@ function mapRawToContact(raw: any) {
     phone_e164: raw.phone_e164 || phone || "",
     mobile_e164: raw.mobile_e164 || "",
     title: raw.title || raw.job_title || "",
-    created_at: raw.created_at || raw.created || raw.createdAt || raw.inserted_at || null,
-    updated_at: raw.updated_at || raw.updated || raw.updatedAt || null,
+    createdAt: raw.createdAt || raw.created || raw.createdAt || raw.inserted_at || null,
+    updatedAt: raw.updatedAt || raw.updated || raw.updatedAt || null,
     // keep everything else so UI can expose ALL FIELDS
     _raw: raw
   };
@@ -103,8 +103,8 @@ router.get("/contacts", async (req: Request, res: Response) => {
           phone_e164: prefer(prev.phone_e164, c.phone_e164),
           mobile_e164: prefer(prev.mobile_e164, c.mobile_e164),
           title: prefer(prev.title, c.title),
-          created_at: prefer(prev.created_at, c.created_at),
-          updated_at: prefer(prev.updated_at, c.updated_at),
+          createdAt: prefer(prev.createdAt, c.createdAt),
+          updatedAt: prefer(prev.updatedAt, c.updatedAt),
           _raw: { ...prev._raw, ...c._raw }
         });
       }

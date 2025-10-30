@@ -10,7 +10,7 @@ router.post("/chat/send", async (req: any, res: any) => {
     const { contactId, body } = req.body || {};
     
     await db.execute(sql`
-      INSERT INTO comms(contact_id, kind, direction, body, created_at) 
+      INSERT INTO comms(contact_id, kind, direction, body, createdAt) 
       VALUES(${contactId}, 'chat', 'in', ${body}, NOW())
     `);
     
@@ -27,7 +27,7 @@ router.post("/chat/reply", async (req: any, res: any) => {
     const { contactId, body } = req.body || {};
     
     await db.execute(sql`
-      INSERT INTO comms(contact_id, kind, direction, body, created_at) 
+      INSERT INTO comms(contact_id, kind, direction, body, createdAt) 
       VALUES(${contactId}, 'chat', 'out', ${body}, NOW())
     `);
     
@@ -44,7 +44,7 @@ router.post("/issues", async (req: any, res: any) => {
     const { contactId, message, appContext } = req.body || {};
     
     await db.execute(sql`
-      INSERT INTO issues(contact_id, message, app_context, created_at) 
+      INSERT INTO issues(contact_id, message, app_context, createdAt) 
       VALUES(${contactId}, ${message}, ${JSON.stringify(appContext || {})}, NOW())
     `);
     

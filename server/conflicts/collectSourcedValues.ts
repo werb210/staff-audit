@@ -17,20 +17,20 @@ export async function collectSourcedValues(applicationId: string): Promise<Sourc
         business_email AS req_business_email,
         business_phone AS req_business_phone,
         loan_amount AS req_loan_amount,
-        created_at
+        createdAt
       FROM applications WHERE id = $1 LIMIT 1;
     `, [applicationId])).rows[0];
 
     if (appData) {
       for (const [column, value] of Object.entries(appData)) {
-        if (value !== undefined && value !== null && column !== 'created_at') {
+        if (value !== undefined && value !== null && column !== 'createdAt') {
           out.push({ 
             column, 
             value: value as any, 
             sourceType: 'client', 
             sourceId: 'client_application', 
             label: 'Client Application',
-            observedAt: appData.created_at?.toISOString()
+            observedAt: appData.createdAt?.toISOString()
           });
         }
       }
@@ -38,29 +38,29 @@ export async function collectSourcedValues(applicationId: string): Promise<Sourc
 
     // 2) OCR extracted values from financials_ocr JSONB column
     const ocrData = (await client.query(`
-      SELECT financials_ocr, updated_at FROM applications WHERE id = $1 AND financials_ocr IS NOT NULL LIMIT 1;
+      SELECT financials_ocr, updatedAt FROM applications WHERE id = $1 AND financials_ocr IS NOT NULL LIMIT 1;
     `, [applicationId])).rows[0];
 
     if (ocrData?.financials_ocr) {
       const ocr = ocrData.financials_ocr;
       // Map common OCR fields to canonical columns
       if (ocr.business_name) {
-        out.push({ column: 'req_business_legal_name', value: ocr.business_name, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updated_at?.toISOString() });
+        out.push({ column: 'req_business_legal_name', value: ocr.business_name, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updatedAt?.toISOString() });
       }
       if (ocr.business_address) {
-        out.push({ column: 'req_business_address', value: ocr.business_address, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updated_at?.toISOString() });
+        out.push({ column: 'req_business_address', value: ocr.business_address, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updatedAt?.toISOString() });
       }
       if (ocr.annual_revenue) {
-        out.push({ column: 'req_annual_revenue', value: ocr.annual_revenue, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updated_at?.toISOString() });
+        out.push({ column: 'req_annual_revenue', value: ocr.annual_revenue, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updatedAt?.toISOString() });
       }
       if (ocr.net_income) {
-        out.push({ column: 'income_statement_net_income', value: ocr.net_income, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Income Statement', observedAt: ocrData.updated_at?.toISOString() });
+        out.push({ column: 'income_statement_net_income', value: ocr.net_income, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Income Statement', observedAt: ocrData.updatedAt?.toISOString() });
       }
     }
 
     // 3) Banking analysis - business address from statements
     const bankData = (await client.query(`
-      SELECT banking_analysis, updated_at FROM applications WHERE id = $1 AND banking_analysis IS NOT NULL LIMIT 1;
+      SELECT banking_analysis, updatedAt FROM applications WHERE id = $1 AND banking_analysis IS NOT NULL LIMIT 1;
     `, [applicationId])).rows[0];
 
     if (bankData?.banking_analysis?.businessAddressFromStatements?.detectedAddress) {
@@ -70,7 +70,7 @@ export async function collectSourcedValues(applicationId: string): Promise<Sourc
         sourceType: 'banking', 
         sourceId: 'bank_statement_header', 
         label: 'Bank Statement Header',
-        observedAt: bankData.updated_at?.toISOString()
+        observedAt: bankData.updatedAt?.toISOString()
       });
     }
 

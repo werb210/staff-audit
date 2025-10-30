@@ -6,7 +6,9 @@ export function openAppSocket(path: string, jwt?: string) {
   const ws = new WebSocket(url);
   // keepalive
   let ping: any;
-  ws.addEventListener("open", () => { ping = setInterval(() => ws.readyState===1 && ws.send("__ping__"), 25000); });
+  ws.addEventListener("open", () => {
+    ping = setInterval(() => ws.readyState === 1 && ws.send("__ping__"), 25000);
+  });
   ws.addEventListener("close", () => ping && clearInterval(ping));
   return ws;
 }

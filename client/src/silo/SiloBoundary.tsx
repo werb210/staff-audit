@@ -14,12 +14,15 @@ class SSEManager {
     return SSEManager.instance;
   }
 
-  connect(endpoint: string, handlers: Record<string, (event: MessageEvent) => void>): EventSource {
+  connect(
+    endpoint: string,
+    handlers: Record<string, (event: MessageEvent) => void>,
+  ): EventSource {
     // Close existing connection for this endpoint
     this.disconnect(endpoint);
 
     const eventSource = new EventSource(endpoint);
-    
+
     // Set up event handlers
     Object.entries(handlers).forEach(([event, handler]) => {
       eventSource.addEventListener(event, handler);
@@ -70,7 +73,9 @@ const disconnectSSE = () => {
   SSEManager.getInstance().disconnect();
 };
 
-const SiloBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const SiloBoundary: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const tenant = useTenant();
   const qc = useQueryClient();
 

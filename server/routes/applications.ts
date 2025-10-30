@@ -393,7 +393,7 @@ router.post('/submit', async (req: any, res: any) => {
     res.json({
       success: true,
       message: 'Application submitted successfully',
-      application_id: `app_${Date.now()}`,
+      applicationId: `app_${Date.now()}`,
       status: 'pending'
     });
   } catch (error: unknown) {

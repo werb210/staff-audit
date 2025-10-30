@@ -1,11 +1,11 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -13,7 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form";
 
 // Clean Lender form schema
 const lenderFormSchema = z.object({
@@ -23,9 +23,13 @@ const lenderFormSchema = z.object({
   mainContactFirst: z.string().optional(),
   mainContactLast: z.string().optional(),
   mainContactMobile: z.string().optional(),
-  mainContactEmail: z.string().email("Invalid email").optional().or(z.literal("")),
+  mainContactEmail: z
+    .string()
+    .email("Invalid email")
+    .optional()
+    .or(z.literal("")),
   url: z.string().url("Invalid URL").optional().or(z.literal("")),
-  description: z.string().optional()
+  description: z.string().optional(),
 });
 
 type LenderFormData = z.infer<typeof lenderFormSchema>;
@@ -34,31 +38,31 @@ interface LenderFormProps {
   initialData?: Partial<LenderFormData>;
   onSubmit: (data: LenderFormData) => void;
   isLoading?: boolean;
-  mode?: 'create' | 'edit' | 'view';
+  mode?: "create" | "edit" | "view";
 }
 
-export default function LenderForm({ 
-  initialData, 
-  onSubmit, 
+export default function LenderForm({
+  initialData,
+  onSubmit,
   isLoading = false,
-  mode = 'create'
+  mode = "create",
 }: LenderFormProps) {
   const form = useForm<LenderFormData>({
     resolver: zodResolver(lenderFormSchema),
     defaultValues: {
-      name: initialData?.name || '',
-      address: initialData?.address || '',
-      mainPhone: initialData?.mainPhone || '',
-      mainContactFirst: initialData?.mainContactFirst || '',
-      mainContactLast: initialData?.mainContactLast || '',
-      mainContactMobile: initialData?.mainContactMobile || '',
-      mainContactEmail: initialData?.mainContactEmail || '',
-      url: initialData?.url || '',
-      description: initialData?.description || ''
-    }
+      name: initialData?.name || "",
+      address: initialData?.address || "",
+      mainPhone: initialData?.mainPhone || "",
+      mainContactFirst: initialData?.mainContactFirst || "",
+      mainContactLast: initialData?.mainContactLast || "",
+      mainContactMobile: initialData?.mainContactMobile || "",
+      mainContactEmail: initialData?.mainContactEmail || "",
+      url: initialData?.url || "",
+      description: initialData?.description || "",
+    },
   });
 
-  const isReadOnly = mode === 'view';
+  const isReadOnly = mode === "view";
 
   return (
     <Form {...form}>
@@ -71,8 +75,8 @@ export default function LenderForm({
               <FormItem>
                 <FormLabel>Lender Name *</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="e.g., Accord Financial Corp."
                     disabled={isReadOnly}
                   />
@@ -89,8 +93,8 @@ export default function LenderForm({
               <FormItem>
                 <FormLabel>Website URL</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="https://example.com"
                     disabled={isReadOnly}
                   />
@@ -108,8 +112,8 @@ export default function LenderForm({
             <FormItem>
               <FormLabel>Address</FormLabel>
               <FormControl>
-                <Textarea 
-                  {...field} 
+                <Textarea
+                  {...field}
                   placeholder="Full business address"
                   disabled={isReadOnly}
                 />
@@ -127,8 +131,8 @@ export default function LenderForm({
               <FormItem>
                 <FormLabel>Main Phone</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="+1 (555) 123-4567"
                     disabled={isReadOnly}
                   />
@@ -145,8 +149,8 @@ export default function LenderForm({
               <FormItem>
                 <FormLabel>Main Contact Email</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="email"
                     placeholder="contact@lender.com"
                     disabled={isReadOnly}
@@ -166,11 +170,7 @@ export default function LenderForm({
               <FormItem>
                 <FormLabel>Contact First Name</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
-                    placeholder="John"
-                    disabled={isReadOnly}
-                  />
+                  <Input {...field} placeholder="John" disabled={isReadOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -184,11 +184,7 @@ export default function LenderForm({
               <FormItem>
                 <FormLabel>Contact Last Name</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
-                    placeholder="Smith"
-                    disabled={isReadOnly}
-                  />
+                  <Input {...field} placeholder="Smith" disabled={isReadOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -202,8 +198,8 @@ export default function LenderForm({
               <FormItem>
                 <FormLabel>Contact Mobile</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="+1 (555) 987-6543"
                     disabled={isReadOnly}
                   />
@@ -221,8 +217,8 @@ export default function LenderForm({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea 
-                  {...field} 
+                <Textarea
+                  {...field}
                   placeholder="Brief description of the lender and their services"
                   disabled={isReadOnly}
                 />
@@ -234,11 +230,12 @@ export default function LenderForm({
 
         {!isReadOnly && (
           <div className="flex justify-end space-x-2">
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-            >
-              {isLoading ? 'Saving...' : mode === 'create' ? 'Create Lender' : 'Update Lender'}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading
+                ? "Saving..."
+                : mode === "create"
+                  ? "Create Lender"
+                  : "Update Lender"}
             </Button>
           </div>
         )}

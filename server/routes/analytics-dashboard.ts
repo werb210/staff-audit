@@ -56,13 +56,13 @@ router.get('/dashboard-summary', developmentAuth, async (req: any, res: any) => 
     const [recentApplications] = await db.execute(sql`
       SELECT cast(count(*) as int) as count 
       FROM applications 
-      WHERE created_at >= ${thirtyDaysAgo}
+      WHERE createdAt >= ${thirtyDaysAgo}
     `);
 
     const [recentDocuments] = await db.execute(sql`
       SELECT cast(count(*) as int) as count 
       FROM documents 
-      WHERE created_at >= ${thirtyDaysAgo}
+      WHERE createdAt >= ${thirtyDaysAgo}
     `);
 
     const summary = {

@@ -11,7 +11,7 @@ export async function findAppByAnyId(id: string) {
         id,
         form_data,
         status,
-        created_at,
+        createdAt,
         requested_amount,
         contact_first_name,
         contact_last_name, 
@@ -40,12 +40,12 @@ export async function findAppByAnyId(id: string) {
     const docsQuery = `
       SELECT 
         id,
-        file_name,
+        name,
         document_type,
         status,
-        created_at
+        createdAt
       FROM documents 
-      WHERE application_id = $1
+      WHERE applicationId = $1
     `;
     
     const docsResult = await q(docsQuery, [id]);
@@ -77,7 +77,7 @@ export async function findAppByAnyId(id: string) {
 
     return {
       id: application.id,
-      createdAt: application.created_at,
+      createdAt: application.createdAt,
       status: application.status,
       requestedAmount: application.requested_amount,
       formData: formData,

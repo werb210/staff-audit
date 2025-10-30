@@ -34,7 +34,7 @@ router.get('/test', (req: Request, res: Response) => {
 //     // SECURITY: Only return products for this specific lender
 //     const products = await db.execute(sql`
 //       SELECT id, product_name, lender_name, product_type, amount_min, amount_max, 
-//              is_active, description, created_at, updated_at
+//              is_active, description, createdAt, updatedAt
 //       FROM lender_products 
 //       WHERE is_active = true AND lender_name = ${lenderUser?.lenderName}
 //       ORDER BY product_name 
@@ -159,7 +159,7 @@ router.patch('/lender-products/:id', requireLenderAuth, async (req: Request, res
     }
     
     // Always update the timestamp
-    updates.push(sql`updated_at = NOW()`);
+    updates.push(sql`updatedAt = NOW()`);
     
     // Build single update query by combining all updates
     let updateQuery = sql`UPDATE lender_products SET `;
@@ -172,7 +172,7 @@ router.patch('/lender-products/:id', requireLenderAuth, async (req: Request, res
       }
     }
     
-    updateQuery = sql`${updateQuery} WHERE id = ${productId} RETURNING id, product_name, lender_name, product_type, geography, amount_min, amount_max, description, updated_at`;
+    updateQuery = sql`${updateQuery} WHERE id = ${productId} RETURNING id, product_name, lender_name, product_type, geography, amount_min, amount_max, description, updatedAt`;
     
     const updatedProduct = await db.execute(updateQuery);
     

@@ -7,8 +7,10 @@ import { Phone } from "lucide-react";
 export default function QuickCallPad() {
   const [to, setTo] = useState("");
   // Using new FAB dialer system - no need for hook
-  const openDialer = () => console.log("[QuickCallPad] Dialer requested - handled by global FAB");
-  const call = async (number: string) => console.log("[QuickCallPad] Call requested to:", number);
+  const openDialer = () =>
+    console.log("[QuickCallPad] Dialer requested - handled by global FAB");
+  const call = async (number: string) =>
+    console.log("[QuickCallPad] Call requested to:", number);
 
   const makeCall = async () => {
     if (!to.trim()) return;
@@ -30,7 +32,7 @@ export default function QuickCallPad() {
             placeholder="Phone number"
             className="flex-1"
           />
-          <Button 
+          <Button
             onClick={makeCall}
             disabled={!to.trim()}
             className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
@@ -39,7 +41,7 @@ export default function QuickCallPad() {
             Call
           </Button>
         </div>
-        <Button 
+        <Button
           onClick={openDialerWithNumber}
           variant="outline"
           className="w-full"

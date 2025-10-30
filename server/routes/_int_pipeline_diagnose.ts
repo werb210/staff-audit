@@ -25,8 +25,8 @@ r.get('/_int/pipeline-diagnose', async (_req, res) => {
            coalesce(a.requested_amount, a.amount, a.loan_amount, 0)::numeric as amount,
            coalesce(a.status, a.stage, 'new')::text as status
     from applications a
-    left join businesses b on b.id = a.business_id
-    order by a.created_at desc nulls last, a.id desc
+    left join businesses b on b.id = a.businessId
+    order by a.createdAt desc nulls last, a.id desc
     limit 10
   `);
 

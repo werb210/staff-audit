@@ -221,7 +221,7 @@ async function getRecentActivity() {
         count: count() 
       })
       .from(applications)
-      .where(sql`created_at > NOW() - INTERVAL '24 hours'`)
+      .where(sql`createdAt > NOW() - INTERVAL '24 hours'`)
       .groupBy(applications.status);
     
     return result;

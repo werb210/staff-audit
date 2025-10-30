@@ -96,7 +96,7 @@ r.get("/full-audit", async (req: any, res: any) => {
       features: [
         { key:"/sales-pipeline page renders SPA", check: ui("/sales-pipeline") },
         { key:"/api/pipeline responds", check: apiOK("/api/pipeline","items") },
-        { key:"applications table schema", check: tableHas(["id","stage","created_at"], "applications") }
+        { key:"applications table schema", check: tableHas(["id","stage","createdAt"], "applications") }
       ]
     },
     {

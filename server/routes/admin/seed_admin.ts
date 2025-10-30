@@ -27,7 +27,7 @@ router.post("/seed-admin", async (req: any, res) => {
     // Create admin user
     const hash = await bcrypt.hash(pw, 12);
     const result = await pool.query(
-      "INSERT INTO staff_users(email, role, password_hash, created_at) VALUES ($1, 'admin', $2, NOW()) RETURNING id",
+      "INSERT INTO staff_users(email, role, password_hash, createdAt) VALUES ($1, 'admin', $2, NOW()) RETURNING id",
       [email, hash]
     );
     

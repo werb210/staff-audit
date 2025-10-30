@@ -21,11 +21,11 @@ router.post('/application/:applicationId', async (req: any, res: any) => {
     
     // Get all bank statement documents for the application
     const documentsResult = await db.execute(sql`
-      SELECT id, file_name, document_type, file_path
+      SELECT id, name, document_type, file_path
       FROM documents 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
       AND document_type = 'bank_statements'
-      ORDER BY created_at
+      ORDER BY createdAt
     `);
     
     if (!documentsResult.rows.length) {
@@ -44,13 +44,13 @@ router.post('/application/:applicationId', async (req: any, res: any) => {
     // Process each document
     for (const doc of documentsResult.rows) {
       try {
-        console.log(`🔍 [OCR-TRIGGER] Processing document: ${doc.file_name} (${doc.id})`);
+        console.log(`🔍 [OCR-TRIGGER] Processing document: ${doc.name} (${doc.id})`);
         
         // Simulate OCR processing (replace with actual OCR service call)
         const ocrData = {
           documentId: doc.id,
           applicationId: applicationId,
-          extractedText: `OCR processed text from ${doc.file_name}`,
+          extractedText: `OCR processed text from ${doc.name}`,
           confidence: 95,
           processingTime: 1250,
           status: 'completed'
@@ -61,7 +61,7 @@ router.post('/application/:applicationId', async (req: any, res: any) => {
           INSERT INTO ocr_results (
             id,
             document_id,
-            application_id,
+            applicationId,
             extracted_data,
             confidence,
             processing_time_ms,
@@ -80,22 +80,22 @@ router.post('/application/:applicationId', async (req: any, res: any) => {
         processedCount++;
         results.push({
           documentId: doc.id,
-          fileName: doc.file_name,
+          fileName: doc.name,
           status: 'success'
         });
         
-        console.log(`✅ [OCR-TRIGGER] Successfully processed: ${doc.file_name}`);
+        console.log(`✅ [OCR-TRIGGER] Successfully processed: ${doc.name}`);
         
       } catch (error: unknown) {
         errorCount++;
         results.push({
           documentId: doc.id,
-          fileName: doc.file_name,
+          fileName: doc.name,
           status: 'error',
           error: error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'
         });
         
-        console.error(`❌ [OCR-TRIGGER] Error processing ${doc.file_name}:`, error);
+        console.error(`❌ [OCR-TRIGGER] Error processing ${doc.name}:`, error);
       }
     }
     
@@ -156,7 +156,7 @@ router.post('/banking-analysis/:applicationId', async (req: any, res: any) => {
     const ocrResult = await db.execute(sql`
       SELECT COUNT(*) as count
       FROM ocr_results 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     const ocrCount = ocrResult.rows[0]?.count || 0;
@@ -208,14 +208,14 @@ router.get('/status/:applicationId', async (req: any, res: any) => {
     const ocrResult = await db.execute(sql`
       SELECT COUNT(*) as count
       FROM ocr_results 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     // Check banking analysis results
     const bankingResult = await db.execute(sql`
       SELECT COUNT(*) as count
       FROM banking_analysis 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     // Check documents
@@ -223,7 +223,7 @@ router.get('/status/:applicationId', async (req: any, res: any) => {
       SELECT COUNT(*) as total,
              COUNT(CASE WHEN document_type = 'bank_statements' THEN 1 END) as bank_statements
       FROM documents 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     const status = {

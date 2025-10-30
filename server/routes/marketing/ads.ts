@@ -22,8 +22,8 @@ router.get("/api/marketing/ads/campaigns", async (req: any, res: any) => {
       FROM marketing_campaigns mc
       LEFT JOIN marketing_ads ma ON mc.id = ma.campaign_id
       WHERE mc.status IN ('active', 'paused', 'ended')
-      GROUP BY mc.id, mc.name, mc.platform, mc.status, mc.start_date, mc.end_date, mc.budget, mc.created_at
-      ORDER BY mc.created_at DESC
+      GROUP BY mc.id, mc.name, mc.platform, mc.status, mc.start_date, mc.end_date, mc.budget, mc.createdAt
+      ORDER BY mc.createdAt DESC
     `);
 
     console.log(`📊 Found ${campaignsResult.length} campaigns`);
@@ -45,7 +45,7 @@ router.get("/api/marketing/ads/campaigns", async (req: any, res: any) => {
       totalAds: Number(campaign.total_ads) || 0,
       ctr: campaign.total_impressions > 0 ? ((Number(campaign.total_clicks) / Number(campaign.total_impressions)) * 100).toFixed(2) : '0.00',
       cpc: campaign.total_clicks > 0 ? (Number(campaign.total_spend) / Number(campaign.total_clicks)).toFixed(2) : '0.00',
-      createdAt: campaign.created_at
+      createdAt: campaign.createdAt
     }));
 
     // Get platform performance summary
@@ -144,7 +144,7 @@ router.post("/api/marketing/ads/campaigns", async (req: any, res: any) => {
     const campaignId = `camp_${Date.now()}`;
     
     await db.execute(sql`
-      INSERT INTO marketing_campaigns (id, name, platform, budget, start_date, end_date, status, created_at, updated_at)
+      INSERT INTO marketing_campaigns (id, name, platform, budget, start_date, end_date, status, createdAt, updatedAt)
       VALUES (${campaignId}, ${name}, ${platform}, ${budget}, ${startDate}, ${endDate}, 'active', NOW(), NOW())
     `);
 
@@ -168,7 +168,7 @@ router.patch("/api/marketing/ads/campaigns/:id", async (req: any, res: any) => {
 
     await db.execute(sql`
       UPDATE marketing_campaigns 
-      SET status = ${status}, updated_at = NOW()
+      SET status = ${status}, updatedAt = NOW()
       WHERE id = ${id}
     `);
 

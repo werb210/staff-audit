@@ -82,7 +82,7 @@ export async function runOcrOnDocument(documentId: string): Promise<string> {
       
       const insertQuery = `
         INSERT INTO ocr_results (
-          id, document_id, application_id, extracted_data, confidence, 
+          id, document_id, applicationId, extracted_data, confidence, 
           processing_time_ms, processing_status, processed_at
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
         RETURNING id

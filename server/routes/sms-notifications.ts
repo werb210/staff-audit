@@ -54,7 +54,7 @@ router.post("/stage-notification", async (req: Request, res: Response) => {
     if (smsResult.success) {
       // Log the notification
       await pool.query(`
-        INSERT INTO sms_logs (application_id, phone, message, stage, status, sent_at)
+        INSERT INTO sms_logs (applicationId, phone, message, stage, status, sent_at)
         VALUES ($1, $2, $3, $4, 'sent', NOW())
       `, [applicationId, phone, message, stage]);
       

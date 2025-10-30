@@ -81,7 +81,7 @@ router.post('/fix-missing-file/:documentId', async (req: any, res: any) => {
       await sql`
         UPDATE documents 
         SET file_type = 'text/plain',
-            file_name = ${document.file_name.replace('.pdf', '.txt')}
+            name = ${document.name.replace('.pdf', '.txt')}
         WHERE id = ${documentId}
       `;
       

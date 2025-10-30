@@ -9,19 +9,19 @@ const INTERNATIONAL_PHONE_REGEX = /^\+[1-9]\d{6,14}$/;
 // Common country codes and their expected lengths
 const COUNTRY_PHONE_PATTERNS = {
   // North America (US, Canada)
-  '+1': { minLength: 11, maxLength: 11, format: '+1XXXXXXXXXX' },
+  "+1": { minLength: 11, maxLength: 11, format: "+1XXXXXXXXXX" },
   // UK
-  '+44': { minLength: 11, maxLength: 13, format: '+44XXXXXXXXXX' },
+  "+44": { minLength: 11, maxLength: 13, format: "+44XXXXXXXXXX" },
   // Germany
-  '+49': { minLength: 11, maxLength: 12, format: '+49XXXXXXXXXX' },
+  "+49": { minLength: 11, maxLength: 12, format: "+49XXXXXXXXXX" },
   // France
-  '+33': { minLength: 11, maxLength: 11, format: '+33XXXXXXXXX' },
+  "+33": { minLength: 11, maxLength: 11, format: "+33XXXXXXXXX" },
   // Australia
-  '+61': { minLength: 11, maxLength: 11, format: '+61XXXXXXXXX' },
+  "+61": { minLength: 11, maxLength: 11, format: "+61XXXXXXXXX" },
   // Japan
-  '+81': { minLength: 11, maxLength: 12, format: '+81XXXXXXXXXX' },
+  "+81": { minLength: 11, maxLength: 12, format: "+81XXXXXXXXXX" },
   // India
-  '+91': { minLength: 13, maxLength: 13, format: '+91XXXXXXXXXX' },
+  "+91": { minLength: 13, maxLength: 13, format: "+91XXXXXXXXXX" },
 };
 
 /**
@@ -30,26 +30,33 @@ const COUNTRY_PHONE_PATTERNS = {
  * @param defaultCountryCode - Default country code if none provided (default: +1)
  * @returns Formatted phone number
  */
-export const formatPhoneNumber = (value: string, defaultCountryCode: string = '+1'): string => {
+export const formatPhoneNumber = (
+  value: string,
+  defaultCountryCode: string = "+1",
+): string => {
   // Remove all non-digit characters except +
-  const cleaned = value.replace(/[^\d+]/g, '');
-  
+  const cleaned = value.replace(/[^\d+]/g, "");
+
   // If empty, return empty
-  if (!cleaned) return '';
-  
+  if (!cleaned) return "";
+
   // If it doesn't start with +, add default country code
-  if (!cleaned.startsWith('+')) {
+  if (!cleaned.startsWith("+")) {
     // If it starts with a digit, assume it needs country code
     if (/^\d/.test(cleaned)) {
       // For US/Canada numbers starting with 1, don't double-add
-      if (defaultCountryCode === '+1' && cleaned.startsWith('1') && cleaned.length === 11) {
-        return '+' + cleaned;
+      if (
+        defaultCountryCode === "+1" &&
+        cleaned.startsWith("1") &&
+        cleaned.length === 11
+      ) {
+        return "+" + cleaned;
       }
       return defaultCountryCode + cleaned;
     }
     return defaultCountryCode + cleaned;
   }
-  
+
   return cleaned;
 };
 
@@ -60,18 +67,20 @@ export const formatPhoneNumber = (value: string, defaultCountryCode: string = '+
  */
 export const isValidPhoneNumber = (phone: string): boolean => {
   if (!phone) return false;
-  
+
   // Must match international format
   if (!INTERNATIONAL_PHONE_REGEX.test(phone)) return false;
-  
+
   // Check against known country patterns
   for (const [countryCode, pattern] of Object.entries(COUNTRY_PHONE_PATTERNS)) {
     if (phone.startsWith(countryCode)) {
       const phoneLength = phone.length;
-      return phoneLength >= pattern.minLength && phoneLength <= pattern.maxLength;
+      return (
+        phoneLength >= pattern.minLength && phoneLength <= pattern.maxLength
+      );
     }
   }
-  
+
   // For unknown country codes, accept if it matches basic international format
   return phone.length >= 8 && phone.length <= 16;
 };
@@ -82,12 +91,13 @@ export const isValidPhoneNumber = (phone: string): boolean => {
  * @returns Formatting hint or validation message
  */
 export const getPhoneFormatHint = (phone: string): string => {
-  if (!phone) return 'Enter phone number in international format (e.g., +1234567890)';
-  
-  if (!phone.startsWith('+')) {
-    return 'Phone numbers must start with + and country code (e.g., +1 for US/Canada)';
+  if (!phone)
+    return "Enter phone number in international format (e.g., +1234567890)";
+
+  if (!phone.startsWith("+")) {
+    return "Phone numbers must start with + and country code (e.g., +1 for US/Canada)";
   }
-  
+
   // Find matching country pattern
   for (const [countryCode, pattern] of Object.entries(COUNTRY_PHONE_PATTERNS)) {
     if (phone.startsWith(countryCode)) {
@@ -98,16 +108,16 @@ export const getPhoneFormatHint = (phone: string): string => {
         return `${countryCode} numbers should be ${pattern.maxLength} digits maximum`;
       }
       if (isValidPhoneNumber(phone)) {
-        return '✓ Valid phone number for 2FA';
+        return "✓ Valid phone number for 2FA";
       }
     }
   }
-  
+
   if (isValidPhoneNumber(phone)) {
-    return '✓ Valid international phone number';
+    return "✓ Valid international phone number";
   }
-  
-  return 'Please use international format: +[country code][phone number]';
+
+  return "Please use international format: +[country code][phone number]";
 };
 
 /**
@@ -118,7 +128,7 @@ export const getPhoneFormatHint = (phone: string): string => {
  */
 export const normalizePhoneNumber = (phone: string): string => {
   const formatted = formatPhoneNumber(phone);
-  return isValidPhoneNumber(formatted) ? formatted : '';
+  return isValidPhoneNumber(formatted) ? formatted : "";
 };
 
 /**
@@ -128,29 +138,29 @@ export const normalizePhoneNumber = (phone: string): string => {
  */
 export const formatPhoneForDisplay = (phone: string): string => {
   if (!phone || !isValidPhoneNumber(phone)) return phone;
-  
+
   // Format common patterns for better readability
-  if (phone.startsWith('+1') && phone.length === 12) {
+  if (phone.startsWith("+1") && phone.length === 12) {
     // US/Canada: +1 (XXX) XXX-XXXX
     const digits = phone.slice(2);
     return `+1 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
-  
-  if (phone.startsWith('+44') && phone.length >= 11) {
+
+  if (phone.startsWith("+44") && phone.length >= 11) {
     // UK: +44 XXXX XXX XXX
     const digits = phone.slice(3);
     return `+44 ${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
   }
-  
+
   // Default: add spaces after country code
   const match = phone.match(/^(\+\d{1,3})(\d+)$/);
   if (match) {
     const [, countryCode, number] = match;
     // Add space every 3-4 digits for readability
-    const spacedNumber = number.replace(/(\d{3,4})/g, '$1 ').trim();
+    const spacedNumber = number.replace(/(\d{3,4})/g, "$1 ").trim();
     return `${countryCode} ${spacedNumber}`;
   }
-  
+
   return phone;
 };
 
@@ -160,16 +170,16 @@ export const formatPhoneForDisplay = (phone: string): string => {
  * @returns Country code (e.g., '+1', '+44')
  */
 export const extractCountryCode = (phone: string): string => {
-  if (!phone.startsWith('+')) return '';
-  
+  if (!phone.startsWith("+")) return "";
+
   // Try known country codes first
   for (const countryCode of Object.keys(COUNTRY_PHONE_PATTERNS)) {
     if (phone.startsWith(countryCode)) return countryCode;
   }
-  
+
   // Extract up to 4 digits after +
   const match = phone.match(/^(\+\d{1,4})/);
-  return match ? match[1] : '';
+  return match ? match[1] : "";
 };
 
 /**
@@ -184,7 +194,7 @@ export const formatPhoneIntl = (value: string): string => {
 
 /**
  * Format phone number for international display (new dialer system)
- * @param value - Raw phone number input  
+ * @param value - Raw phone number input
  * @returns Formatted international phone number
  */
 export const formatIntl = (value: string): string => {

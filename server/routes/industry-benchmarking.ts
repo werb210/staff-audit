@@ -69,8 +69,8 @@ router.post('/analyze/:applicationId', simpleAuth, async (req: any, res: any) =>
     const bankingResult = await pool.query(`
       SELECT profit_margin, cash_flow_ratio, transaction_count
       FROM bank_statement_analysis 
-      WHERE application_id = $1
-      ORDER BY created_at DESC 
+      WHERE applicationId = $1
+      ORDER BY createdAt DESC 
       LIMIT 1
     `, [applicationId]);
 
@@ -98,7 +98,7 @@ router.post('/analyze/:applicationId', simpleAuth, async (req: any, res: any) =>
     // Save benchmark comparison to database
     await pool.query(`
       INSERT INTO benchmark_comparisons (
-        application_id, industry, applicant_monthly_revenue, applicant_monthly_expenses,
+        applicationId, industry, applicant_monthly_revenue, applicant_monthly_expenses,
         applicant_profit_margin, applicant_cash_flow_ratio, applicant_debt_to_revenue_ratio,
         applicant_transaction_volume, applicant_business_age, applicant_employee_count,
         performance_score, overall_ranking, risk_adjustment,
@@ -115,13 +115,13 @@ router.post('/analyze/:applicationId', simpleAuth, async (req: any, res: any) =>
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
         $14, $15, $16, $17, $18, $19, $20, $21, $22, $23,
         $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36
-      ) ON CONFLICT (application_id) DO UPDATE SET
+      ) ON CONFLICT (applicationId) DO UPDATE SET
         performance_score = EXCLUDED.performance_score,
         overall_ranking = EXCLUDED.overall_ranking,
         risk_adjustment = EXCLUDED.risk_adjustment,
         recommendations = EXCLUDED.recommendations,
         processing_time = EXCLUDED.processing_time,
-        updated_at = NOW()
+        updatedAt = NOW()
     `, [
       applicationId, benchmarkResult.industryBenchmark.industry,
       applicantMetrics.monthlyRevenue, applicantMetrics.monthlyExpenses,
@@ -192,8 +192,8 @@ router.get('/results/:applicationId', simpleAuth, async (req: any, res: any) => 
 
     const result = await pool.query(`
       SELECT * FROM benchmark_comparisons 
-      WHERE application_id = $1
-      ORDER BY created_at DESC 
+      WHERE applicationId = $1
+      ORDER BY createdAt DESC 
       LIMIT 1
     `, [applicationId]);
 
@@ -260,7 +260,7 @@ router.get('/results/:applicationId', simpleAuth, async (req: any, res: any) => 
       seasonalConsiderations: comparison.seasonal_considerations || [],
       riskFactors: comparison.risk_factors || [],
       industry: comparison.industry,
-      analysisDate: comparison.created_at,
+      analysisDate: comparison.createdAt,
       processingTime: comparison.processing_time
     };
 
@@ -433,11 +433,11 @@ router.get('/stats', simpleAuth, async (req: any, res: any) => {
       // Recent analysis activity (last 7 days)
       pool.query(`
         SELECT 
-          DATE(created_at) as date,
+          DATE(createdAt) as date,
           COUNT(*) as analyses
         FROM benchmark_comparisons
-        WHERE created_at > NOW() - INTERVAL '7 days'
-        GROUP BY DATE(created_at)
+        WHERE createdAt > NOW() - INTERVAL '7 days'
+        GROUP BY DATE(createdAt)
         ORDER BY date DESC
       `)
     ]);

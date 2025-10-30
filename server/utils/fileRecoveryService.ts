@@ -64,7 +64,7 @@ export class FileRecoveryService {
           
           await pool.query(`
             UPDATE documents 
-            SET file_path = $1, file_name = $2 
+            SET file_path = $1, name = $2 
             WHERE id = $3
           `, [result.newPath, updatedFileName, documentId]);
           

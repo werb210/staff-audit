@@ -18,7 +18,7 @@ const mockDb = {
   // Campaign operations
   createCampaign: (data: any) => {
     const id = mockDb.generateId();
-    const campaign = { id, ...data, created_at: new Date().toISOString() };
+    const campaign = { id, ...data, createdAt: new Date().toISOString() };
     mockDb.campaigns.set(id, campaign);
     return campaign;
   },
@@ -29,7 +29,7 @@ const mockDb = {
     const campaign = mockDb.campaigns.get(id);
     if (campaign) {
       campaign.status = status;
-      campaign.updated_at = new Date().toISOString();
+      campaign.updatedAt = new Date().toISOString();
     }
     return campaign;
   },
@@ -53,7 +53,7 @@ const mockDb = {
   // Events operations
   addEvent: (data: any) => {
     const id = mockDb.generateId();
-    const event = { id, ...data, created_at: new Date().toISOString() };
+    const event = { id, ...data, createdAt: new Date().toISOString() };
     mockDb.events.set(id, event);
     return event;
   }

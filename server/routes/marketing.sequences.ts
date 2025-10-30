@@ -8,7 +8,7 @@ r.use(requireAuth);
 
 // CRUD sequences
 r.get("/marketing/sequences", async (_req, res) => { 
-  const { rows } = await db.execute(sql`select * from marketing_sequences order by created_at desc`); 
+  const { rows } = await db.execute(sql`select * from marketing_sequences order by createdAt desc`); 
   res.json({ ok: true, items: rows }); 
 });
 
@@ -50,14 +50,14 @@ r.get("/marketing/sequences/:id/enrollments", async (req: any, res: any) => {
     from marketing_enrollments e 
     left join contacts c on e.contact_id = c.id 
     where e.sequence_id = ${req.params.id} 
-    order by e.created_at desc
+    order by e.createdAt desc
   `);
   res.json({ ok: true, items: rows });
 });
 
 // Audiences CRUD
 r.get("/marketing/audiences", async (_req, res) => {
-  const { rows } = await db.execute(sql`select * from audiences order by created_at desc`);
+  const { rows } = await db.execute(sql`select * from audiences order by createdAt desc`);
   res.json({ ok: true, items: rows });
 });
 
@@ -69,7 +69,7 @@ r.post("/marketing/audiences", async (req: any, res: any) => {
 
 // A/B Experiments
 r.get("/marketing/experiments", async (_req, res) => {
-  const { rows } = await db.execute(sql`select * from experiments order by created_at desc`);
+  const { rows } = await db.execute(sql`select * from experiments order by createdAt desc`);
   res.json({ ok: true, items: rows });
 });
 

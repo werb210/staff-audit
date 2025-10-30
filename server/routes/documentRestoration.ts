@@ -13,9 +13,9 @@ router.post('/restore-actual-documents/:applicationId', async (req: any, res: an
     
     // Get all placeholder documents (.txt files) for this application
     const placeholderQuery = `
-      SELECT id, file_name, file_path, file_type 
+      SELECT id, name, file_path, file_type 
       FROM documents 
-      WHERE application_id = $1 
+      WHERE applicationId = $1 
       AND (file_path LIKE '%.txt' OR file_type IS NULL OR file_type = '')
     `;
     const placeholderResult = await db.query(placeholderQuery, [applicationId]);
@@ -47,10 +47,10 @@ router.post('/restore-actual-documents/:applicationId', async (req: any, res: an
     
     for (const placeholder of placeholders) {
       try {
-        console.log(`🔄 [DOCUMENT RESTORATION] Processing: ${placeholder.file_name} (${placeholder.id})`);
+        console.log(`🔄 [DOCUMENT RESTORATION] Processing: ${placeholder.name} (${placeholder.id})`);
         
         // Extract original filename from placeholder content or database
-        let originalFileName = placeholder.file_name;
+        let originalFileName = placeholder.name;
         if (originalFileName.endsWith('.txt')) {
           originalFileName = originalFileName.replace('.txt', '');
         }
@@ -86,9 +86,9 @@ router.post('/restore-actual-documents/:applicationId', async (req: any, res: an
             UPDATE documents 
             SET file_path = $1, 
                 file_type = $2, 
-                file_size = $3,
-                file_name = $4,
-                updated_at = NOW()
+                size = $3,
+                name = $4,
+                updatedAt = NOW()
             WHERE id = $5
           `;
           
@@ -114,7 +114,7 @@ router.post('/restore-actual-documents/:applicationId', async (req: any, res: an
           
           results.push({
             documentId: placeholder.id,
-            originalName: placeholder.file_name,
+            originalName: placeholder.name,
             restoredName: restoredFileName,
             actualFile: actualFile,
             fileSize: fileStats.size,
@@ -126,20 +126,20 @@ router.post('/restore-actual-documents/:applicationId', async (req: any, res: an
           console.log(`✅ [DOCUMENT RESTORATION] Successfully restored: ${restoredFileName}`);
           
         } else {
-          console.log(`⚠️ [DOCUMENT RESTORATION] No matching file found for: ${placeholder.file_name}`);
+          console.log(`⚠️ [DOCUMENT RESTORATION] No matching file found for: ${placeholder.name}`);
           results.push({
             documentId: placeholder.id,
-            originalName: placeholder.file_name,
+            originalName: placeholder.name,
             status: 'NO_MATCH_FOUND',
             error: 'No matching actual file found in uploads directory'
           });
         }
         
       } catch (error: unknown) {
-        console.error(`❌ [DOCUMENT RESTORATION] Error processing ${placeholder.file_name}:`, error);
+        console.error(`❌ [DOCUMENT RESTORATION] Error processing ${placeholder.name}:`, error);
         results.push({
           documentId: placeholder.id,
-          originalName: placeholder.file_name,
+          originalName: placeholder.name,
           status: 'ERROR',
           error: error instanceof Error ? error.message : String(error)
         });
@@ -185,7 +185,7 @@ router.get('/status/:applicationId', async (req: any, res: any) => {
         COUNT(CASE WHEN file_path LIKE '%.txt' THEN 1 END) as placeholder_count,
         COUNT(CASE WHEN file_path NOT LIKE '%.txt' AND file_path IS NOT NULL THEN 1 END) as actual_count
       FROM documents 
-      WHERE application_id = $1
+      WHERE applicationId = $1
     `;
     
     const result = await pool.query(statusQuery, [applicationId]);

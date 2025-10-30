@@ -38,7 +38,8 @@ export default function SimpleAIActionBar({ ctx }: Props) {
   const ready = useMemo(() => {
     // Bar is ON if env or localStorage enables it
     const envOn = (import.meta as any).env?.VITE_STAFF_AI_BAR === "on";
-    const ls = typeof window !== "undefined" ? localStorage.getItem("bf.aiBar") : null;
+    const ls =
+      typeof window !== "undefined" ? localStorage.getItem("bf.aiBar") : null;
     return envOn || ls === "on" || true; // default ON
   }, []);
 
@@ -66,28 +67,76 @@ export default function SimpleAIActionBar({ ctx }: Props) {
   };
 
   return (
-    <div style={{
-      position:"sticky", top:0, zIndex: 50,
-      background:"#0B1324", color:"#fff",
-      padding:"10px 14px", borderBottom:"1px solid #0F1B36",
-      display:"flex", alignItems:"center", gap:12, overflowX:"auto"
-    }}>
-      <strong style={{fontSize:13, letterSpacing:.3}}>🤖 AI Actions</strong>
-      <div style={{display:"flex", gap:8}}>
-        <Pill title="Recommend lenders based on profile" onClick={() => safe("Lender Match", api.lenderMatch)}>Lender Match</Pill>
-        <Pill title="OCR + summary of attached docs" onClick={() => safe("Summarize Docs", api.summarizeDocs)}>Doc IQ</Pill>
-        <Pill title="Risk scoring & red flags" onClick={() => safe("Risk Score", api.scoreRisk)}>Risk Score</Pill>
-        <Pill title="Draft an email/SMS reply" onClick={() => safe("Smart Reply", api.smartReply)}>Smart Reply</Pill>
-        <Pill title="Suggest next steps & checklist" onClick={() => safe("Next Steps", api.nextSteps)}>Next Steps</Pill>
+    <div
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        background: "#0B1324",
+        color: "#fff",
+        padding: "10px 14px",
+        borderBottom: "1px solid #0F1B36",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        overflowX: "auto",
+      }}
+    >
+      <strong style={{ fontSize: 13, letterSpacing: 0.3 }}>
+        🤖 AI Actions
+      </strong>
+      <div style={{ display: "flex", gap: 8 }}>
+        <Pill
+          title="Recommend lenders based on profile"
+          onClick={() => safe("Lender Match", api.lenderMatch)}
+        >
+          Lender Match
+        </Pill>
+        <Pill
+          title="OCR + summary of attached docs"
+          onClick={() => safe("Summarize Docs", api.summarizeDocs)}
+        >
+          Doc IQ
+        </Pill>
+        <Pill
+          title="Risk scoring & red flags"
+          onClick={() => safe("Risk Score", api.scoreRisk)}
+        >
+          Risk Score
+        </Pill>
+        <Pill
+          title="Draft an email/SMS reply"
+          onClick={() => safe("Smart Reply", api.smartReply)}
+        >
+          Smart Reply
+        </Pill>
+        <Pill
+          title="Suggest next steps & checklist"
+          onClick={() => safe("Next Steps", api.nextSteps)}
+        >
+          Next Steps
+        </Pill>
       </div>
-      <div style={{marginLeft:"auto", fontSize:12, opacity:.9}}>
-        {ctx?.name ? `${ctx.name}${ctx.amount ? ` • $${ctx.amount.toLocaleString()}` : ""}` : "No context"}
+      <div style={{ marginLeft: "auto", fontSize: 12, opacity: 0.9 }}>
+        {ctx?.name
+          ? `${ctx.name}${ctx.amount ? ` • $${ctx.amount.toLocaleString()}` : ""}`
+          : "No context"}
       </div>
       {msg && (
-        <div style={{
-          position:"absolute", right:14, bottom:-22, background:"#111827",
-          color:"#fff", padding:"4px 8px", borderRadius:6, fontSize:11
-        }}>{msg}</div>
+        <div
+          style={{
+            position: "absolute",
+            right: 14,
+            bottom: -22,
+            background: "#111827",
+            color: "#fff",
+            padding: "4px 8px",
+            borderRadius: 6,
+            fontSize: 11,
+          }}
+        >
+          {msg}
+        </div>
       )}
     </div>
   );

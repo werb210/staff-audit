@@ -1,4 +1,12 @@
-.card{ @apply rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition cursor-pointer; }
-.card-content{ @apply p-4; }
-.card-title{ @apply text-sm font-medium text-gray-900; }
-.card-subtitle{ @apply mt-1 text-xs text-gray-600; }
+.card {
+  @apply rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition cursor-pointer;
+}
+.card-content {
+  @apply p-4;
+}
+.card-title {
+  @apply text-sm font-medium text-gray-900;
+}
+.card-subtitle {
+  @apply mt-1 text-xs text-gray-600;
+}

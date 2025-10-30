@@ -24,7 +24,7 @@ function adminOnly(req: any, res: any, next: any) {
 router.get('/flags', adminOnly, async (req: any, res: any) => {
   try {
     const flags = await db.execute(sql`
-      SELECT flag_key, enabled, config, updated_at
+      SELECT flag_key, enabled, config, updatedAt
       FROM ai_feature_flags
       ORDER BY flag_key
     `);
@@ -45,7 +45,7 @@ router.put('/flags/:flagKey', adminOnly, async (req: any, res: any) => {
     
     await db.execute(sql`
       UPDATE ai_feature_flags 
-      SET enabled = ${enabled}, updated_at = NOW(), updated_by = ${userId}
+      SET enabled = ${enabled}, updatedAt = NOW(), updated_by = ${userId}
       WHERE flag_key = ${flagKey}
     `);
     
@@ -60,7 +60,7 @@ router.put('/flags/:flagKey', adminOnly, async (req: any, res: any) => {
 router.get('/prompts', adminOnly, async (req: any, res: any) => {
   try {
     const prompts = await db.execute(sql`
-      SELECT id, prompt_key, version, body, metadata, active, created_at
+      SELECT id, prompt_key, version, body, metadata, active, createdAt
       FROM ai_prompts
       WHERE active = true
       ORDER BY prompt_key, version DESC
@@ -159,7 +159,7 @@ router.get('/usage/users', adminOnly, async (req: any, res: any) => {
         AVG(CASE WHEN success THEN 1.0 ELSE 0.0 END) as success_rate
       FROM ai_usage
       WHERE tenant_id = ${tenantId}
-      AND created_at >= ${startDate}
+      AND createdAt >= ${startDate}
       GROUP BY user_id
       ORDER BY request_count DESC
       LIMIT 20
@@ -188,7 +188,7 @@ router.post('/emergency-disable', adminOnly, async (req: any, res: any) => {
     
     await db.execute(sql`
       UPDATE ai_feature_flags 
-      SET enabled = false, updated_at = NOW(), updated_by = ${userId}
+      SET enabled = false, updatedAt = NOW(), updated_by = ${userId}
       WHERE enabled = true
     `);
     

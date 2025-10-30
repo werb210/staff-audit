@@ -8,10 +8,10 @@ export async function logContactActivity({
   contactId: string; type: 'sms'|'email'|'call';
   direction: 'in'|'out'; title?: string; body?: string; meta?: any;
 }) {
-  const [row] = await q<{ id: string; created_at: string }>(`
+  const [row] = await q<{ id: string; createdAt: string }>(`
     INSERT INTO contact_activity (contact_id, type, direction, title, body, meta)
     VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING id, created_at
+    RETURNING id, createdAt
   `, [contactId, type, direction, title ?? null, body ?? null, meta ? JSON.stringify(meta) : null]);
 
   // Push live to any subscribers of the contact
@@ -23,7 +23,7 @@ export async function logContactActivity({
     body, 
     meta, 
     id: row.id, 
-    createdAt: row.created_at 
+    createdAt: row.createdAt 
   });
   
   return row;

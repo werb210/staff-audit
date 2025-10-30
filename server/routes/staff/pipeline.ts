@@ -9,12 +9,12 @@ async function ensureActivityTable() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS pipeline_activity (
       id             BIGSERIAL PRIMARY KEY,
-      application_id VARCHAR(64) NOT NULL,
+      applicationId VARCHAR(64) NOT NULL,
       from_stage     VARCHAR(64),
       to_stage       VARCHAR(64) NOT NULL,
       actor          VARCHAR(128) DEFAULT 'staff',
       note           TEXT,
-      created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      createdAt     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )
   `);
 }
@@ -36,7 +36,7 @@ r.get("/pipeline", async (_req: Request, res: Response) => {
            u.first_name, u.last_name, u.email, u.phone
     FROM applications a
     LEFT JOIN users u ON u.id::text = a.user_id AND a.user_id ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-    ORDER BY a.updated_at DESC NULLS LAST, a.id DESC
+    ORDER BY a.updatedAt DESC NULLS LAST, a.id DESC
   `);
   const columns = PIPELINE_STAGES.map(c => ({ id: c.id, label: c.label, items: [] as any[] }));
   const byId: Record<PipelineStage, any> = Object.fromEntries(columns.map(c => [c.id, c]));
@@ -60,7 +60,7 @@ r.post("/pipeline/move", async (req: Request, res: Response) => {
   if (from === target) return res.json({ ok: true, changed: false, stage: target });
   await pool.query(`UPDATE applications SET stage = $1 WHERE id = $2::uuid`, [target, applicationId]);
   await pool.query(
-    `INSERT INTO pipeline_activity (application_id, from_stage, to_stage, note) VALUES ($1,$2,$3,$4)`,
+    `INSERT INTO pipeline_activity (applicationId, from_stage, to_stage, note) VALUES ($1,$2,$3,$4)`,
     [applicationId, from || null, target, note || null]
   );
   
@@ -90,10 +90,10 @@ r.get("/pipeline/activity", async (req: Request, res: Response) => {
   if (!id) return res.status(400).json({ error: "missing_applicationId" });
   await ensureActivityTable();
   const { rows } = await pool.query(
-    `SELECT id, application_id, from_stage, to_stage, actor, note, created_at
+    `SELECT id, applicationId, from_stage, to_stage, actor, note, createdAt
        FROM pipeline_activity
-      WHERE application_id = $1
-      ORDER BY created_at DESC, id DESC
+      WHERE applicationId = $1
+      ORDER BY createdAt DESC, id DESC
       LIMIT 100`,
     [id]
   );

@@ -306,9 +306,9 @@ function generateApplicationSummaryHTML(application: any, documents: any[], ocrD
           ${documents.map(doc => `
             <tr>
               <td>${doc.document_type.replace('_', ' ').toUpperCase()}</td>
-              <td>${doc.file_name}</td>
+              <td>${doc.name}</td>
               <td><span class="status-badge status-${doc.status}">${doc.status}</span></td>
-              <td>${formatDate(doc.created_at)}</td>
+              <td>${formatDate(doc.createdAt)}</td>
             </tr>
           `).join('')}
         </table>
@@ -437,13 +437,13 @@ r.post("/applications/generate-all-pdfs", async (req: any, res) => {
     // Fetch all applications using raw SQL to avoid schema conflicts
     const allApplications = await pool.query(`
       SELECT id, business_name, contact_first_name, contact_last_name, 
-             contact_email, loan_amount, status, created_at, financials_ocr,
+             contact_email, loan_amount, status, createdAt, financials_ocr,
              legal_business_name, dba_name, business_type, business_email,
              business_phone, business_address, contact_phone, owner_first_name,
              owner_last_name, annual_revenue, years_in_business, number_of_employees,
              use_of_funds, stage, submitted_at
       FROM applications 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `);
     
     console.log(`📊 Found ${allApplications.rows.length} applications to process`);
@@ -462,10 +462,10 @@ r.post("/applications/generate-all-pdfs", async (req: any, res) => {
         
         // Fetch related documents using raw SQL
         const applicationDocuments = await pool.query(`
-          SELECT id, file_name, document_type, status, created_at, file_size
+          SELECT id, name, document_type, status, createdAt, size
           FROM documents 
-          WHERE application_id = $1
-          ORDER BY created_at DESC
+          WHERE applicationId = $1
+          ORDER BY createdAt DESC
         `, [app.id]);
         
         // Extract OCR data
@@ -484,10 +484,10 @@ r.post("/applications/generate-all-pdfs", async (req: any, res) => {
         
         // Store PDF as document in database using raw SQL
         const pdfDocument = await pool.query(`
-          INSERT INTO documents (application_id, file_name, file_type, document_type, file_size, uploaded_by, 
+          INSERT INTO documents (applicationId, name, file_type, document_type, size, uploaded_by, 
                                 is_required, is_verified, status, storage_key, description)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-          RETURNING id, file_name, storage_key
+          RETURNING id, name, storage_key
         `, [
           app.id,
           `Application_Summary_${app.business_name || 'Business'}_${new Date().toISOString().split('T')[0]}.pdf`,
@@ -504,10 +504,10 @@ r.post("/applications/generate-all-pdfs", async (req: any, res) => {
         
         results.successful++;
         results.pdfs.push({
-          application_id: app.id,
+          applicationId: app.id,
           business_name: app.business_name,
           pdf_document_id: pdfDocument.rows[0].id,
-          file_name: pdfDocument.rows[0].file_name,
+          name: pdfDocument.rows[0].name,
           storage_key: pdfDocument.rows[0].storage_key
         });
         

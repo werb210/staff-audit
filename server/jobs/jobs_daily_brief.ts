@@ -12,7 +12,7 @@ export async function dailyBriefJob() {
   const cost = spend.reduce((s, x) => s + Number(x.costMicros) / 1_000_000, 0);
 
   const apps = await db.applications.findMany({ 
-    where: { created_at: { gte: since } }, 
+    where: { createdAt: { gte: since } }, 
     select: { status: true, requested_amount: true }
   });
   

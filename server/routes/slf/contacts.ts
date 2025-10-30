@@ -77,8 +77,8 @@ router.get('/', async (req: any, res: any) => {
           owner: 'SLF System',
           source: 'SLF External API (LIVE)',
           silo: 'slf',
-          createdAt: item.createdAt || item.created_at || item.date_created || new Date().toISOString(),
-          updatedAt: item.updatedAt || item.updated_at || item.date_modified || new Date().toISOString(),
+          createdAt: item.createdAt || item.createdAt || item.date_created || new Date().toISOString(),
+          updatedAt: item.updatedAt || item.updatedAt || item.date_modified || new Date().toISOString(),
           lastContact: item.lastContact || item.last_contact || new Date().toISOString()
         }));
         

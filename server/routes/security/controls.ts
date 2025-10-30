@@ -8,7 +8,7 @@ const router = Router();
 
 // --- API keys (staff-auth endpoints; assume your existing authz protects /api/security/* ) ---
 router.get("/keys", async (_req,res)=>{
-  const r = await db.execute(sql`SELECT id, name, prefix, scopes, revoked_at, last_used_at, created_at FROM api_keys ORDER BY created_at DESC`);
+  const r = await db.execute(sql`SELECT id, name, prefix, scopes, revoked_at, last_used_at, createdAt FROM api_keys ORDER BY createdAt DESC`);
   res.json(r.rows || []);
 });
 
@@ -35,7 +35,7 @@ router.get("/ping", apiKeyAuth, async (req:any,res)=>{
 
 // --- IP rules ---
 router.get("/ip-rules", async (_req,res)=>{
-  const r = await db.execute(sql`SELECT id, action, value, note, created_at FROM ip_rules ORDER BY created_at DESC`);
+  const r = await db.execute(sql`SELECT id, action, value, note, createdAt FROM ip_rules ORDER BY createdAt DESC`);
   res.json(r.rows || []);
 });
 router.post("/ip-rules", async (req,res)=>{
@@ -58,9 +58,9 @@ router.get("/maintenance", async (_req,res)=>{
 router.post("/maintenance", async (req,res)=>{
   const on = !!req.body?.on;
   await db.execute(sql`
-    INSERT INTO app_settings(key, value, updated_at)
+    INSERT INTO app_settings(key, value, updatedAt)
     VALUES ('maintenance_mode', ${on}, now())
-    ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=now()
+    ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updatedAt=now()
   `);
   res.json({ ok:true, on });
 });

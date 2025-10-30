@@ -83,11 +83,11 @@ router.get("/lenders/:id/messages", allowPublicAccess, async (req: any, res: any
         recipient as "to",
         message as body,
         subject,
-        created_at as timestamp
+        createdAt as timestamp
       FROM lender_comm_logs 
       WHERE lender_id = ${id}
-      AND created_at >= CURRENT_DATE - INTERVAL '30 days'
-      ORDER BY created_at DESC
+      AND createdAt >= CURRENT_DATE - INTERVAL '30 days'
+      ORDER BY createdAt DESC
       LIMIT 50
     `);
 
@@ -116,7 +116,7 @@ router.post("/lenders/:id/messages", allowPublicAccess, async (req: any, res: an
     
     // Log the message attempt
     await db.execute(sql`
-      INSERT INTO lender_comm_logs (lender_id, type, recipient, message, status, created_at)
+      INSERT INTO lender_comm_logs (lender_id, type, recipient, message, status, createdAt)
       VALUES (${id}, ${type}, ${to}, ${body}, 'sent', NOW())
     `);
     

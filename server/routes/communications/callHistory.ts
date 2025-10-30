@@ -26,7 +26,7 @@ router.post('/call-action', async (req: any, res: any) => async (req: any, res: 
     // Insert call action log
     const logResult = await db.execute(sql`
       INSERT INTO call_logs (
-        call_sid, staff_id, action, reason, timestamp, created_at
+        call_sid, staff_id, action, reason, timestamp, createdAt
       ) VALUES (
         ${callSid}, ${user?.id || 'unknown'}, ${action}, ${reason || null}, 
         ${timestamp || new Date().toISOString()}, NOW()
@@ -36,7 +36,7 @@ router.post('/call-action', async (req: any, res: any) => async (req: any, res: 
         action = EXCLUDED.action,
         reason = EXCLUDED.reason,
         timestamp = EXCLUDED.timestamp,
-        updated_at = NOW()
+        updatedAt = NOW()
       RETURNING id
     `);
 
@@ -47,7 +47,7 @@ router.post('/call-action', async (req: any, res: any) => async (req: any, res: 
       // Log missed call for escalation tracking
       await db.execute(sql`
         INSERT INTO missed_calls (
-          call_sid, from_number, to_number, reason, staff_id, created_at
+          call_sid, from_number, to_number, reason, staff_id, createdAt
         ) VALUES (
           ${callSid}, '', '', ${reason || 'unanswered'}, ${user?.id || 'unknown'}, NOW()
         )
@@ -100,16 +100,16 @@ router.get('/call-history', async (req: any, res: any) => async (req: any, res: 
       let timeCondition = '';
       switch (timeframe) {
         case 'today':
-          timeCondition = "DATE(created_at) = CURRENT_DATE";
+          timeCondition = "DATE(createdAt) = CURRENT_DATE";
           break;
         case 'yesterday':
-          timeCondition = "DATE(created_at) = CURRENT_DATE - INTERVAL '1 day'";
+          timeCondition = "DATE(createdAt) = CURRENT_DATE - INTERVAL '1 day'";
           break;
         case 'week':
-          timeCondition = "created_at >= CURRENT_DATE - INTERVAL '7 days'";
+          timeCondition = "createdAt >= CURRENT_DATE - INTERVAL '7 days'";
           break;
         case 'month':
-          timeCondition = "created_at >= CURRENT_DATE - INTERVAL '30 days'";
+          timeCondition = "createdAt >= CURRENT_DATE - INTERVAL '30 days'";
           break;
       }
       if (timeCondition) {
@@ -127,12 +127,12 @@ router.get('/call-history', async (req: any, res: any) => async (req: any, res: 
         cl.action as status,
         cl.reason,
         cl.duration,
-        cl.created_at as timestamp,
+        cl.createdAt as timestamp,
         COALESCE(ls.source_type, 'direct_call') as source
       FROM call_logs cl
       LEFT JOIN lead_sources ls ON ls.twilio_number = cl.to_number
       ${sql.raw(whereClause)}
-      ORDER BY cl.created_at DESC
+      ORDER BY cl.createdAt DESC
       LIMIT ${sql.raw(limit.toString())}
     `);
 
@@ -144,7 +144,7 @@ router.get('/call-history', async (req: any, res: any) => async (req: any, res: 
         COUNT(CASE WHEN action = 'missed' THEN 1 END) as missed,
         COUNT(CASE WHEN action = 'declined' THEN 1 END) as declined
       FROM call_logs
-      WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+      WHERE createdAt >= CURRENT_DATE - INTERVAL '30 days'
     `);
 
     const calls = callHistoryResult.rows || [];
@@ -192,13 +192,13 @@ router.get('/missed-calls', async (req: any, res: any) => {
         mc.to_number,
         mc.reason,
         mc.staff_id,
-        mc.created_at,
+        mc.createdAt,
         mc.handled,
         cl.duration
       FROM missed_calls mc
       LEFT JOIN call_logs cl ON cl.call_sid = mc.call_sid
       WHERE mc.handled = FALSE
-      ORDER BY mc.created_at DESC
+      ORDER BY mc.createdAt DESC
       LIMIT 100
     `);
 
@@ -269,7 +269,7 @@ router.get('/call-status', async (req: any, res: any) => async (req: any, res: a
       SELECT COUNT(*) as active_count
       FROM call_logs
       WHERE action = 'accepted' 
-      AND created_at >= NOW() - INTERVAL '1 hour'
+      AND createdAt >= NOW() - INTERVAL '1 hour'
     `);
 
     // Get recent missed calls count
@@ -277,7 +277,7 @@ router.get('/call-status', async (req: any, res: any) => async (req: any, res: a
       SELECT COUNT(*) as missed_count
       FROM missed_calls
       WHERE handled = FALSE
-      AND created_at >= CURRENT_DATE
+      AND createdAt >= CURRENT_DATE
     `);
 
     const activeCount = parseInt(activeCallsResult.rows[0]?.active_count || '0');

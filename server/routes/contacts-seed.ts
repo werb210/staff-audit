@@ -15,7 +15,7 @@ router.post('/seed', (req: any, res: any) => {
       company: 'Acme Manufacturing',
       lifecycle_stage: 'Lead',
       tags: ['priority', 'manufacturing'],
-      created_at: new Date().toISOString()
+      createdAt: new Date().toISOString()
     },
     {
       id: 'ct-bf-002',
@@ -27,7 +27,7 @@ router.post('/seed', (req: any, res: any) => {
       company: 'Quick Mart LLC',
       lifecycle_stage: 'Lead',
       tags: ['retail'],
-      created_at: new Date().toISOString()
+      createdAt: new Date().toISOString()
     },
     {
       id: 'ct-bf-003',
@@ -39,7 +39,7 @@ router.post('/seed', (req: any, res: any) => {
       company: 'Denver Construction', 
       lifecycle_stage: 'Lead',
       tags: ['construction'],
-      created_at: new Date().toISOString()
+      createdAt: new Date().toISOString()
     }
   ];
 
@@ -62,7 +62,7 @@ router.get('/', (req: any, res: any) => {
       company: 'Acme Manufacturing',
       amount_requested: 250000,
       lead_status: 'Lead',
-      created_at: '2024-08-20T10:00:00Z',
+      createdAt: '2024-08-20T10:00:00Z',
       last_activity: '2024-08-21T09:30:00Z',
       tags: ['priority', 'manufacturing'],
       lifecycle_stage: 'Lead'
@@ -76,7 +76,7 @@ router.get('/', (req: any, res: any) => {
       company: 'Quick Mart LLC',
       amount_requested: 75000,
       lead_status: 'Lead',
-      created_at: '2024-08-19T14:20:00Z',
+      createdAt: '2024-08-19T14:20:00Z',
       last_activity: '2024-08-21T08:15:00Z',
       tags: ['retail'],
       lifecycle_stage: 'Lead'
@@ -90,7 +90,7 @@ router.get('/', (req: any, res: any) => {
       company: 'Denver Construction',
       amount_requested: 125000,
       lead_status: 'Lead',
-      created_at: '2024-08-18T16:45:00Z',
+      createdAt: '2024-08-18T16:45:00Z',
       last_activity: '2024-08-20T17:20:00Z',
       tags: ['construction'],
       lifecycle_stage: 'Lead'
@@ -123,7 +123,7 @@ router.get('/:id', (req: any, res: any) => {
       lead_status: 'Lead',
       lifecycle_stage: 'Lead',
       tags: ['priority', 'manufacturing'],
-      created_at: '2024-08-20T10:00:00Z',
+      createdAt: '2024-08-20T10:00:00Z',
       last_activity: '2024-08-21T09:30:00Z',
       activity_timeline: [
         {
@@ -166,7 +166,7 @@ router.get('/:id', (req: any, res: any) => {
       lead_status: 'Lead',
       lifecycle_stage: 'Lead',
       tags: ['retail'],
-      created_at: '2024-08-19T14:20:00Z',
+      createdAt: '2024-08-19T14:20:00Z',
       last_activity: '2024-08-21T08:15:00Z',
       activity_timeline: [
         {
@@ -200,7 +200,7 @@ router.get('/:id', (req: any, res: any) => {
       lead_status: 'Lead',
       lifecycle_stage: 'Lead',
       tags: ['construction'],
-      created_at: '2024-08-18T16:45:00Z',
+      createdAt: '2024-08-18T16:45:00Z',
       last_activity: '2024-08-20T17:20:00Z',
       activity_timeline: [
         {

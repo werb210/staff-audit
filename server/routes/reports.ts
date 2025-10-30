@@ -386,7 +386,7 @@ router.get("/reports/summary", async (req: any, res: any) => {
                         THEN COALESCE(a.approved_amount, a.requested_amount, 0)
                         ELSE 0 END),0)::bigint AS volume_cents
     FROM applications a
-    WHERE a.created_at >= $1 AND a.created_at < $2
+    WHERE a.createdAt >= $1 AND a.createdAt < $2
     ${siloSql};
   `;
   const { rows:[r] } = await pool.query(sql, params);
@@ -405,11 +405,11 @@ router.get("/reports/monthly", async (req: any, res: any) => {
   const params:any[] = [from, to];
   const siloSql = silo ? `AND a.silo = $${params.push(silo)}` : "";
   const sql = `
-    SELECT date_trunc('month', a.created_at) AS month,
+    SELECT date_trunc('month', a.createdAt) AS month,
            COUNT(*)::int AS applications,
            COALESCE(SUM(COALESCE(a.approved_amount, a.requested_amount, 0)),0)::bigint AS volume_cents
     FROM applications a
-    WHERE a.created_at >= $1 AND a.created_at < $2
+    WHERE a.createdAt >= $1 AND a.createdAt < $2
     ${siloSql}
     GROUP BY 1 ORDER BY 1;
   `;
@@ -431,7 +431,7 @@ router.get("/reports/lenders", async (req,res)=>{
            COALESCE(SUM(CASE WHEN a.status='approved' THEN COALESCE(a.approved_amount,0) END),0)::bigint AS volume_cents
     FROM applications a
     LEFT JOIN lender_products lp ON lp.id = a.lender_product_id
-    WHERE a.created_at >= $1 AND a.created_at < $2
+    WHERE a.createdAt >= $1 AND a.createdAt < $2
     ${siloSql}
     GROUP BY 1
     ORDER BY volume_cents DESC NULLS LAST, apps DESC;
@@ -456,9 +456,9 @@ router.get('/conversions', async (req: any, res: any) => {
       SELECT
         COUNT(*)::int AS total_applications,
         SUM((a.status = 'approved')::int)::int AS approved,
-        AVG(EXTRACT(EPOCH FROM (a.updated_at - a.created_at)) / 86400)::float AS avg_time_to_approval
+        AVG(EXTRACT(EPOCH FROM (a.updatedAt - a.createdAt)) / 86400)::float AS avg_time_to_approval
       FROM applications a
-      WHERE a.created_at >= $1 AND a.created_at < $2
+      WHERE a.createdAt >= $1 AND a.createdAt < $2
       ${siloSql};
     `;
     
@@ -513,8 +513,8 @@ router.get('/documents', async (req: any, res: any) => {
           COUNT(*) AS type_count,
           SUM((d.status = 'rejected')::int) AS rejected_count
         FROM documents d
-        LEFT JOIN applications a ON d.application_id = a.id
-        WHERE d.created_at >= $1 AND d.created_at < $2
+        LEFT JOIN applications a ON d.applicationId = a.id
+        WHERE d.createdAt >= $1 AND d.createdAt < $2
         GROUP BY d.type
         ORDER BY type_count DESC;
       `;
@@ -528,9 +528,9 @@ router.get('/documents', async (req: any, res: any) => {
         FROM (
           SELECT COUNT(*) AS doc_count
           FROM documents d
-          LEFT JOIN applications a ON d.application_id = a.id
-          WHERE d.created_at >= $1 AND d.created_at < $2
-          GROUP BY d.application_id
+          LEFT JOIN applications a ON d.applicationId = a.id
+          WHERE d.createdAt >= $1 AND d.createdAt < $2
+          GROUP BY d.applicationId
         ) app_docs;
       `;
       
@@ -539,9 +539,9 @@ router.get('/documents', async (req: any, res: any) => {
       // Processing times
       const processingQuery = `
         SELECT
-          AVG(EXTRACT(EPOCH FROM (d.updated_at - d.created_at)) / 3600)::float AS avg_processing_hours
+          AVG(EXTRACT(EPOCH FROM (d.updatedAt - d.createdAt)) / 3600)::float AS avg_processing_hours
         FROM documents d
-        WHERE d.created_at >= $1 AND d.created_at < $2 AND d.status != 'pending';
+        WHERE d.createdAt >= $1 AND d.createdAt < $2 AND d.status != 'pending';
       `;
       
       const { rows: [procResult] } = await client.query(processingQuery, params);
@@ -607,9 +607,9 @@ router.get('/applications', async (req: any, res: any) => {
           SUM((a.status = 'approved')::int)::int AS approved_count,
           SUM((a.status = 'rejected')::int)::int AS rejected_count,
           SUM((a.status NOT IN ('approved', 'rejected'))::int)::int AS pending_count,
-          AVG(EXTRACT(EPOCH FROM (a.updated_at - a.created_at)) / 86400)::float AS avg_processing_days
+          AVG(EXTRACT(EPOCH FROM (a.updatedAt - a.createdAt)) / 86400)::float AS avg_processing_days
         FROM applications a
-        WHERE a.created_at >= $1 AND a.created_at < $2
+        WHERE a.createdAt >= $1 AND a.createdAt < $2
         ${siloSql};
       `;
       
@@ -621,7 +621,7 @@ router.get('/applications', async (req: any, res: any) => {
           COALESCE(a.status, 'pending') AS status,
           COUNT(*)::int AS count
         FROM applications a
-        WHERE a.created_at >= $1 AND a.created_at < $2
+        WHERE a.createdAt >= $1 AND a.createdAt < $2
         ${siloSql}
         GROUP BY a.status
         ORDER BY count DESC;
@@ -632,14 +632,14 @@ router.get('/applications', async (req: any, res: any) => {
       // Monthly trends
       const monthlyQuery = `
         SELECT
-          date_trunc('month', a.created_at) AS month,
+          date_trunc('month', a.createdAt) AS month,
           COUNT(*)::int AS applications,
           SUM((a.status = 'approved')::int)::int AS approvals,
           AVG(COALESCE(a.requested_amount, 0))::bigint AS avg_amount_cents
         FROM applications a
-        WHERE a.created_at >= $1 AND a.created_at < $2
+        WHERE a.createdAt >= $1 AND a.createdAt < $2
         ${siloSql}
-        GROUP BY date_trunc('month', a.created_at)
+        GROUP BY date_trunc('month', a.createdAt)
         ORDER BY month DESC
         LIMIT 6;
       `;
@@ -885,7 +885,7 @@ router.get('/analytics/events', async (req: any, res: any) => {
         'application_submitted' as name,
         COUNT(*)::int as count
       FROM applications
-      WHERE created_at >= $1 AND created_at < $2
+      WHERE createdAt >= $1 AND createdAt < $2
       
       UNION ALL
       
@@ -893,7 +893,7 @@ router.get('/analytics/events', async (req: any, res: any) => {
         'document_uploaded' as name,
         COUNT(*)::int as count
       FROM documents
-      WHERE created_at >= $1 AND created_at < $2
+      WHERE createdAt >= $1 AND createdAt < $2
       
       UNION ALL
       
@@ -901,7 +901,7 @@ router.get('/analytics/events', async (req: any, res: any) => {
         'user_registered' as name,
         COUNT(*)::int as count
       FROM users
-      WHERE created_at >= $1 AND created_at < $2
+      WHERE createdAt >= $1 AND createdAt < $2
     `, [from, to]);
     
     const totalEvents = applicationEvents.rows.reduce((sum, row) => sum + row.count, 0);

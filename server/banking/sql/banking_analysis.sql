@@ -25,7 +25,7 @@ WITH base AS (
     application_id,
     date_trunc('day', tx_date)::date AS d,
     ABS(amount) AS amt,
-    REGEXP_REPLACE(lower(coalesce(merchant_name, normalized_description, description)), '\s+', ' ', 'g') AS key
+    REGEXP_REPLACE(lower(coalesce(merchant_file_name, normalized_description, description)), '\s+', ' ', 'g') AS key
   FROM bank_transactions
   WHERE type='debit' AND amount < 0
 ),
@@ -53,7 +53,7 @@ SELECT
   dates
 FROM grp;
 
--- 3) Personal-use pulls (owner draws) — heuristics: transfers to individuals, Venmo/Interac e-Transfers, "owner"/"draw"/known names
+-- 3) Personal-use pulls (owner draws) — heuristics: transfers to individuals, Venmo/Interac e-Transfers, "owner"/"draw"/known file_names
 --    Expect to refine via allowlist/denylist.
 SELECT
   application_id,
@@ -64,5 +64,5 @@ FROM bank_transactions
 WHERE type='debit' AND amount < 0
   AND (
     lower(description) ~ '(owner|draw|shareholder|dividend|e-transfer|etransfer|interac|venmo|zelle|cash withdrawal|atm|personal)'
-    OR lower(coalesce(counterparty_name, '')) ~ '(owner|todd|williams|shareholder)'
+    OR lower(coalesce(counterparty_file_name, '')) ~ '(owner|todd|williams|shareholder)'
   );

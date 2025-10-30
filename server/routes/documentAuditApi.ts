@@ -78,8 +78,8 @@ router.get('/uploads/recent', async (req: any, res: any) => {
     const result = await db.execute(sql`
       SELECT 
         document_id,
-        application_id,
-        file_name,
+        applicationId,
+        name,
         upload_attempted_at,
         disk_write_successful,
         s3_backup_successful,
@@ -92,8 +92,8 @@ router.get('/uploads/recent', async (req: any, res: any) => {
     
     const uploads = result.rows.map(row => ({
       documentId: row.document_id,
-      applicationId: row.application_id,
-      fileName: row.file_name,
+      applicationId: row.applicationId,
+      fileName: row.name,
       uploadAttemptedAt: row.upload_attempted_at,
       diskWriteSuccessful: row.disk_write_successful,
       s3BackupSuccessful: row.s3_backup_successful,

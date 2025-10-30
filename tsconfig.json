@@ -10,9 +10,16 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "outDir": "out",
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "jsx": "react-jsx"
   },
-  "include": ["server/**/*.ts", "shared/**/*.ts", "client/**/*.ts"],
+  "include": [
+    "server/**/*.ts",
+    "shared/**/*.ts",
+    "client/**/*.ts"
+  ],
   "exclude": [
     "node_modules",
     "scripts/**",

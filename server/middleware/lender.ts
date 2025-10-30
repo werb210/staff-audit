@@ -8,13 +8,13 @@ export async function lenderAuth(req:any, res:any, next:any){
   const data:any = verifyShareToken(token);
   if (!data) return res.status(401).json({ error: "invalid token" });
 
-  const r = await db.execute(sql`SELECT id, application_id, partner_id, perms, expires_at, revoked_at, disabled FROM app_lender_shares WHERE token=${token} LIMIT 1`);
+  const r = await db.execute(sql`SELECT id, applicationId, partner_id, perms, expires_at, revoked_at, disabled FROM app_lender_shares WHERE token=${token} LIMIT 1`);
   const share = r.rows?.[0];
   if (!share) return res.status(401).json({ error: "share not found" });
   if (share.disabled || share.revoked_at) return res.status(401).json({ error: "share revoked" });
   if (new Date(share.expires_at).getTime() < Date.now()) return res.status(401).json({ error: "share expired" });
 
-  req.lender = { shareId: share.id, applicationId: share.application_id, partnerId: share.partner_id, perms: share.perms, token };
+  req.lender = { shareId: share.id, applicationId: share.applicationId, partnerId: share.partner_id, perms: share.perms, token };
   await db.execute(sql`UPDATE app_lender_shares SET last_access_at=now() WHERE id=${share.id}`);
   next();
 }
@@ -24,7 +24,7 @@ export async function lenderAudit(req:any, event:string, meta:any = {}){
     const ip = (req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "") as string;
     const ua = String(req.headers["user-agent"] || "");
     await db.execute(sql`
-      INSERT INTO lender_activity(share_id, partner_id, application_id, event, meta, ip, ua)
+      INSERT INTO lender_activity(share_id, partner_id, applicationId, event, meta, ip, ua)
       VALUES (${req.lender?.shareId || null}, ${req.lender?.partnerId || null}, ${req.lender?.applicationId || null}, ${event}, ${JSON.stringify(meta)}, ${ip}, ${ua})
     `);
   } catch {}

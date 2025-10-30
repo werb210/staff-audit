@@ -13,7 +13,7 @@ export async function generateSignedApplicationPdf(applicationId: string) {
       `SELECT a.*, b.business_name, b.legal_business_name, b.business_type,
               u.first_name, u.last_name, u.email, u.phone
        FROM applications a
-       LEFT JOIN businesses b ON a.business_id = b.id
+       LEFT JOIN businesses b ON a.businessId = b.id
        LEFT JOIN users u ON a.user_id = u.id
        WHERE a.id = $1`,
       [applicationId]
@@ -142,7 +142,7 @@ export async function generateSignedApplicationPdf(applicationId: string) {
     });
     yPosition -= 20;
 
-    page.drawText(`Submission Date: ${new Date(application.created_at).toLocaleDateString()}`, {
+    page.drawText(`Submission Date: ${new Date(application.createdAt).toLocaleDateString()}`, {
       x: 50,
       y: yPosition,
       size: fontSize,
@@ -203,8 +203,8 @@ export async function generateSignedApplicationPdf(applicationId: string) {
     const documentId = uuidv4();
     await db.execute(
       `INSERT INTO documents (
-        id, application_id, file_name, document_type, status, 
-        source, uploaded_by, storage_key, uploaded_at, file_size, checksum
+        id, applicationId, name, document_type, status, 
+        source, uploaded_by, storage_key, uploaded_at, size, checksum
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
         documentId,

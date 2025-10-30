@@ -57,7 +57,7 @@ router.post('/', upload.single('screenshot'), async (req: any, res: any) => {
     
     // Direct SQL insert to avoid schema conflicts
     const result = await db.execute(sql`
-      INSERT INTO feedback (user_id, text, conversation, metadata, status, created_at, updated_at)
+      INSERT INTO feedback (user_id, text, conversation, metadata, status, createdAt, updatedAt)
       VALUES (${userId || null}, ${text}, ${conversation || null}, ${screenshotPath ? JSON.stringify({ screenshotPath }) : null}, 'new', NOW(), NOW())
       RETURNING id
     `);
@@ -133,7 +133,7 @@ router.get('/:id', async (req: any, res: any) => {
     const result = await db.execute(sql`
       SELECT id, user_id as "userId", text, conversation, status, category, priority,
              assigned_to as "assignedTo", resolution, tags, metadata,
-             created_at as "createdAt", updated_at as "updatedAt", resolved_at as "resolvedAt"
+             createdAt as "createdAt", updatedAt as "updatedAt", resolved_at as "resolvedAt"
       FROM feedback 
       WHERE id = ${parseInt(id)}
       LIMIT 1

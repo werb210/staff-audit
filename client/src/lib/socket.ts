@@ -1,14 +1,29 @@
-import { io, Socket } from 'socket.io-client';
+import { io, Socket } from "socket.io-client";
 
 interface SocketEvents {
   // Pipeline events
-  'pipeline:card-moved': (data: { cardId: string; fromStage: string; toStage: string }) => void;
-  'pipeline:card-updated': (data: { cardId: string; updates: any }) => void;
-  'pipeline:notification': (data: { message: string; type: 'info' | 'success' | 'warning' | 'error' }) => void;
-  
+  "pipeline:card-moved": (data: {
+    cardId: string;
+    fromStage: string;
+    toStage: string;
+  }) => void;
+  "pipeline:card-updated": (data: { cardId: string; updates: any }) => void;
+  "pipeline:notification": (data: {
+    message: string;
+    type: "info" | "success" | "warning" | "error";
+  }) => void;
+
   // System events
-  'system:notification': (data: { title: string; message: string; type: string }) => void;
-  'user:activity': (data: { userId: string; action: string; timestamp: string }) => void;
+  "system:notification": (data: {
+    title: string;
+    message: string;
+    type: string;
+  }) => void;
+  "user:activity": (data: {
+    userId: string;
+    action: string;
+    timestamp: string;
+  }) => void;
 }
 
 class SocketManager {
@@ -23,7 +38,7 @@ class SocketManager {
     }
 
     this.connecting = true;
-    
+
     // Socket.IO connects to base URL, not /ws path
     const wsUrl = window.location.origin;
 
@@ -35,28 +50,28 @@ class SocketManager {
 
     this.socket = io(wsUrl, {
       auth: token ? { token } : undefined,
-      transports: ['websocket', 'polling'], // Allow fallback to polling
+      transports: ["websocket", "polling"], // Allow fallback to polling
       autoConnect: true,
       timeout: 5000,
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 3,
-      path: '/ws', // Match server WebSocket path configuration
+      path: "/ws", // Match server WebSocket path configuration
     });
 
-    this.socket.on('connect', () => {
+    this.socket.on("connect", () => {
       this.connecting = false;
       // console.log('✅ WebSocket connected'); // Removed debug log
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on("disconnect", (reason) => {
       this.connecting = false;
       // console.log('❌ WebSocket disconnected:', reason); // Removed debug log
     });
 
-    this.socket.on('connect_error', (error) => {
+    this.socket.on("connect_error", (error) => {
       this.connecting = false;
-      console.warn('🔴 WebSocket connection error:', error.message);
+      console.warn("🔴 WebSocket connection error:", error.message);
     });
 
     return this.socket;

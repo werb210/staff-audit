@@ -28,5 +28,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/settings" component={Settings} />
       </Layout>
     </Router>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

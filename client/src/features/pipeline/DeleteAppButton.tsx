@@ -14,10 +14,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export function DeleteAppButton({ id, onDeleted }: { id: string; onDeleted: () => void }) {
+export function DeleteAppButton({
+  id,
+  onDeleted,
+}: {
+  id: string;
+  onDeleted: () => void;
+}) {
   const qc = useQueryClient();
   const { toast } = useToast();
-  
+
   const m = useMutation({
     mutationFn: () => deleteApp(id),
     onSuccess: () => {
@@ -35,7 +41,7 @@ export function DeleteAppButton({ id, onDeleted }: { id: string; onDeleted: () =
         description: error.message || "Failed to delete application",
         variant: "destructive",
       });
-    }
+    },
   });
 
   return (
@@ -54,12 +60,14 @@ export function DeleteAppButton({ id, onDeleted }: { id: string; onDeleted: () =
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Application?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the application
-            and all associated data.
+            This action cannot be undone. This will permanently delete the
+            application and all associated data.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+          <AlertDialogCancel data-testid="button-cancel-delete">
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={() => m.mutate()}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

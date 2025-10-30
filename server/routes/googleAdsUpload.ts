@@ -57,7 +57,7 @@ router.post("/offline-conversion", async (req: any, res: any) => {
     
     // Get application with click IDs
     const result = await db.execute(`
-      SELECT gclid, gbraid, wbraid, COALESCE(ad_click_time, created_at) AS click_ts
+      SELECT gclid, gbraid, wbraid, COALESCE(ad_click_time, createdAt) AS click_ts
       FROM applications WHERE id = $1
     `, [body.applicationId]);
     

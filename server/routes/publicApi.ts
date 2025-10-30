@@ -69,7 +69,7 @@ async function resolveUUIDFromAppKey(appId: string): Promise<string | null> {
   try {
     const { pool } = await import('../db.js');
     const storageKeyQuery = `
-      SELECT DISTINCT application_id
+      SELECT DISTINCT applicationId
       FROM documents 
       WHERE storage_key LIKE $1
       LIMIT 1
@@ -82,7 +82,7 @@ async function resolveUUIDFromAppKey(appId: string): Promise<string | null> {
       return null;
     }
     
-    const uuid = result.rows[0].application_id;
+    const uuid = result.rows[0].applicationId;
     console.log(`✅ [UUID-RESOLVER] Resolved ${appId} → ${uuid}`);
     return uuid;
   } catch (error: unknown) {
@@ -837,7 +837,7 @@ router.get('/applications/:id/documents', async (req: any, res: any) => {
       
       // For app_ format, find documents with storage_key containing the app_ ID
       const storageKeyQuery = `
-        SELECT DISTINCT application_id
+        SELECT DISTINCT applicationId
         FROM documents 
         WHERE storage_key LIKE $1
         LIMIT 1
@@ -860,7 +860,7 @@ router.get('/applications/:id/documents', async (req: any, res: any) => {
         });
       }
       
-      dbId = storageResult.rows[0].application_id;
+      dbId = storageResult.rows[0].applicationId;
       console.log(`✅ [DUAL-FORMAT] Mapped app_ ID ${actualId} to UUID ${dbId}`);
       
     } else {
@@ -883,15 +883,15 @@ router.get('/applications/:id/documents', async (req: any, res: any) => {
       SELECT 
         id as "documentId",
         document_type as "documentType",
-        file_name as "fileName",
+        name as "fileName",
         storage_key as "storageKey",
-        created_at as "uploadedAt",
-        file_size as "fileSize",
+        createdAt as "uploadedAt",
+        size as "fileSize",
         checksum
       FROM documents 
-      WHERE application_id = $1 
+      WHERE applicationId = $1 
         AND storage_key IS NOT NULL
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `;
     
     const result = await pool.query(documentsQuery, [dbId]);

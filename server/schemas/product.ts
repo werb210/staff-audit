@@ -10,7 +10,7 @@ export const ProductSchema = z.object({
   min_amount: z.number().int().nonnegative(),
   max_amount: z.number().int().nonnegative(),
   active: z.boolean(),
-  updated_at: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 
   // Optional but recommended for filtering:
   min_time_in_business: z.number().int().nonnegative().nullable().optional(),

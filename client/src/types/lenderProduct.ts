@@ -4,17 +4,17 @@ export type LenderProduct = {
   name: string;
   countryOffered?: string;
   category?: string;
-  minAmount?: number; 
+  minAmount?: number;
   maxAmount?: number;
-  minRate?: number;   
+  minRate?: number;
   maxRate?: number;
-  minTermMonths?: number; 
+  minTermMonths?: number;
   maxTermMonths?: number;
   active?: boolean;
   description?: string;
   // Legacy compatibility
   productName?: string;
-  productCategory?: 
+  productCategory?:
     | "Working Capital"
     | "Term Loan"
     | "Line of Credit"
@@ -41,9 +41,9 @@ export type ProductRules = {
   maxDebtToIncome?: number;
   preferredIndustries?: string[];
   excludedIndustries?: string[];
-  requiredDocs?: string[];        // ["bank_statements","tax_returns",...]
-  excludedRegions?: string[];     // e.g. ["CA","NY"]
-  advancedLogic?: string;         // freeform expression
+  requiredDocs?: string[]; // ["bank_statements","tax_returns",...]
+  excludedRegions?: string[]; // e.g. ["CA","NY"]
+  advancedLogic?: string; // freeform expression
 };
 
 export type ProductWithRules = LenderProduct & { rules: ProductRules };

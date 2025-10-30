@@ -11,7 +11,7 @@ export async function loadStaff(req:Request, _res:Response, next:NextFunction){
   if (!sid) return next();
   try {
     const r = await db.execute(sql`
-      SELECT s.id, s.user_id, s.created_at, s.last_seen_at, s.expires_at, s.revoked_at,
+      SELECT s.id, s.user_id, s.createdAt, s.last_seen_at, s.expires_at, s.revoked_at,
              u.id as uid, u.email, u.name, u.role
       FROM staff_sessions s
       JOIN staff_users u ON u.id = s.user_id
@@ -22,7 +22,7 @@ export async function loadStaff(req:Request, _res:Response, next:NextFunction){
 
     const now = new Date();
     const idleExpired = now.getTime() - new Date(row.last_seen_at).getTime() > IDLE*60*1000;
-    const absExpired  = now.getTime() - new Date(row.created_at).getTime() > ABS*60*1000;
+    const absExpired  = now.getTime() - new Date(row.createdAt).getTime() > ABS*60*1000;
     const hardExpired = now > new Date(row.expires_at);
     if (idleExpired || absExpired || hardExpired){
       await db.execute(sql`UPDATE staff_sessions SET revoked_at=now() WHERE id=${row.id}`);

@@ -9,9 +9,9 @@ export async function startupFixMissingPaths() {
   try {
     // Get all documents from database
     const result = await pool.query(`
-      SELECT id, file_name, file_path, application_id, file_size, checksum 
+      SELECT id, name, file_path, applicationId, size, checksum 
       FROM documents 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `);
     
     const documents = result.rows;
@@ -22,13 +22,13 @@ export async function startupFixMissingPaths() {
     let verified = 0;
     
     for (const doc of documents) {
-      const { id, file_name, file_path, application_id } = doc;
+      const { id, name, file_path, applicationId } = doc;
       
       // Define expected paths to check
       const possiblePaths = [
         file_path, // Current database path
         `uploads/documents/${id}.pdf`, // Standard UUID.pdf format
-        `uploads/documents/${id}.${file_name?.split('.').pop() || 'pdf'}`, // UUID + original extension
+        `uploads/documents/${id}.${name?.split('.').pop() || 'pdf'}`, // UUID + original extension
       ].filter(Boolean);
       
       let actualPath: string | null = null;
@@ -53,7 +53,7 @@ export async function startupFixMissingPaths() {
         let updates: any = {};
         
         if (file_path !== actualPath) {
-          console.log(`[STARTUP-FIX] Correcting path for ${file_name}: ${file_path} → ${actualPath}`);
+          console.log(`[STARTUP-FIX] Correcting path for ${name}: ${file_path} → ${actualPath}`);
           updates.file_path = actualPath;
           needsUpdate = true;
         }
@@ -64,10 +64,10 @@ export async function startupFixMissingPaths() {
             const fileBuffer = await fs.readFile(path.resolve(actualPath));
             const hash = createHash('sha256').update(fileBuffer).digest('hex');
             updates.checksum = hash;
-            console.log(`[STARTUP-FIX] Generated checksum for ${file_name}: ${hash.substring(0, 8)}...`);
+            console.log(`[STARTUP-FIX] Generated checksum for ${name}: ${hash.substring(0, 8)}...`);
             needsUpdate = true;
           } catch (err) {
-            console.warn(`[STARTUP-FIX] Could not generate checksum for ${file_name}:`, err);
+            console.warn(`[STARTUP-FIX] Could not generate checksum for ${name}:`, err);
           }
         }
         
@@ -86,7 +86,7 @@ export async function startupFixMissingPaths() {
         
       } else {
         // File missing completely
-        console.error(`[STARTUP-FIX] ORPHANED: ${file_name} (${id}) - no file found at any expected path`);
+        console.error(`[STARTUP-FIX] ORPHANED: ${name} (${id}) - no file found at any expected path`);
         
         // Mark as orphaned in database
         await pool.query(
@@ -109,7 +109,7 @@ export async function startupFixMissingPaths() {
     
     // Log audit results
     await pool.query(`
-      INSERT INTO document_audit_log (operation, status, documents_processed, issues_found, details, created_at)
+      INSERT INTO document_audit_log (operation, status, documents_processed, issues_found, details, createdAt)
       VALUES ($1, $2, $3, $4, $5, NOW())
     `, [
       'startup_path_fix',

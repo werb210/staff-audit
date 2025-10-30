@@ -5,7 +5,7 @@ export const applications = pgTable('applications', {
   business_name: text('business_name').notNull(),
   amount: integer('amount').default(0).notNull(),
   stage: text('stage').default('New').notNull(),
-  created_at: timestamp('created_at').defaultNow().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 });
 
 export const contacts = pgTable('contacts', {
@@ -13,5 +13,5 @@ export const contacts = pgTable('contacts', {
   name: text('name').notNull(),
   email: text('email'),
   phone: text('phone'),
-  created_at: timestamp('created_at').defaultNow().notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 });

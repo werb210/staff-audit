@@ -68,7 +68,7 @@ async function logUploadAudit(auditData: UploadAuditLog): Promise<void> {
   try {
     await db.execute(`
       INSERT INTO document_upload_log (
-        document_id, application_id, file_name, upload_attempted_at,
+        document_id, applicationId, name, uploadAttemptedAt,
         disk_write_successful, s3_backup_successful, checksum_verified,
         error_message, recovery_attempted_at
       ) VALUES (
@@ -263,14 +263,14 @@ export async function getUploadAuditLogs(documentId: string): Promise<UploadAudi
     const result = await db.execute(`
       SELECT * FROM document_upload_log 
       WHERE document_id = $1 
-      ORDER BY upload_attempted_at DESC
+      ORDER BY uploadAttemptedAt DESC
     `, [documentId]);
     
     return result.rows.map(row => ({
       documentId: row.document_id,
       applicationId: row.applicationId,
       fileName: row.fileName,
-      uploadAttemptedAt: new Date(row.upload_attempted_at),
+      uploadAttemptedAt: new Date(row.uploadAttemptedAt),
       diskWriteSuccessful: row.disk_write_successful,
       s3BackupSuccessful: row.s3_backup_successful,
       checksumVerified: row.checksum_verified,

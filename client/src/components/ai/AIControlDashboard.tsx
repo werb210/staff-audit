@@ -3,77 +3,77 @@
  * Comprehensive AI management and oversight interface
  */
 
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Brain, 
-  Settings, 
-  BarChart3, 
-  Play, 
-  Pause, 
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import {
+  Brain,
+  Settings,
+  BarChart3,
+  Play,
+  Pause,
   AlertTriangle,
   TrendingUp,
   Clock,
   DollarSign,
   Activity,
   ShieldAlert,
-  Zap
-} from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
+  Zap,
+} from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 export function AIControlDashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [playgroundPrompt, setPlaygroundPrompt] = useState('');
+  const [activeTab, setActiveTab] = useState("overview");
+  const [playgroundPrompt, setPlaygroundPrompt] = useState("");
   const queryClient = useQueryClient();
 
   // Dashboard overview query
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
-    queryKey: ['ai-control-dashboard'],
+    queryKey: ["ai-control-dashboard"],
     queryFn: async () => {
       try {
-        const response = await apiRequest('/api/ai-control/dashboard');
+        const response = await apiRequest("/api/ai-control/dashboard");
         return response;
       } catch (error) {
         // Return mock data for dev mode
         return {
           overview: {
-            systemStatus: 'operational',
+            systemStatus: "operational",
             enabledFeatures: 25,
-            totalFeatures: 25
+            totalFeatures: 25,
           },
           usage: {
             totalCalls: 1247,
             avgLatency: 0.8,
             totalCost: 45.67,
-            avgErrorRate: 2.1
+            avgErrorRate: 2.1,
           },
           topFeatures: [
-            { name: 'creditSummary', calls: 324, performance: 98 },
-            { name: 'riskScoring', calls: 287, performance: 94 },
-            { name: 'documentMatcher', calls: 256, performance: 96 },
-            { name: 'emailDrafter', calls: 203, performance: 92 },
-            { name: 'nextStepEngine', calls: 177, performance: 89 }
-          ]
+            { name: "creditSummary", calls: 324, performance: 98 },
+            { name: "riskScoring", calls: 287, performance: 94 },
+            { name: "documentMatcher", calls: 256, performance: 96 },
+            { name: "emailDrafter", calls: 203, performance: 92 },
+            { name: "nextStepEngine", calls: 177, performance: 89 },
+          ],
         };
       }
     },
-    refetchInterval: 30000 // Refresh every 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // AI settings query
   const { data: settingsData, isLoading: settingsLoading } = useQuery({
-    queryKey: ['ai-control-settings'],
+    queryKey: ["ai-control-settings"],
     queryFn: async () => {
       try {
-        const response = await apiRequest('/api/ai-control/settings');
+        const response = await apiRequest("/api/ai-control/settings");
         return response;
       } catch (error) {
         // Return mock data for dev mode
@@ -104,49 +104,49 @@ export function AIControlDashboard() {
               chromeExtension: true,
               smartNotifications: true,
               performanceInsights: true,
-              predictiveAnalytics: true
-            }
-          }
+              predictiveAnalytics: true,
+            },
+          },
         };
       }
-    }
+    },
   });
 
   // Analytics query
   const { data: analyticsData } = useQuery({
-    queryKey: ['ai-control-analytics'],
+    queryKey: ["ai-control-analytics"],
     queryFn: async () => {
       try {
-        const response = await apiRequest('/api/ai-control/analytics');
+        const response = await apiRequest("/api/ai-control/analytics");
         return response;
       } catch (error) {
         return {
           analytics: {
             trends: {
-              apiCallsChange: '+23%',
-              accuracyChange: '+5.2%',
-              costEfficiency: '+12%',
-              userSatisfaction: '+8.7%'
+              apiCallsChange: "+23%",
+              accuracyChange: "+5.2%",
+              costEfficiency: "+12%",
+              userSatisfaction: "+8.7%",
             },
             summary: [
-              { feature: 'Credit Summary', calls: 324 },
-              { feature: 'Risk Scoring', calls: 287 },
-              { feature: 'Document Matcher', calls: 256 },
-              { feature: 'Email Drafter', calls: 203 },
-              { feature: 'Next Step Engine', calls: 177 }
-            ]
-          }
+              { feature: "Credit Summary", calls: 324 },
+              { feature: "Risk Scoring", calls: 287 },
+              { feature: "Document Matcher", calls: 256 },
+              { feature: "Email Drafter", calls: 203 },
+              { feature: "Next Step Engine", calls: 177 },
+            ],
+          },
         };
       }
-    }
+    },
   });
 
   // Training data query
   const { data: trainingData } = useQuery({
-    queryKey: ['ai-control-training'],
+    queryKey: ["ai-control-training"],
     queryFn: async () => {
       try {
-        const response = await apiRequest('/api/ai-control/training');
+        const response = await apiRequest("/api/ai-control/training");
         return response;
       } catch (error) {
         return {
@@ -154,38 +154,39 @@ export function AIControlDashboard() {
             stats: {
               totalFeedback: 142,
               featuresImproving: 18,
-              avgImprovementRate: 0.087
+              avgImprovementRate: 0.087,
             },
             recentFeedback: [
               {
-                feature: 'creditSummary',
-                improvement: 'Improved accuracy in identifying cash flow patterns',
-                timestamp: new Date().toISOString()
+                feature: "creditSummary",
+                improvement:
+                  "Improved accuracy in identifying cash flow patterns",
+                timestamp: new Date().toISOString(),
               },
               {
-                feature: 'riskScoring',
-                improvement: 'Enhanced detection of industry-specific risks',
-                timestamp: new Date().toISOString()
+                feature: "riskScoring",
+                improvement: "Enhanced detection of industry-specific risks",
+                timestamp: new Date().toISOString(),
               },
               {
-                feature: 'emailDrafter',
-                improvement: 'Better tone matching for different lender types',
-                timestamp: new Date().toISOString()
-              }
-            ]
-          }
+                feature: "emailDrafter",
+                improvement: "Better tone matching for different lender types",
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          },
         };
       }
-    }
+    },
   });
 
   // Settings update mutation
   const updateSettingsMutation = useMutation({
     mutationFn: async (newSettings: any) => {
       try {
-        const response = await apiRequest('/api/ai-control/settings', {
-          method: 'PUT',
-          body: JSON.stringify(newSettings)
+        const response = await apiRequest("/api/ai-control/settings", {
+          method: "PUT",
+          body: JSON.stringify(newSettings),
         });
         return response;
       } catch (error) {
@@ -193,36 +194,36 @@ export function AIControlDashboard() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai-control-settings'] });
-      queryClient.invalidateQueries({ queryKey: ['ai-control-dashboard'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["ai-control-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["ai-control-dashboard"] });
+    },
   });
 
   // Playground mutation
   const playgroundMutation = useMutation({
     mutationFn: async (prompt: string) => {
       try {
-        const response = await apiRequest('/api/ai-control/playground', {
-          method: 'POST',
-          body: JSON.stringify({ prompt, maxTokens: 500 })
+        const response = await apiRequest("/api/ai-control/playground", {
+          method: "POST",
+          body: JSON.stringify({ prompt, maxTokens: 500 }),
         });
         return response;
       } catch (error) {
         return {
           result: `AI Response to: "${prompt}"\n\nThis is a sample AI response for development. The actual AI integration would provide real analysis and recommendations here.`,
-          metadata: { latency: 850, tokens: 95 }
+          metadata: { latency: 850, tokens: 95 },
         };
       }
-    }
+    },
   });
 
   // Emergency disable mutation
   const emergencyDisableMutation = useMutation({
     mutationFn: async (reason: string) => {
       try {
-        const response = await apiRequest('/api/ai-control/emergency-disable', {
-          method: 'POST',
-          body: JSON.stringify({ reason })
+        const response = await apiRequest("/api/ai-control/emergency-disable", {
+          method: "POST",
+          body: JSON.stringify({ reason }),
         });
         return response;
       } catch (error) {
@@ -230,15 +231,15 @@ export function AIControlDashboard() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai-control-settings'] });
-      queryClient.invalidateQueries({ queryKey: ['ai-control-dashboard'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["ai-control-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["ai-control-dashboard"] });
+    },
   });
 
   const handleFeatureToggle = (feature: string, enabled: boolean) => {
     const newFeatures = {
       ...settingsData?.settings?.features,
-      [feature]: enabled
+      [feature]: enabled,
     };
     updateSettingsMutation.mutate({ features: newFeatures });
   };
@@ -250,8 +251,8 @@ export function AIControlDashboard() {
   };
 
   const handleEmergencyDisable = () => {
-    if (confirm('This will disable ALL AI features immediately. Continue?')) {
-      emergencyDisableMutation.mutate('Emergency manual disable');
+    if (confirm("This will disable ALL AI features immediately. Continue?")) {
+      emergencyDisableMutation.mutate("Emergency manual disable");
     }
   };
 
@@ -278,17 +279,27 @@ export function AIControlDashboard() {
           <Brain className="h-8 w-8 text-blue-600" />
           <div>
             <h1 className="text-2xl font-bold">AI Control Dashboard</h1>
-            <p className="text-gray-600">Manage and monitor all AI features across the platform</p>
+            <p className="text-gray-600">
+              Manage and monitor all AI features across the platform
+            </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <Badge variant={dashboardData?.overview?.systemStatus === 'operational' ? 'default' : 'destructive'}>
-            {dashboardData?.overview?.systemStatus === 'operational' ? 'Operational' : 'Configuration Required'}
+          <Badge
+            variant={
+              dashboardData?.overview?.systemStatus === "operational"
+                ? "default"
+                : "destructive"
+            }
+          >
+            {dashboardData?.overview?.systemStatus === "operational"
+              ? "Operational"
+              : "Configuration Required"}
           </Badge>
-          
-          <Button 
-            variant="destructive" 
+
+          <Button
+            variant="destructive"
             size="sm"
             onClick={handleEmergencyDisable}
             disabled={emergencyDisableMutation.isPending}
@@ -379,19 +390,23 @@ export function AIControlDashboard() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span>Feature Availability</span>
-                  <Progress 
-                    value={(dashboardData?.overview?.enabledFeatures / dashboardData?.overview?.totalFeatures) * 100} 
-                    className="w-32" 
+                  <Progress
+                    value={
+                      (dashboardData?.overview?.enabledFeatures /
+                        dashboardData?.overview?.totalFeatures) *
+                      100
+                    }
+                    className="w-32"
                   />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span>Error Rate</span>
                   <Badge variant="outline">
                     {dashboardData?.usage?.avgErrorRate || 0}%
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span>Performance</span>
                   <Badge variant="default">Excellent</Badge>
@@ -406,21 +421,26 @@ export function AIControlDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {Array.isArray(dashboardData?.topFeatures) ? dashboardData.topFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium capitalize">
-                          {feature.name?.replace(/([A-Z])/g, ' $1').trim()}
+                  {Array.isArray(dashboardData?.topFeatures) ? (
+                    dashboardData.topFeatures.map((feature, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between"
+                      >
+                        <div>
+                          <div className="font-medium capitalize">
+                            {feature.name?.replace(/([A-Z])/g, " $1").trim()}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {feature.calls} calls
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-600">
-                          {feature.calls} calls
-                        </div>
+                        <Badge variant="outline">
+                          {feature.performance}% success
+                        </Badge>
                       </div>
-                      <Badge variant="outline">
-                        {feature.performance}% success
-                      </Badge>
-                    </div>
-                  )) : (
+                    ))
+                  ) : (
                     <div className="text-center text-gray-500 py-4">
                       No usage data available
                     </div>
@@ -442,23 +462,34 @@ export function AIControlDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {settingsData?.settings?.features && Object.entries(settingsData.settings.features).map(([feature, enabled]) => (
-                  <div key={feature} className="flex items-center justify-between p-3 border rounded">
-                    <div>
-                      <div className="font-medium capitalize">
-                        {feature.replace(/([A-Z])/g, ' $1').trim()}
+                {settingsData?.settings?.features &&
+                  Object.entries(settingsData.settings.features).map(
+                    ([feature, enabled]) => (
+                      <div
+                        key={feature}
+                        className="flex items-center justify-between p-3 border rounded"
+                      >
+                        <div>
+                          <div className="font-medium capitalize">
+                            {feature.replace(/([A-Z])/g, " $1").trim()}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            AI-powered{" "}
+                            {feature.includes("Summary")
+                              ? "analysis"
+                              : "automation"}
+                          </div>
+                        </div>
+                        <Switch
+                          checked={enabled as boolean}
+                          onCheckedChange={(checked) =>
+                            handleFeatureToggle(feature, checked)
+                          }
+                          disabled={updateSettingsMutation.isPending}
+                        />
                       </div>
-                      <div className="text-xs text-gray-500">
-                        AI-powered {feature.includes('Summary') ? 'analysis' : 'automation'}
-                      </div>
-                    </div>
-                    <Switch
-                      checked={enabled as boolean}
-                      onCheckedChange={(checked) => handleFeatureToggle(feature, checked)}
-                      disabled={updateSettingsMutation.isPending}
-                    />
-                  </div>
-                ))}
+                    ),
+                  )}
               </div>
             </CardContent>
           </Card>
@@ -480,13 +511,15 @@ export function AIControlDashboard() {
                 onChange={(e) => setPlaygroundPrompt(e.target.value)}
                 className="min-h-24"
               />
-              
-              <Button 
+
+              <Button
                 onClick={handlePlaygroundTest}
-                disabled={playgroundMutation.isPending || !playgroundPrompt.trim()}
+                disabled={
+                  playgroundMutation.isPending || !playgroundPrompt.trim()
+                }
               >
                 <Play className="h-4 w-4 mr-2" />
-                {playgroundMutation.isPending ? 'Testing...' : 'Test Prompt'}
+                {playgroundMutation.isPending ? "Testing..." : "Test Prompt"}
               </Button>
 
               {playgroundMutation.data && (
@@ -498,7 +531,7 @@ export function AIControlDashboard() {
                     </pre>
                   </div>
                   <div className="text-xs text-gray-500">
-                    Latency: {playgroundMutation.data.metadata?.latency}ms • 
+                    Latency: {playgroundMutation.data.metadata?.latency}ms •
                     Tokens: {playgroundMutation.data.metadata?.tokens}
                   </div>
                 </div>
@@ -524,19 +557,32 @@ export function AIControlDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {analyticsData?.analytics?.trends && typeof analyticsData.analytics.trends === 'object' ? Object.entries(analyticsData.analytics.trends).map(([metric, value]) => (
-                    <div key={metric} className="flex items-center justify-between">
-                      <span className="capitalize">
-                        {metric.replace(/([A-Z])/g, ' $1').trim()}
-                      </span>
-                      <Badge variant={
-                        (value as string).startsWith('+') ? 'default' : 
-                        (value as string).startsWith('-') ? 'destructive' : 'secondary'
-                      }>
-                        {value as string}
-                      </Badge>
-                    </div>
-                  )) : null}
+                  {analyticsData?.analytics?.trends &&
+                  typeof analyticsData.analytics.trends === "object"
+                    ? Object.entries(analyticsData.analytics.trends).map(
+                        ([metric, value]) => (
+                          <div
+                            key={metric}
+                            className="flex items-center justify-between"
+                          >
+                            <span className="capitalize">
+                              {metric.replace(/([A-Z])/g, " $1").trim()}
+                            </span>
+                            <Badge
+                              variant={
+                                (value as string).startsWith("+")
+                                  ? "default"
+                                  : (value as string).startsWith("-")
+                                    ? "destructive"
+                                    : "secondary"
+                              }
+                            >
+                              {value as string}
+                            </Badge>
+                          </div>
+                        ),
+                      )
+                    : null}
                 </div>
               </CardContent>
             </Card>
@@ -547,15 +593,22 @@ export function AIControlDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {Array.isArray(analyticsData?.analytics?.summary) ? analyticsData.analytics.summary.slice(0, 5).map((stat, index) => (
-                    <div key={index} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="capitalize">{stat.feature}</span>
-                        <span>{stat.calls} calls</span>
-                      </div>
-                      <Progress value={(stat.calls / 250) * 100} className="h-1" />
-                    </div>
-                  )) : null}
+                  {Array.isArray(analyticsData?.analytics?.summary)
+                    ? analyticsData.analytics.summary
+                        .slice(0, 5)
+                        .map((stat, index) => (
+                          <div key={index} className="space-y-1">
+                            <div className="flex justify-between text-sm">
+                              <span className="capitalize">{stat.feature}</span>
+                              <span>{stat.calls} calls</span>
+                            </div>
+                            <Progress
+                              value={(stat.calls / 250) * 100}
+                              className="h-1"
+                            />
+                          </div>
+                        ))
+                    : null}
                 </div>
               </CardContent>
             </Card>
@@ -576,18 +629,22 @@ export function AIControlDashboard() {
                     {trainingData?.training?.stats?.totalFeedback || 0}
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span>Features Improving</span>
                   <Badge variant="outline">
                     {trainingData?.training?.stats?.featuresImproving || 0}
                   </Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span>Improvement Rate</span>
                   <Badge variant="default">
-                    {Math.round((trainingData?.training?.stats?.avgImprovementRate || 0) * 100)}%
+                    {Math.round(
+                      (trainingData?.training?.stats?.avgImprovementRate || 0) *
+                        100,
+                    )}
+                    %
                   </Badge>
                 </div>
               </CardContent>
@@ -599,19 +656,26 @@ export function AIControlDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {Array.isArray(trainingData?.training?.recentFeedback) ? trainingData.training.recentFeedback.slice(0, 3).map((feedback, index) => (
-                    <div key={index} className="border-l-2 border-blue-500 pl-3 space-y-1">
-                      <div className="font-medium capitalize">
-                        {feedback.feature.replace(/([A-Z])/g, ' $1').trim()}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {feedback.improvement}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {new Date(feedback.timestamp).toLocaleDateString()}
-                      </div>
-                    </div>
-                  )) : (
+                  {Array.isArray(trainingData?.training?.recentFeedback) ? (
+                    trainingData.training.recentFeedback
+                      .slice(0, 3)
+                      .map((feedback, index) => (
+                        <div
+                          key={index}
+                          className="border-l-2 border-blue-500 pl-3 space-y-1"
+                        >
+                          <div className="font-medium capitalize">
+                            {feedback.feature.replace(/([A-Z])/g, " $1").trim()}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {feedback.improvement}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {new Date(feedback.timestamp).toLocaleDateString()}
+                          </div>
+                        </div>
+                      ))
+                  ) : (
                     <div className="text-center text-gray-500 py-4">
                       No training data available
                     </div>

@@ -30,10 +30,10 @@ export async function getContactMergeVars(contactId: string, db?: any) {
 
   // Pull missing/rejected documents for the most recent application by this contact
   const [application] = await execute(`
-    SELECT a.id, a.created_at, a.stage
+    SELECT a.id, a.createdAt, a.stage
     FROM applications a
     WHERE a.contact_id = $1
-    ORDER BY a.created_at DESC
+    ORDER BY a.createdAt DESC
     LIMIT 1
   `, [contactId]);
 
@@ -43,7 +43,7 @@ export async function getContactMergeVars(contactId: string, db?: any) {
     const docs = await execute(`
       SELECT id, category, status, filename
       FROM documents
-      WHERE application_id = $1
+      WHERE applicationId = $1
     `, [application.id]);
     
     missingDocs = docs.filter((x:any)=> x.status === "uploaded"); // uploaded but not accepted -> still missing

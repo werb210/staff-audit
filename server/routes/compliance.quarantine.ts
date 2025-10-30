@@ -6,7 +6,7 @@ const r = Router();
 
 // List quarantined/pending docs
 r.get("/compliance/quarantine", async (_req, res) => {
-  const { rows } = await db.execute(sql`select id, name, av_status, quarantine_reason, created_at from documents where av_status in ('pending','infected') order by created_at desc`);
+  const { rows } = await db.execute(sql`select id, name, av_status, quarantine_reason, createdAt from documents where av_status in ('pending','infected') order by createdAt desc`);
   res.json({ ok: true, items: rows });
 });
 

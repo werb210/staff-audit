@@ -1,14 +1,30 @@
 import React from "react";
-import { v4 as uuidv4 } from 'uuid';
-import AIResultPanel from './AIResultPanel';
-import { useQueryClient } from '@tanstack/react-query';
+import { v4 as uuidv4 } from "uuid";
+import AIResultPanel from "./AIResultPanel";
+import { useQueryClient } from "@tanstack/react-query";
 
-type Ctx = { applicationId?: string; contactId?: string; lenderId?: string; naics?: string };
+type Ctx = {
+  applicationId?: string;
+  contactId?: string;
+  lenderId?: string;
+  naics?: string;
+};
 type Action =
-  | "scan_docs" | "ocr" | "validate" | "redflags" | "finhealth"
-  | "approval" | "timeline" | "routing" | "credit_summary"
-  | "benchmarks" | "compose_email" | "compose_sms" | "request_missing"
-  | "aml" | "lender_qa";
+  | "scan_docs"
+  | "ocr"
+  | "validate"
+  | "redflags"
+  | "finhealth"
+  | "approval"
+  | "timeline"
+  | "routing"
+  | "credit_summary"
+  | "benchmarks"
+  | "compose_email"
+  | "compose_sms"
+  | "request_missing"
+  | "aml"
+  | "lender_qa";
 
 const labels: Record<Action, string> = {
   scan_docs: "Scan Docs",
@@ -28,22 +44,83 @@ const labels: Record<Action, string> = {
   lender_qa: "Lender Q&A",
 };
 
-const endpoints: Record<Action, { url: (ctx: Ctx) => string; method?: "GET"|"POST"; body?: (ctx: Ctx)=>any }> = {
-  scan_docs: { url: (c)=> `/api/ai/docs/scan?applicationId=${c.applicationId}` },
-  ocr: { url: (c)=> `/api/ai/docs/ocr?applicationId=${c.applicationId}` },
-  validate: { url: (c)=> `/api/ai/docs/validate?applicationId=${c.applicationId}`, method:"POST", body:(c)=>({ applicationId:c.applicationId }) },
-  redflags: { url: (c)=> `/api/ai/docs/redflags?applicationId=${c.applicationId}`, method:"POST", body:(c)=>({ applicationId:c.applicationId }) },
-  finhealth: { url: (c)=> `/api/ai/financials/score`, method:"POST", body:(c)=>({ applicationId:c.applicationId }) },
-  approval: { url: (c)=> `/api/ai/approval-prob`, method:"POST", body:(c)=>({ applicationId:c.applicationId, lenderId:c.lenderId }) },
-  timeline: { url: (c)=> `/api/ai/timeline`, method:"POST", body:(c)=>({ applicationId:c.applicationId }) },
-  routing: { url: (c)=> `/api/ai/ops/priority`, method:"POST", body:(c)=>({ applicationId:c.applicationId }) },
-  credit_summary: { url: (c)=> `/api/ai/credit-summary/generate`, method:"POST", body:(c)=>({ applicationId:c.applicationId }) },
-  benchmarks: { url: (c)=> `/api/ai/benchmarks/${c.naics || ""}` },
-  compose_email: { url: (c)=> `/api/ai/compose/email`, method:"POST", body:(c)=>({ applicationId:c.applicationId, contactId:c.contactId }) },
-  compose_sms: { url: (c)=> `/api/ai/compose/sms`, method:"POST", body:(c)=>({ applicationId:c.applicationId, contactId:c.contactId }) },
-  request_missing: { url: (c)=> `/api/ai/docs/request-missing`, method:"POST", body:(c)=>({ applicationId:c.applicationId }) },
-  aml: { url: (c)=> `/api/ai/compliance/screen`, method:"POST", body:(c)=>({ applicationId:c.applicationId, contactId:c.contactId }) },
-  lender_qa: { url: (c)=> `/api/ai/lender-qa`, method:"POST", body:(c)=>({ applicationId:c.applicationId, lenderId:c.lenderId, question:"What docs are mandatory?" }) },
+const endpoints: Record<
+  Action,
+  {
+    url: (ctx: Ctx) => string;
+    method?: "GET" | "POST";
+    body?: (ctx: Ctx) => any;
+  }
+> = {
+  scan_docs: {
+    url: (c) => `/api/ai/docs/scan?applicationId=${c.applicationId}`,
+  },
+  ocr: { url: (c) => `/api/ai/docs/ocr?applicationId=${c.applicationId}` },
+  validate: {
+    url: (c) => `/api/ai/docs/validate?applicationId=${c.applicationId}`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId }),
+  },
+  redflags: {
+    url: (c) => `/api/ai/docs/redflags?applicationId=${c.applicationId}`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId }),
+  },
+  finhealth: {
+    url: (c) => `/api/ai/financials/score`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId }),
+  },
+  approval: {
+    url: (c) => `/api/ai/approval-prob`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId, lenderId: c.lenderId }),
+  },
+  timeline: {
+    url: (c) => `/api/ai/timeline`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId }),
+  },
+  routing: {
+    url: (c) => `/api/ai/ops/priority`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId }),
+  },
+  credit_summary: {
+    url: (c) => `/api/ai/credit-summary/generate`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId }),
+  },
+  benchmarks: { url: (c) => `/api/ai/benchmarks/${c.naics || ""}` },
+  compose_email: {
+    url: (c) => `/api/ai/compose/email`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId, contactId: c.contactId }),
+  },
+  compose_sms: {
+    url: (c) => `/api/ai/compose/sms`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId, contactId: c.contactId }),
+  },
+  request_missing: {
+    url: (c) => `/api/ai/docs/request-missing`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId }),
+  },
+  aml: {
+    url: (c) => `/api/ai/compliance/screen`,
+    method: "POST",
+    body: (c) => ({ applicationId: c.applicationId, contactId: c.contactId }),
+  },
+  lender_qa: {
+    url: (c) => `/api/ai/lender-qa`,
+    method: "POST",
+    body: (c) => ({
+      applicationId: c.applicationId,
+      lenderId: c.lenderId,
+      question: "What docs are mandatory?",
+    }),
+  },
 };
 
 export default function AiActions({
@@ -76,26 +153,32 @@ export default function AiActions({
 
     const ep = endpoints[action];
     const method = ep.method || "GET";
-    
+
     try {
       // Add requestId to body for idempotency
-      const body = method === "POST" ? {
-        ...ep.body?.(ctx),
-        requestId: reqId
-      } : undefined;
+      const body =
+        method === "POST"
+          ? {
+              ...ep.body?.(ctx),
+              requestId: reqId,
+            }
+          : undefined;
 
       const res = await fetch(ep.url(ctx), {
         method,
-        headers: method === "POST" ? { "Content-Type": "application/json" } : undefined,
-        body: method === "POST" ? JSON.stringify(body) : undefined, 
+        headers:
+          method === "POST"
+            ? { "Content-Type": "application/json" }
+            : undefined,
+        body: method === "POST" ? JSON.stringify(body) : undefined,
       });
-      
+
       const json = await res.json().catch(() => ({}));
-      
+
       if (!res.ok) {
         throw new Error(json?.error || json?.message || res.statusText);
       }
-      
+
       // Handle job-based responses
       if (json.jobId) {
         setJobId(json.jobId);
@@ -104,39 +187,46 @@ export default function AiActions({
         setData(json);
         setLoading(false);
       }
-      
+
       // Write timeline event
-      await writeTimelineEvent(action, { ok: true, requestId: reqId, jobId: json.jobId });
-      
+      await writeTimelineEvent(action, {
+        ok: true,
+        requestId: reqId,
+        jobId: json.jobId,
+      });
     } catch (e: any) {
       setError(e?.message || "Request failed");
       setLoading(false);
-      
+
       // Write timeline error event
-      await writeTimelineEvent(action, { ok: false, error: e?.message, requestId: reqId });
+      await writeTimelineEvent(action, {
+        ok: false,
+        error: e?.message,
+        requestId: reqId,
+      });
     }
   }
-  
+
   async function pollJob(jobId: string) {
     const maxAttempts = 60; // 5 minutes with 5-second intervals
     let attempts = 0;
-    
+
     const poll = async () => {
       if (attempts >= maxAttempts) {
         setError("Job timed out");
         setLoading(false);
         return;
       }
-      
+
       try {
         const res = await fetch(`/api/ai/jobs/${jobId}`, {});
         const job = await res.json();
-        
-        if (job.status === 'completed') {
+
+        if (job.status === "completed") {
           setData(job.result);
           setLoading(false);
-        } else if (job.status === 'failed') {
-          setError(job.error || 'Job failed');
+        } else if (job.status === "failed") {
+          setError(job.error || "Job failed");
           setLoading(false);
         } else {
           // Still running, poll again
@@ -148,15 +238,15 @@ export default function AiActions({
         setLoading(false);
       }
     };
-    
+
     poll();
   }
-  
+
   async function writeTimelineEvent(action: Action, result: any) {
     try {
-      await fetch('/api/timeline', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, 
+      await fetch("/api/timeline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           applicationId: ctx.applicationId,
           contactId: ctx.contactId,
@@ -164,39 +254,46 @@ export default function AiActions({
           payload: {
             action,
             result,
-            timestamp: new Date().toISOString()
-          }
-        })
+            timestamp: new Date().toISOString(),
+          },
+        }),
       });
-      
+
       // Invalidate timeline queries to refresh UI
       if (ctx.applicationId) {
-        queryClient.invalidateQueries({ queryKey: ['timeline', ctx.applicationId] });
+        queryClient.invalidateQueries({
+          queryKey: ["timeline", ctx.applicationId],
+        });
       }
       if (ctx.contactId) {
-        queryClient.invalidateQueries({ queryKey: ['contact-timeline', ctx.contactId] });
+        queryClient.invalidateQueries({
+          queryKey: ["contact-timeline", ctx.contactId],
+        });
       }
     } catch (e) {
-      console.warn('Failed to write timeline event:', e);
+      console.warn("Failed to write timeline event:", e);
     }
   }
-  
+
   async function cancelJob() {
     if (jobId) {
       try {
         await fetch(`/api/ai/jobs/${jobId}/cancel`, {
-          method: 'POST'});
+          method: "POST",
+        });
         setLoading(false);
-        setError('Job cancelled');
+        setError("Job cancelled");
       } catch (e: any) {
-        setError(e?.message || 'Failed to cancel job');
+        setError(e?.message || "Failed to cancel job");
       }
     }
   }
-  
+
   async function retryAction() {
     if (title) {
-      const action = Object.entries(labels).find(([_, label]) => label === title)?.[0] as Action;
+      const action = Object.entries(labels).find(
+        ([_, label]) => label === title,
+      )?.[0] as Action;
       if (action) {
         run(action);
       }

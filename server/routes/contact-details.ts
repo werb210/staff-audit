@@ -16,7 +16,7 @@ router.get('/:id', async (req: any, res: any) => {
     const { rows } = await db.execute(sql`
       SELECT 
         id, full_name, first_name, last_name, email, phone, 
-        company_name, job_title, status, notes, created_at, updated_at, silo
+        company_name, job_title, status, notes, createdAt, updatedAt, silo
       FROM contacts 
       WHERE id = ${id}
     `);
@@ -40,12 +40,12 @@ router.get('/:id', async (req: any, res: any) => {
       status: contact.status,
       notes: contact.notes,
       silo: contact.silo,
-      createdAt: contact.created_at,
-      updatedAt: contact.updated_at,
+      createdAt: contact.createdAt,
+      updatedAt: contact.updatedAt,
       // Add computed fields for UI
       initials: getInitials(contact.first_name, contact.last_name),
       avatarUrl: null, // TODO: Implement avatar system
-      lastContactAt: contact.updated_at
+      lastContactAt: contact.updatedAt
     };
     
     res.json({ ok: true, data: formattedContact });
@@ -64,10 +64,10 @@ router.get('/:id/timeline', async (req: any, res: any) => {
     // Get timeline events for this contact
     const { rows } = await db.execute(sql`
       SELECT 
-        id, kind, direction, subject, body, created_at, meta
+        id, kind, direction, subject, body, createdAt, meta
       FROM comms 
       WHERE contact_id = ${id}
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
       LIMIT 100
     `);
     
@@ -77,7 +77,7 @@ router.get('/:id/timeline', async (req: any, res: any) => {
       direction: event.direction,
       title: event.subject,
       description: event.body,
-      timestamp: event.created_at,
+      timestamp: event.createdAt,
       metadata: typeof event.meta === 'string' ? JSON.parse(event.meta) : event.meta
     }));
     
@@ -108,20 +108,20 @@ router.get('/:id/associations', async (req: any, res: any) => {
     // Get applications associated with this contact
     const { rows: applications } = await db.execute(sql`
       SELECT 
-        id, status, stage, requested_amount, created_at, legal_business_name
+        id, status, stage, requested_amount, createdAt, legal_business_name
       FROM applications 
       WHERE contact_email = (SELECT email FROM contacts WHERE id = ${id})
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
       LIMIT 10
     `);
     
     // Get documents associated with this contact
     const { rows: documents } = await db.execute(sql`
       SELECT 
-        id, name, type, size, created_at
+        id, name, type, size, createdAt
       FROM documents 
       WHERE contact_id = ${id}
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
       LIMIT 20
     `);
     
@@ -134,14 +134,14 @@ router.get('/:id/associations', async (req: any, res: any) => {
         status: app.status,
         stage: app.stage,
         amount: app.requested_amount,
-        createdAt: app.created_at
+        createdAt: app.createdAt
       })),
       documents: documents.map((doc: any) => ({
         id: doc.id,
         name: doc.name,
         type: doc.type,
         size: doc.size,
-        createdAt: doc.created_at
+        createdAt: doc.createdAt
       }))
     };
     
@@ -161,10 +161,10 @@ router.get('/:id/email/threads', async (req: any, res: any) => {
     // Get email communications for this contact
     const { rows } = await db.execute(sql`
       SELECT 
-        id, subject, body, direction, created_at, meta
+        id, subject, body, direction, createdAt, meta
       FROM comms 
       WHERE contact_id = ${id} AND kind = 'email'
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
       LIMIT 50
     `);
     
@@ -173,7 +173,7 @@ router.get('/:id/email/threads', async (req: any, res: any) => {
       subject: email.subject,
       body: email.body,
       direction: email.direction,
-      timestamp: email.created_at,
+      timestamp: email.createdAt,
       metadata: typeof email.meta === 'string' ? JSON.parse(email.meta) : email.meta
     }));
     
@@ -193,10 +193,10 @@ router.get('/:id/sms/threads', async (req: any, res: any) => {
     // Get SMS communications for this contact
     const { rows } = await db.execute(sql`
       SELECT 
-        id, body, direction, created_at, meta
+        id, body, direction, createdAt, meta
       FROM comms 
       WHERE contact_id = ${id} AND kind = 'sms'
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
       LIMIT 100
     `);
     
@@ -204,7 +204,7 @@ router.get('/:id/sms/threads', async (req: any, res: any) => {
       id: sms.id,
       message: sms.body,
       direction: sms.direction,
-      timestamp: sms.created_at,
+      timestamp: sms.createdAt,
       metadata: typeof sms.meta === 'string' ? JSON.parse(sms.meta) : sms.meta
     }));
     

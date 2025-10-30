@@ -279,11 +279,11 @@ r.get("/lender-portal/dashboard", async (req: any, res) => {
   
   // Get matched applications for this lender (last 30 days)
   const { rows: applications } = await db.execute(sql`
-    SELECT id, status, amount, created_at, funded
+    SELECT id, status, amount, createdAt, funded
     FROM applications 
     WHERE lender_id = ${lender.lender_id}
-    AND created_at >= CURRENT_DATE - INTERVAL '30 days'
-    ORDER BY created_at DESC
+    AND createdAt >= CURRENT_DATE - INTERVAL '30 days'
+    ORDER BY createdAt DESC
   `);
   
   // Get summary stats
@@ -294,7 +294,7 @@ r.get("/lender-portal/dashboard", async (req: any, res) => {
       COALESCE(SUM(amount) FILTER (WHERE funded = true), 0) as total_volume
     FROM applications 
     WHERE lender_id = ${lender.lender_id}
-    AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+    AND createdAt >= CURRENT_DATE - INTERVAL '30 days'
   `);
   
   res.json({
@@ -326,7 +326,7 @@ r.get("/lender-portal/reports", async (req: any, res) => {
   
   // Get monthly report logs
   const { rows: reports } = await db.execute(sql`
-    SELECT period, sent_to, matched_count, funded_count, created_at
+    SELECT period, sent_to, matched_count, funded_count, createdAt
     FROM lender_report_logs
     WHERE lender_id = ${lenderId}
     ORDER BY period DESC

@@ -10,8 +10,8 @@ export interface User {
   name?: string; 
   role: Role; 
   active?: boolean; 
-  created_at?: string;
-  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Contact { 
@@ -22,15 +22,15 @@ export interface Contact {
   phone?: string; 
   role?: string;
   company_name?: string; 
-  application_id?: string;
+  applicationId?: string;
   slf_contact_id?: string;
   slf_lead_status?: string;
   slf_last_sync?: string;
   source?: string;
   status?: string;
   job_title?: string;
-  created_at?: string;
-  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Application { 
@@ -45,8 +45,8 @@ export interface Application {
   outcome?: string|null; 
   funded_amount?: number|null;
   status?: string;
-  created_at?: string;
-  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LenderProduct { 
@@ -61,8 +61,8 @@ export interface LenderProduct {
   term_months?: number; 
   data?: any; 
   active: boolean;
-  created_at?: string;
-  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LenderReport { 
@@ -73,14 +73,14 @@ export interface LenderReport {
   type: "link"|"iframe"|"pdf"|"csv"; 
   url?: string; 
   embed_url?: string;
-  created_at?: string;
+  createdAt?: string;
 }
 
 export interface ReportPrefs { 
   tenant_id?: TenantId; 
   lender_id: string; 
   reports: string[];
-  updated_at?: string;
+  updatedAt?: string;
 }
 
 export interface IntakeEvent { 
@@ -91,7 +91,7 @@ export interface IntakeEvent {
   source: string; 
   campaign?: string; 
   medium?: string; 
-  created_at?: string; 
+  createdAt?: string; 
 }
 
 export interface MarketingCost { 

@@ -46,7 +46,7 @@ if(existing.rows.length > 0){
   if(!hasAdmin){
     await pool.query(`
       UPDATE users 
-      SET roles = $2, first_name = $3, last_name = $4, phone_e164 = $5, updated_at = now() 
+      SET roles = $2, first_name = $3, last_name = $4, phone_e164 = $5, updatedAt = now() 
       WHERE id = $1
     `, [user.id, roles, 'Todd', 'Werboweski', phone]);
     console.log("✅ Updated existing user to admin:", phone, "User ID:", user.id);

@@ -14,7 +14,7 @@ export const lenderProducts = pgTable("lender_products", {
   documentsRequired: text("documents_required").array(),
   description: text("description"),
   active: boolean("is_active"),
-  updatedAt: timestamp("updated_at"),
+  updatedAt: timestamp("updatedAt"),
 });
 
 export type LenderProduct = typeof lenderProducts.$inferSelect;

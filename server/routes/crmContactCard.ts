@@ -37,10 +37,10 @@ router.get('/:id', async (req: any, res: any) => {
         c.email,
         c.phone,
         c.company_name,
-        c.application_id,
+        c.applicationId,
         c.role,
-        c.created_at,
-        c.updated_at,
+        c.createdAt,
+        c.updatedAt,
         a.id as app_id,
         a.stage,
         a.status as application_status,
@@ -48,7 +48,7 @@ router.get('/:id', async (req: any, res: any) => {
         a.submitted_at,
         a.form_data
       FROM contacts c
-      LEFT JOIN applications a ON c.application_id = a.id
+      LEFT JOIN applications a ON c.applicationId = a.id
       WHERE c.id = ${id}
       LIMIT 1
     `);
@@ -71,12 +71,12 @@ router.get('/:id', async (req: any, res: any) => {
       email: contactRow.email,
       phone: contactRow.phone,
       businessName: contactRow.company_name,
-      applicationId: contactRow.application_id,
+      applicationId: contactRow.applicationId,
       role: contactRow.role,
       source: 'application',
       status: 'active',
-      createdAt: contactRow.created_at,
-      updatedAt: contactRow.updated_at
+      createdAt: contactRow.createdAt,
+      updatedAt: contactRow.updatedAt
     };
     
     const application = contactRow.app_id ? {
@@ -361,7 +361,7 @@ router.get('/:id/applications', async (req: any, res: any) => {
     const contactApplications = await db
       .select()
       .from(applications)
-      .where(eq(applications.id, sql`(SELECT application_id FROM contacts WHERE id = ${id})`))
+      .where(eq(applications.id, sql`(SELECT applicationId FROM contacts WHERE id = ${id})`))
       .orderBy(desc(applications.createdAt));
     
     console.log(`✅ [CRM-APPLICATIONS] Found ${contactApplications.length} applications`);

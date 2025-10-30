@@ -9,5 +9,5 @@ export const ROUTES = {
   reports: "/staff/reports",
   marketing: "/staff/marketing",
   lenders: "/staff/lenders",
-  lendersV1: "/staff/lenders/v1"
+  lendersV1: "/staff/lenders/v1",
 };

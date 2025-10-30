@@ -81,9 +81,9 @@ export class RecoveryLogger {
     try {
       await pool.query(`
         INSERT INTO recovery_logs (
-          document_id, file_name, application_id, legal_business_name, 
-          event_type, status, original_path, new_path, file_size, 
-          uploaded_by, error_message, created_at
+          document_id, name, applicationId, legal_business_name, 
+          event_type, status, original_path, new_path, size, 
+          uploaded_by, error_message, createdAt
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       `, [
         entry.documentId,

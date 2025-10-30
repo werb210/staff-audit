@@ -18,7 +18,7 @@ router.post('/restore-orphaned/:applicationId', async (req: any, res: any) => {
     const { sql } = await import('drizzle-orm');
     const orphanedDocs = await db.execute(sql`
       SELECT * FROM documents 
-      WHERE application_id = ${applicationId} 
+      WHERE applicationId = ${applicationId} 
       AND file_exists = false
     `);
 
@@ -34,16 +34,16 @@ router.post('/restore-orphaned/:applicationId', async (req: any, res: any) => {
           .select()
           .from(documents)
           .where(and(
-            eq(documents.application_id, applicationId),
+            eq(documents.applicationId, applicationId),
             eq(documents.document_type, doc.document_type),
             eq(documents.file_exists, true)
           ));
 
         if (workingDocs.length > 0) {
-          console.log(`✅ [AUTO-RESTORE] Skipping ${doc.file_name} - working replacement exists`);
+          console.log(`✅ [AUTO-RESTORE] Skipping ${doc.name} - working replacement exists`);
           results.push({
             documentId: doc.id,
-            fileName: doc.file_name,
+            fileName: doc.name,
             success: true,
             action: 'skipped_has_replacement'
           });
@@ -90,7 +90,7 @@ stream
 BT
 /F1 12 Tf
 50 700 Td
-(Document Placeholder: ${doc.file_name}) Tj
+(Document Placeholder: ${doc.name}) Tj
 0 -20 Td
 (Original document missing - please re-upload) Tj
 0 -20 Td
@@ -138,28 +138,28 @@ startxref
           .set({
             file_exists: true,
             file_path: `uploads/documents/${doc.id}.pdf`,
-            file_size: placeholderContent.length,
+            size: placeholderContent.length,
             file_type: 'application/pdf',
-            updated_at: new Date()
+            updatedAt: new Date()
           })
           .where(eq(documents.id, doc.id));
 
-        console.log(`✅ [AUTO-RESTORE] Restored ${doc.file_name} with placeholder`);
+        console.log(`✅ [AUTO-RESTORE] Restored ${doc.name} with placeholder`);
         restoredCount++;
         
         results.push({
           documentId: doc.id,
-          fileName: doc.file_name,
+          fileName: doc.name,
           success: true,
           action: 'placeholder_created',
           filePath
         });
 
       } catch (error: any) {
-        console.error(`❌ [AUTO-RESTORE] Failed to restore ${doc.file_name}:`, error instanceof Error ? error.message : String(error));
+        console.error(`❌ [AUTO-RESTORE] Failed to restore ${doc.name}:`, error instanceof Error ? error.message : String(error));
         results.push({
           documentId: doc.id,
-          fileName: doc.file_name,
+          fileName: doc.name,
           success: false,
           error: error instanceof Error ? error.message : String(error)
         });

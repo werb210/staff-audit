@@ -23,7 +23,7 @@ router.get('/test-document-access', async (req: any, res: any) => {
     const { db } = await import('../db');
     
     const result = await db.execute(sql`
-      SELECT storage_key, file_name, id 
+      SELECT storage_key, name, id 
       FROM documents 
       WHERE storage_key IS NOT NULL 
       LIMIT 1
@@ -38,7 +38,7 @@ router.get('/test-document-access', async (req: any, res: any) => {
     }
     
     const document = result.rows[0] as any;
-    console.log(`🔍 Testing document: ${document.file_name} with storage key: ${document.storage_key}`);
+    console.log(`🔍 Testing document: ${document.name} with storage key: ${document.storage_key}`);
     
     // Generate pre-signed URL for the document
     const getObjectCommand = new GetObjectCommand({
@@ -64,7 +64,7 @@ router.get('/test-document-access', async (req: any, res: any) => {
       message: 'Document access test successful!',
       document: {
         id: document.id,
-        fileName: document.file_name,
+        fileName: document.name,
         storageKey: document.storage_key
       },
       s3: {

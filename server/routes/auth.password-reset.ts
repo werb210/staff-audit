@@ -36,7 +36,7 @@ router.post('/', async (req: any, res: any) => {
       SELECT pr.id, pr.user_id, pr.expires_at, pr.consumed_at
       FROM password_resets pr
       WHERE pr.token_hash = $1
-      ORDER BY pr.created_at DESC
+      ORDER BY pr.createdAt DESC
       LIMIT 1
     `, [tokenHash]);
 
@@ -130,7 +130,7 @@ router.get('/verify', async (req: any, res: any) => {
       FROM password_resets pr
       JOIN users u ON pr.user_id = u.id
       WHERE pr.token_hash = $1
-      ORDER BY pr.created_at DESC
+      ORDER BY pr.createdAt DESC
       LIMIT 1
     `, [tokenHash]);
 

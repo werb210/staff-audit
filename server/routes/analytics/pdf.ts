@@ -19,7 +19,7 @@ router.get("/monthly-pdf", async (req: any, res: any) => {
     // Fetch activity data
     const [activity] = await q<any>(`
       SELECT
-        (SELECT COUNT(*) FROM applications a WHERE a.created_at BETWEEN $1::date AND $2::date + INTERVAL '1 day') AS apps_this_period,
+        (SELECT COUNT(*) FROM applications a WHERE a.createdAt BETWEEN $1::date AND $2::date + INTERVAL '1 day') AS apps_this_period,
         (SELECT COUNT(*) FROM applications WHERE stage='Requires Docs') AS requires_docs,
         (SELECT COUNT(*) FROM applications WHERE stage='In Review') AS in_review,
         (SELECT COUNT(*) FROM applications WHERE stage='Off to Lender') AS lenders,

@@ -39,7 +39,7 @@ export async function triggerAutoRecoveryFlow(): Promise<AutoRecoveryResult> {
 
   try {
     // Get all documents from database using connection pool
-    const query = 'SELECT id, file_name, file_path, application_id, file_size, created_at FROM documents';
+    const query = 'SELECT id, name, file_path, applicationId, size, createdAt FROM documents';
     const dbResult = await pool.query(query);
     const allDocuments = dbResult.rows;
 
@@ -104,7 +104,7 @@ export async function getMissingDocumentsForApplication(applicationId: string): 
   
   try {
     // Get all documents for the application using connection pool
-    const query = 'SELECT id, file_name, file_path, application_id, created_at FROM documents WHERE application_id = $1';
+    const query = 'SELECT id, name, file_path, applicationId, createdAt FROM documents WHERE applicationId = $1';
     const dbResult = await pool.query(query, [applicationId]);
     const appDocuments = dbResult.rows;
 

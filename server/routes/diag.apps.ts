@@ -11,11 +11,11 @@ async function getApplications() {
   const enhancedQuery = `
     SELECT 
       a.id, a.status, a.stage, a.contact_email, a.contact_first_name, a.contact_last_name, 
-      a.created_at, a.updated_at, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
+      a.createdAt, a.updatedAt, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
       b.business_name
     FROM applications a 
-    LEFT JOIN businesses b ON a.business_id = b.id
-    ORDER BY a.created_at DESC
+    LEFT JOIN businesses b ON a.businessId = b.id
+    ORDER BY a.createdAt DESC
     LIMIT 500
   `;
   
@@ -28,8 +28,8 @@ async function getApplications() {
     businessName: row.business_name || row.legal_business_name || null,
     amount: Number(row.requested_amount) || 0,
     status: row.status || 'new',
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
     ...row
   }));
 }

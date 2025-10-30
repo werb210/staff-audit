@@ -57,7 +57,7 @@ router.get('/status', async (req: any, res: any) => {
       const orphanedResult = await db.execute(sql`
         SELECT COUNT(*) as orphaned_count
         FROM documents d
-        LEFT JOIN applications a ON d.application_id = a.id
+        LEFT JOIN applications a ON d.applicationId = a.id
         WHERE a.id IS NULL
       `);
       
@@ -145,7 +145,7 @@ router.post('/recover/:type', async (req: any, res: any) => {
         const { sql } = await import('drizzle-orm');
         const deleteResult = await db.execute(sql`
           DELETE FROM documents 
-          WHERE application_id NOT IN (SELECT id FROM applications)
+          WHERE applicationId NOT IN (SELECT id FROM applications)
         `);
         
         return res.json({

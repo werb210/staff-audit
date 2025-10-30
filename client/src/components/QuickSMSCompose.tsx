@@ -13,26 +13,26 @@ export default function QuickSMSCompose() {
 
   const sendSMS = async () => {
     if (!to.trim() || !msg.trim()) return;
-    
+
     setSending(true);
     try {
-      await api('/api/sms/send', {
-        method: 'POST',
-        body: { to: to.trim(), message: msg.trim() }
+      await api("/api/sms/send", {
+        method: "POST",
+        body: { to: to.trim(), message: msg.trim() },
       });
-      
+
       setTo("");
       setMsg("");
       toast({
         title: "SMS sent successfully!",
-        description: `Message sent to ${to}`
+        description: `Message sent to ${to}`,
       });
     } catch (error) {
-      console.error('Failed to send SMS:', error);
+      console.error("Failed to send SMS:", error);
       toast({
         title: "Failed to send SMS",
         description: "Please check the phone number and try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setSending(false);
@@ -50,7 +50,7 @@ export default function QuickSMSCompose() {
             placeholder="Phone (E.164 format)"
             className="flex-1"
           />
-          <Button 
+          <Button
             onClick={sendSMS}
             disabled={sending || !to.trim() || !msg.trim()}
             className="bg-blue-600 hover:bg-blue-700"

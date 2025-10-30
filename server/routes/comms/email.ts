@@ -88,7 +88,7 @@ router.get("/threads/:contactId", async (req: any, res: any) => {
     const threads = await q<any>(`
       SELECT t.*, 
              COUNT(m.id) as message_count,
-             MAX(m.created_at) as last_message_at
+             MAX(m.createdAt) as last_message_at
       FROM comm_threads t
       LEFT JOIN comm_messages m ON t.id = m.thread_id
       WHERE t.contact_id = $1 AND t.channel = 'email'

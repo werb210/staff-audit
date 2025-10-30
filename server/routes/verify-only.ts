@@ -16,8 +16,8 @@ async function findOrCreateUserByPhone(e164:string){
       email TEXT,
       roles TEXT[] NOT NULL DEFAULT ARRAY['user'],
       tenant_id UUID,
-      created_at TIMESTAMPTZ DEFAULT now(),
-      updated_at TIMESTAMPTZ DEFAULT now()
+      createdAt TIMESTAMPTZ DEFAULT now(),
+      updatedAt TIMESTAMPTZ DEFAULT now()
     );
   `);
   // Try find

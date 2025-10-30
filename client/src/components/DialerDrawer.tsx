@@ -32,9 +32,20 @@ export default function DialerDrawer() {
         flexDirection: "column",
       }}
     >
-      <div style={{ padding: 12, borderBottom: "1px solid #e5e7eb", display: "flex", justifyContent: "space-between" }}>
+      <div
+        style={{
+          padding: 12,
+          borderBottom: "1px solid #e5e7eb",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <strong>Dialer</strong>
-        <button onClick={() => window.dispatchEvent(new CustomEvent("close-dialer"))}>✕</button>
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent("close-dialer"))}
+        >
+          ✕
+        </button>
       </div>
 
       <div style={{ padding: 12, gap: 8, display: "grid" }}>
@@ -44,7 +55,10 @@ export default function DialerDrawer() {
           <button className="btn">Mute</button>
           <button className="btn">Hold</button>
         </div>
-        <div className="text-xs text-gray-500">* Wire this to your existing call API/Twilio client; UI is mounted & visible.</div>
+        <div className="text-xs text-gray-500">
+          * Wire this to your existing call API/Twilio client; UI is mounted &
+          visible.
+        </div>
       </div>
     </div>
   );

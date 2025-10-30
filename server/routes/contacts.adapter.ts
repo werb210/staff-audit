@@ -30,7 +30,7 @@ router.get("/contacts", async (req: any, res: any) => {
         company: a.businessName || null,
         amount_requested: a.requestedAmount || a.amount || 0,
         lead_status: a.status || 'New',
-        created_at: a.createdAt || a.created_at || new Date().toISOString()
+        createdAt: a.createdAt || a.createdAt || new Date().toISOString()
       }));
 
     res.json({ ok: true, items: contacts, count: contacts.length, total: contacts.length });

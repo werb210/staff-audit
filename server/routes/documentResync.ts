@@ -24,14 +24,14 @@ router.post('/fix-associations', async (req: Request, res: Response) => {
     const applicationsQuery = `
       SELECT 
         a.id,
-        a.created_at,
+        a.createdAt,
         b.business_name,
         a.status,
         a.stage,
-        (SELECT COUNT(*) FROM documents d WHERE d.application_id = a.id) as doc_count
+        (SELECT COUNT(*) FROM documents d WHERE d.applicationId = a.id) as doc_count
       FROM applications a
-      LEFT JOIN businesses b ON a.business_id = b.id
-      ORDER BY a.created_at DESC
+      LEFT JOIN businesses b ON a.businessId = b.id
+      ORDER BY a.createdAt DESC
     `;
     
     const applicationsResult = await pool.query(applicationsQuery);
@@ -48,8 +48,8 @@ router.post('/fix-associations', async (req: Request, res: Response) => {
           ELSE 'orphaned'
         END as status
       FROM documents d
-      LEFT JOIN applications a ON d.application_id = a.id
-      ORDER BY d.created_at DESC
+      LEFT JOIN applications a ON d.applicationId = a.id
+      ORDER BY d.createdAt DESC
     `;
     
     const docsResult = await pool.query(orphanedDocsQuery);
@@ -69,7 +69,7 @@ router.post('/fix-associations', async (req: Request, res: Response) => {
       // Find the most recent application that has no documents
       const applicationWithoutDocs = applications.find(app => 
         app.doc_count === 0 && 
-        new Date(doc.created_at).getTime() >= new Date(app.created_at).getTime() - (24 * 60 * 60 * 1000) // Within 24 hours
+        new Date(doc.createdAt).getTime() >= new Date(app.createdAt).getTime() - (24 * 60 * 60 * 1000) // Within 24 hours
       );
       
       if (applicationWithoutDocs) {
@@ -77,7 +77,7 @@ router.post('/fix-associations', async (req: Request, res: Response) => {
         
         const updateQuery = `
           UPDATE documents 
-          SET application_id = $1 
+          SET applicationId = $1 
           WHERE id = $2
         `;
         
@@ -98,8 +98,8 @@ router.post('/fix-associations', async (req: Request, res: Response) => {
     const finalStatsQuery = `
       SELECT 
         COUNT(*) as total_docs,
-        COUNT(CASE WHEN application_id IS NOT NULL THEN 1 END) as linked_docs,
-        COUNT(CASE WHEN application_id IS NULL THEN 1 END) as orphaned_docs
+        COUNT(CASE WHEN applicationId IS NOT NULL THEN 1 END) as linked_docs,
+        COUNT(CASE WHEN applicationId IS NULL THEN 1 END) as orphaned_docs
       FROM documents
     `;
     
@@ -121,7 +121,7 @@ router.post('/fix-associations', async (req: Request, res: Response) => {
         businessName: app.business_name,
         documentCount: app.doc_count,
         status: app.status,
-        createdAt: app.created_at
+        createdAt: app.createdAt
       }))
     });
     
@@ -147,16 +147,16 @@ router.get('/status', async (req: Request, res: Response) => {
     const query = `
       SELECT 
         a.id,
-        a.created_at,
+        a.createdAt,
         b.business_name,
         a.status,
         a.stage,
         COUNT(d.id) as document_count
       FROM applications a
-      LEFT JOIN businesses b ON a.business_id = b.id
-      LEFT JOIN documents d ON d.application_id = a.id
-      GROUP BY a.id, a.created_at, b.business_name, a.status, a.stage
-      ORDER BY a.created_at DESC
+      LEFT JOIN businesses b ON a.businessId = b.id
+      LEFT JOIN documents d ON d.applicationId = a.id
+      GROUP BY a.id, a.createdAt, b.business_name, a.status, a.stage
+      ORDER BY a.createdAt DESC
     `;
     
     const result = await pool.query(query);
@@ -166,7 +166,7 @@ router.get('/status', async (req: Request, res: Response) => {
     const orphanedQuery = `
       SELECT COUNT(*) as orphaned_count
       FROM documents d
-      LEFT JOIN applications a ON d.application_id = a.id
+      LEFT JOIN applications a ON d.applicationId = a.id
       WHERE a.id IS NULL
     `;
     
@@ -187,7 +187,7 @@ router.get('/status', async (req: Request, res: Response) => {
         status: app.status, 
         stage: app.stage,
         documentCount: parseInt(app.document_count),
-        createdAt: app.created_at,
+        createdAt: app.createdAt,
         needsDocuments: parseInt(app.document_count) === 0
       }))
     });

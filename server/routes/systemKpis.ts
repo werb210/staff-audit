@@ -106,8 +106,8 @@ router.get("/stats", async (_req, res) => {
 router.get("/activity", async (_req, res) => {
   try {
     const appsResult = await pool.query(`
-      SELECT id, legal_business_name, created_at, status
-      FROM applications ORDER BY created_at DESC LIMIT 10
+      SELECT id, legal_business_name, createdAt, status
+      FROM applications ORDER BY createdAt DESC LIMIT 10
     `);
     
     const activities = appsResult.rows.map((app, index) => ({
@@ -115,7 +115,7 @@ router.get("/activity", async (_req, res) => {
       type: 'application',
       title: `Application Submitted`,
       description: `${app.legal_business_name || 'Unknown Business'} - ${app.status || 'draft'}`,
-      timestamp: app.created_at || new Date().toISOString(),
+      timestamp: app.createdAt || new Date().toISOString(),
       priority: 'medium'
     }));
 

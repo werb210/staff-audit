@@ -15,7 +15,7 @@ r.get("/ai/banking/:applicationId/series", async (req: any, res: any) => {
            sum(case when amount_cents<0 then amount_cents else 0 end) as outflow_cents,
            sum(case when lower(coalesce(type,''))='nsf' then 1 else 0 end) as nsf
     from bank_tx
-    where application_id=${appId} and posted_at>=${since}
+    where applicationId=${appId} and posted_at>=${since}
     group by d order by d
   `);
   // simple anomaly: day net < -2*median(outflow) or nsf>0

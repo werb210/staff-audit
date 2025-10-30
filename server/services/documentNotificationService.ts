@@ -68,17 +68,17 @@ export class DocumentNotificationService {
       const query = `
         SELECT 
           d.id as document_id,
-          d.application_id,
-          d.file_name,
+          d.applicationId,
+          d.name,
           d.document_type,
-          d.file_size,
-          d.created_at,
+          d.size,
+          d.createdAt,
           'Unknown Business' as business_name,
           a.id as app_id
         FROM documents d
-        JOIN applications a ON d.application_id = a.id
-        WHERE d.created_at > $1
-        ORDER BY d.created_at DESC
+        JOIN applications a ON d.applicationId = a.id
+        WHERE d.createdAt > $1
+        ORDER BY d.createdAt DESC
       `;
 
       const { pool } = await import('../db');
@@ -86,12 +86,12 @@ export class DocumentNotificationService {
 
       const submissions: DocumentSubmission[] = result.rows.map(row => ({
         documentId: row.document_id,
-        applicationId: row.application_id,
+        applicationId: row.applicationId,
         businessName: row.business_name || 'Unknown Business',
-        fileName: row.file_name,
+        fileName: row.name,
         documentType: row.document_type,
-        fileSize: row.file_size,
-        uploadedAt: row.created_at
+        fileSize: row.size,
+        uploadedAt: row.createdAt
       }));
 
       return submissions;

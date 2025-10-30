@@ -1,5 +1,11 @@
 // Canonical Wouter-only router shim
-import { Router as WouterRouter, Route, Link, useLocation, useRoute } from "wouter";
+import {
+  Router as WouterRouter,
+  Route,
+  Link,
+  useLocation,
+  useRoute,
+} from "wouter";
 
 export const Router = WouterRouter;
 export const RouteShim = Route;

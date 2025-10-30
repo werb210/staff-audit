@@ -47,8 +47,8 @@ function mapRawToContact(raw: any) {
     phone_e164: "",
     mobile_e164: "",
     title: "",
-    created_at: raw.createdAt || null,
-    updated_at: null,
+    createdAt: raw.createdAt || null,
+    updatedAt: null,
     // Include SLF-specific fields
     amount: raw.amount || null,
     country: raw.country || null,
@@ -119,8 +119,8 @@ router.get("/contacts", async (req: Request, res: Response) => {
           phone_e164: prefer(prev.phone_e164, c.phone_e164),
           mobile_e164: prefer(prev.mobile_e164, c.mobile_e164),
           title: prefer(prev.title, c.title),
-          created_at: prefer(prev.created_at, c.created_at),
-          updated_at: prefer(prev.updated_at, c.updated_at),
+          createdAt: prefer(prev.createdAt, c.createdAt),
+          updatedAt: prefer(prev.updatedAt, c.updatedAt),
           _raw: { ...prev._raw, ...c._raw }
         });
       }

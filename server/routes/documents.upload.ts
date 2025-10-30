@@ -44,7 +44,7 @@ r.post("/api/applications/:id/documents/upload", requireStaff, upload.single("fi
     // 📥 Record in DB
     // Replace with your query helper; this is illustrative:
     const insert = await (req as any).app.locals.db.query(
-      `insert into documents (application_id, file_name, file_size, document_type, status, file_key, uploaded_by)
+      `insert into documents (applicationId, name, size, document_type, status, file_key, uploaded_by)
        values ($1,$2,$3,$4,'pending',$5,$6) returning id`,
       [appId, f.originalname, f.size, documentType, key, "staff-ui"]
     );

@@ -15,7 +15,7 @@ export async function getFullApplicationData(applicationId: string): Promise<App
         id,
         form_data,
         status,
-        created_at
+        createdAt
       FROM applications 
       WHERE id = ${applicationId}
       LIMIT 1
@@ -35,8 +35,8 @@ export async function getFullApplicationData(applicationId: string): Promise<App
         nsf_count,
         volatility_score
       FROM banking_analysis 
-      WHERE application_id = ${applicationId}
-      ORDER BY created_at DESC
+      WHERE applicationId = ${applicationId}
+      ORDER BY createdAt DESC
       LIMIT 1
     `);
     
@@ -45,7 +45,7 @@ export async function getFullApplicationData(applicationId: string): Promise<App
       SELECT 
         extracted_data
       FROM ocr_results 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
       ORDER BY processed_at DESC
       LIMIT 1
     `);
@@ -55,7 +55,7 @@ export async function getFullApplicationData(applicationId: string): Promise<App
       SELECT 
         document_type
       FROM documents 
-      WHERE application_id = ${applicationId} 
+      WHERE applicationId = ${applicationId} 
       AND status = 'accepted'
     `);
     

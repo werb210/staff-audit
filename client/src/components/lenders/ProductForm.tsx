@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -14,8 +20,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { api } from '@/lib/queryClient';
+} from "@/components/ui/form";
+import { api } from "@/lib/queryClient";
 
 // Product form schema matching the clean schema
 const productFormSchema = z.object({
@@ -34,7 +40,7 @@ const productFormSchema = z.object({
   preferredIndustries: z.string().optional(),
   excludedIndustries: z.string().optional(),
   country: z.string().optional(),
-  requiredDocuments: z.string().optional()
+  requiredDocuments: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productFormSchema>;
@@ -43,32 +49,32 @@ interface ProductFormProps {
   initialData?: Partial<ProductFormData>;
   onSubmit: (data: ProductFormData) => void;
   isLoading?: boolean;
-  mode?: 'create' | 'edit' | 'view';
+  mode?: "create" | "edit" | "view";
 }
 
 const categoryOptions = [
-  'line_of_credit',
-  'term_loan',
-  'equipment_financing',
-  'invoice_factoring',
-  'purchase_order_financing',
-  'Working Capital',
-  'Asset-Based Lending',
-  'SBA Loan'
+  "line_of_credit",
+  "term_loan",
+  "equipment_financing",
+  "invoice_factoring",
+  "purchase_order_financing",
+  "Working Capital",
+  "Asset-Based Lending",
+  "SBA Loan",
 ];
 
-export default function ProductForm({ 
-  initialData, 
-  onSubmit, 
+export default function ProductForm({
+  initialData,
+  onSubmit,
   isLoading = false,
-  mode = 'create'
+  mode = "create",
 }: ProductFormProps) {
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
-      lenderId: initialData?.lenderId || '',
-      productName: initialData?.productName || '',
-      category: initialData?.category || '',
+      lenderId: initialData?.lenderId || "",
+      productName: initialData?.productName || "",
+      category: initialData?.category || "",
       minAmount: initialData?.minAmount || 0,
       maxAmount: initialData?.maxAmount || 0,
       minTermMonths: initialData?.minTermMonths || undefined,
@@ -78,23 +84,23 @@ export default function ProductForm({
       minCreditScore: initialData?.minCreditScore || undefined,
       minAnnualRevenue: initialData?.minAnnualRevenue || undefined,
       minTimeBusinessMonths: initialData?.minTimeBusinessMonths || undefined,
-      preferredIndustries: initialData?.preferredIndustries || '',
-      excludedIndustries: initialData?.excludedIndustries || '',
-      country: initialData?.country || '',
-      requiredDocuments: initialData?.requiredDocuments || ''
-    }
+      preferredIndustries: initialData?.preferredIndustries || "",
+      excludedIndustries: initialData?.excludedIndustries || "",
+      country: initialData?.country || "",
+      requiredDocuments: initialData?.requiredDocuments || "",
+    },
   });
 
   // Fetch lenders for dropdown
   const { data: lenders = [] } = useQuery({
-    queryKey: ['lenders'],
+    queryKey: ["lenders"],
     queryFn: async () => {
-      const response = await api('/api/lenders');
+      const response = await api("/api/lenders");
       return response || [];
     },
   });
 
-  const isReadOnly = mode === 'view';
+  const isReadOnly = mode === "view";
 
   return (
     <Form {...form}>
@@ -106,7 +112,11 @@ export default function ProductForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Lender *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isReadOnly}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={isReadOnly}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a lender" />
@@ -132,8 +142,8 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Product Name *</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="e.g., Business Line of Credit"
                     disabled={isReadOnly}
                   />
@@ -151,7 +161,11 @@ export default function ProductForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isReadOnly}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={isReadOnly}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
@@ -160,7 +174,9 @@ export default function ProductForm({
                   <SelectContent>
                     {categoryOptions.map((category) => (
                       <SelectItem key={category} value={category}>
-                        {category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {category
+                          .replace(/_/g, " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -177,8 +193,8 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Country</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     placeholder="US, CA"
                     disabled={isReadOnly}
                   />
@@ -197,8 +213,8 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Minimum Amount *</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={isReadOnly}
@@ -216,8 +232,8 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Maximum Amount *</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={isReadOnly}
@@ -237,10 +253,14 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Min Term (Months)</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
                     disabled={isReadOnly}
                   />
                 </FormControl>
@@ -256,10 +276,14 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Max Term (Months)</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
                     disabled={isReadOnly}
                   />
                 </FormControl>
@@ -277,11 +301,15 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Min Interest Rate (%)</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
                     step="0.01"
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
                     disabled={isReadOnly}
                   />
                 </FormControl>
@@ -297,11 +325,15 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Max Interest Rate (%)</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
                     step="0.01"
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
                     disabled={isReadOnly}
                   />
                 </FormControl>
@@ -319,10 +351,14 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Min Credit Score</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
                     disabled={isReadOnly}
                   />
                 </FormControl>
@@ -338,10 +374,14 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Min Annual Revenue</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
                     disabled={isReadOnly}
                   />
                 </FormControl>
@@ -357,10 +397,14 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Min Time in Business (Months)</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
+                  <Input
+                    {...field}
                     type="number"
-                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined,
+                      )
+                    }
                     disabled={isReadOnly}
                   />
                 </FormControl>
@@ -378,8 +422,8 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Preferred Industries</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    {...field} 
+                  <Textarea
+                    {...field}
                     placeholder="Manufacturing, Healthcare, Technology (comma-separated)"
                     disabled={isReadOnly}
                   />
@@ -396,8 +440,8 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Excluded Industries</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    {...field} 
+                  <Textarea
+                    {...field}
                     placeholder="Cannabis, Adult Entertainment (comma-separated)"
                     disabled={isReadOnly}
                   />
@@ -415,8 +459,8 @@ export default function ProductForm({
             <FormItem>
               <FormLabel>Required Documents</FormLabel>
               <FormControl>
-                <Textarea 
-                  {...field} 
+                <Textarea
+                  {...field}
                   placeholder="Bank statements, Tax returns, Financial statements (comma-separated)"
                   disabled={isReadOnly}
                 />
@@ -428,11 +472,12 @@ export default function ProductForm({
 
         {!isReadOnly && (
           <div className="flex justify-end space-x-2">
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-            >
-              {isLoading ? 'Saving...' : mode === 'create' ? 'Create Product' : 'Update Product'}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading
+                ? "Saving..."
+                : mode === "create"
+                  ? "Create Product"
+                  : "Update Product"}
             </Button>
           </div>
         )}

@@ -94,7 +94,7 @@ router.get('/:id/run', limiter, async (req: any, res: any) => {
   try {
     // Use the same filtering logic - for demo, get all contacts and apply basic filtering
     const allContacts = await db.execute(sql`
-      SELECT id, email, phone, full_name as fullName, status, updated_at as updatedAt
+      SELECT id, email, phone, full_name as fullName, status, updatedAt as updatedAt
       FROM contacts
       LIMIT 100
     `);

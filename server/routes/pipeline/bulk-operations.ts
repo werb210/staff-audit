@@ -67,7 +67,7 @@ r.post("/assign-lender", async (req: any, res) => {
     await db.execute(sql`
       UPDATE applications 
       SET assigned_lender_id = ${lenderId},
-          updated_at = NOW()
+          updatedAt = NOW()
       WHERE id = ANY(${applicationIds})
     `);
     
@@ -105,7 +105,7 @@ async function validateStageGate(applicationId: string, targetStage: string): Pr
         SELECT COUNT(*) as total, 
                COUNT(CASE WHEN status = 'accepted' THEN 1 END) as accepted
         FROM documents 
-        WHERE application_id = ${applicationId}
+        WHERE applicationId = ${applicationId}
       `);
       const counts = rows[0];
       if (counts.total === 0) {

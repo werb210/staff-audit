@@ -7,8 +7,8 @@ const r = Router();
 r.get("/ai/insights/:applicationId", async (req,res)=>{
   const appId = req.params.applicationId;
   // Pull document meta (assumed captured elsewhere)
-  const { rows: docs } = await db.execute(sql`select id, category, status, name, version from documents where application_id=${appId}`);
-  const { rows: tx } = await db.execute(sql`select posted_at, amount_cents, type from bank_tx where application_id=${appId} order by posted_at desc limit 500`);
+  const { rows: docs } = await db.execute(sql`select id, category, status, name, version from documents where applicationId=${appId}`);
+  const { rows: tx } = await db.execute(sql`select posted_at, amount_cents, type from bank_tx where applicationId=${appId} order by posted_at desc limit 500`);
   const groups = groupDocs(docs||[]);
   const banking = computeBanking(tx||[]);
   const conflicts = findConflicts(groups);

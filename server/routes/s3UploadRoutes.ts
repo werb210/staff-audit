@@ -83,11 +83,11 @@ router.post('/s3-upload/:applicationId', upload.single('document'), async (req: 
     // Create database record with S3 storage key using raw SQL to avoid field mapping issues
     const insertQuery = `
       INSERT INTO documents (
-        id, application_id, document_type, file_name, file_path, file_size, 
+        id, applicationId, document_type, name, file_path, size, 
         file_type, file_exists, checksum, storage_key, backup_status, 
-        is_required, is_verified, uploaded_by, created_at, updated_at
+        is_required, is_verified, uploaded_by, createdAt, updatedAt
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-      RETURNING id, file_name, storage_key, file_size, checksum
+      RETURNING id, name, storage_key, size, checksum
     `;
     
     const dbResult = await pool.query(insertQuery, [

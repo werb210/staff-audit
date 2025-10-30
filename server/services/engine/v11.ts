@@ -65,7 +65,7 @@ export async function runEngine11(applicationId: string, variant="prod"){
   if (!a) throw new Error("application not found");
 
   const weights = await getVariantWeights(variant);
-  const products = (await db.execute(sql`SELECT * FROM lender_products ORDER BY created_at`)).rows || [];
+  const products = (await db.execute(sql`SELECT * FROM lender_products ORDER BY createdAt`)).rows || [];
   const policies = (await db.execute(sql`
     SELECT scope, rule FROM engine_policies
     WHERE scope IN ('global', 'application:${applicationId}')
@@ -124,7 +124,7 @@ export async function runEngine11(applicationId: string, variant="prod"){
 
   const ranked = results.filter(r=>r.eligible).sort((a,b)=> b.score - a.score);
   await db.execute(sql`
-    INSERT INTO decision_traces(application_id, variant, results, rules_applied, inputs)
+    INSERT INTO decision_traces(applicationId, variant, results, rules_applied, inputs)
     VALUES (${applicationId}, ${variant}, ${JSON.stringify(ranked)}, ${JSON.stringify(rulesApplied)}, ${JSON.stringify(inputs)})
   `);
 

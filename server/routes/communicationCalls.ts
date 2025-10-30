@@ -31,7 +31,7 @@ router.post('/start', async (req: any, res: any) => {
     // Save call to database
     await db.execute(`
       INSERT INTO communication_calls (
-        id, twilio_sid, direction, phone_number, status, created_at
+        id, twilio_sid, direction, phone_number, status, createdAt
       ) VALUES (?, ?, ?, ?, ?, ?)
     `, [callId, call.sid, 'outgoing', phoneNumber, 'initiated', new Date()]);
 

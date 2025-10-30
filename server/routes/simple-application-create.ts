@@ -20,7 +20,7 @@ router.post("/public/applications", async (req: any, res: any) => {
     const appId = crypto.randomUUID();
     
     const query = `
-      INSERT INTO applications (id, user_id, requested_amount, use_of_funds, status, submission_country, product_id, created_at, updated_at)
+      INSERT INTO applications (id, user_id, requested_amount, use_of_funds, status, submission_country, product_id, createdAt, updatedAt)
       VALUES ($1, $2, $3, $4, 'draft', $5, $6, NOW(), NOW())
       RETURNING id
     `;

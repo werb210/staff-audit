@@ -33,9 +33,9 @@ router.get('/sms', async (req: any, res: any) => {
         phone_number,
         MAX(id) as thread_id,
         COUNT(*) as message_count,
-        MAX(created_at) as last_message_time,
-        (SELECT body FROM sms_messages s2 WHERE s2.phone_number = s1.phone_number ORDER BY created_at DESC LIMIT 1) as last_message,
-        (SELECT direction FROM sms_messages s2 WHERE s2.phone_number = s1.phone_number ORDER BY created_at DESC LIMIT 1) as direction,
+        MAX(createdAt) as last_message_time,
+        (SELECT body FROM sms_messages s2 WHERE s2.phone_number = s1.phone_number ORDER BY createdAt DESC LIMIT 1) as last_message,
+        (SELECT direction FROM sms_messages s2 WHERE s2.phone_number = s1.phone_number ORDER BY createdAt DESC LIMIT 1) as direction,
         COUNT(CASE WHEN direction = 'incoming' AND status != 'read' THEN 1 END) as unread_count
       FROM sms_messages s1
       GROUP BY phone_number
@@ -92,7 +92,7 @@ router.get('/sms/:threadId', async (req: any, res: any) => {
       SELECT *
       FROM sms_messages
       WHERE phone_number = ${phoneNumber}
-      ORDER BY created_at ASC
+      ORDER BY createdAt ASC
     `);
 
     res.json({
@@ -148,8 +148,8 @@ router.post('/sms/send', async (req: any, res: any) => {
           phone_number: to,
           from_number: result.from,
           to_number: to,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         };
         io.emit('sms:new', smsData);
         console.log(`📡 [COMM CENTER] Real-time SMS event emitted: ${result.sid}`);
@@ -201,10 +201,10 @@ router.get('/sms/messages', async (req: any, res: any) => {
         phone_number,
         from_number,
         to_number,
-        created_at,
-        updated_at
+        createdAt,
+        updatedAt
       FROM sms_messages 
-      ORDER BY created_at DESC 
+      ORDER BY createdAt DESC 
       LIMIT ${limit} OFFSET ${offset}
     `);
 
@@ -256,10 +256,10 @@ router.get('/calls', async (req: any, res: any) => {
         from_number,
         to_number,
         status,
-        created_at,
-        updated_at
+        createdAt,
+        updatedAt
       FROM call_logs 
-      ORDER BY created_at DESC 
+      ORDER BY createdAt DESC 
       LIMIT ${limit} OFFSET ${offset}
     `);
 
@@ -331,8 +331,8 @@ router.post('/voice/call', async (req: any, res: any) => {
           phone_number: to,
           to_number: to,
           status: result.status,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         };
         io.emit('call:new', callData);
         console.log(`📡 [COMM CENTER] Real-time call event emitted: ${result.sid}`);
@@ -386,10 +386,10 @@ router.get('/voice/calls', async (req: any, res: any) => {
         from_number,
         to_number,
         status,
-        created_at,
-        updated_at
+        createdAt,
+        updatedAt
       FROM call_logs 
-      ORDER BY created_at DESC 
+      ORDER BY createdAt DESC 
       LIMIT ${limit} OFFSET ${offset}
     `);
 
@@ -442,7 +442,7 @@ router.post('/voice/transcribe', async (req: any, res: any) => {
         UPDATE call_logs 
         SET transcription = ${TranscriptionText || null}, 
             recording_url = ${RecordingUrl || null},
-            updated_at = NOW()
+            updatedAt = NOW()
         WHERE twilio_sid = ${CallSid}
       `);
 
@@ -484,8 +484,8 @@ router.post('/webhooks/inbound-sms', async (req: any, res: any) => {
         phone_number: From,
         from_number: From,
         to_number: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       io.emit('sms:new', smsData);
       console.log(`📡 [COMM CENTER] Real-time inbound SMS event emitted: ${MessageSid}`);
@@ -527,8 +527,8 @@ router.post('/webhooks/inbound-call', async (req: any, res: any) => {
         phone_number: From,
         from_number: From,
         status: 'initiated',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       io.emit('call:new', callData);
       console.log(`📡 [COMM CENTER] Real-time inbound call event emitted: ${CallSid}`);
@@ -565,7 +565,7 @@ router.post('/webhooks/sms-status', async (req: any, res: any) => {
     
     await db.execute(sql`
       UPDATE sms_messages 
-      SET status = ${MessageStatus}, updated_at = NOW()
+      SET status = ${MessageStatus}, updatedAt = NOW()
       WHERE twilio_sid = ${MessageSid}
     `);
 
@@ -589,7 +589,7 @@ router.post('/webhooks/call-events', async (req: any, res: any) => {
       UPDATE call_logs 
       SET status = ${CallStatus}, 
           duration_seconds = ${CallDuration || null}, 
-          updated_at = NOW()
+          updatedAt = NOW()
       WHERE twilio_sid = ${CallSid}
     `);
 

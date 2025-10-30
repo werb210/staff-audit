@@ -2,7 +2,7 @@
 import { CATEGORY_LIST } from "../../../shared/categories";
 
 // Use canonical category labels for forms
-export const PRODUCT_CATEGORIES = CATEGORY_LIST.map(c => c.label);
+export const PRODUCT_CATEGORIES = CATEGORY_LIST.map((c) => c.label);
 
 // Legacy export for backward compatibility - now using the unified system
 export const REQUIRED_DOCUMENTS = {
@@ -16,7 +16,7 @@ export const REQUIRED_DOCUMENTS = {
   "Commercial Real Estate": ["Purchase/lease docs", "Property info"],
   "Purchase Order Financing": [
     "Copy of purchase order(s)",
-    "Supplier quote / pro forma invoice", 
+    "Supplier quote / pro forma invoice",
     "Customer contract or confirmed PO",
     "A/R aging report",
     "Proof of margin (COGS vs sales price)",

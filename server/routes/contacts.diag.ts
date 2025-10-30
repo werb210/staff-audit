@@ -16,11 +16,11 @@ router.get("/dupes", async (_req, res) => {
     const result = await pool.query(`
       SELECT 
         a.id, a.contact_email, a.contact_first_name, a.contact_last_name, 
-        a.created_at, a.updated_at, a.form_data, b.business_name
+        a.createdAt, a.updatedAt, a.form_data, b.business_name
       FROM applications a 
-      LEFT JOIN businesses b ON a.business_id = b.id
+      LEFT JOIN businesses b ON a.businessId = b.id
       WHERE a.contact_email IS NOT NULL
-      ORDER BY a.created_at DESC
+      ORDER BY a.createdAt DESC
     `);
     
     // Group by canonical email
@@ -42,7 +42,7 @@ router.get("/dupes", async (_req, res) => {
         name: [row.contact_first_name, row.contact_last_name].filter(Boolean).join(' ') || 'Name Not Set',
         company: row.business_name || '—',
         source: 'applications',
-        updatedAt: row.updated_at,
+        updatedAt: row.updatedAt,
       });
     });
     

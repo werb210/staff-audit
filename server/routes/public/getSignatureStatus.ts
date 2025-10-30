@@ -31,7 +31,7 @@ router.get('/applications/:id/signature-status', async (req: any, res: any) => {
       signature_status: app.signingStatus || "pending",
       document_id: app.signNowDocumentId,
       signed_at: app.signedAt,
-      application_id: app.id
+      applicationId: app.id
     });
 
   } catch (error: unknown) {

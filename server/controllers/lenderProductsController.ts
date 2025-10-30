@@ -23,7 +23,7 @@ export async function getLenderProducts(req: Request, res: Response) {
                COUNT(d.id) as total_docs,
                COUNT(CASE WHEN d.status = 'accepted' THEN 1 END) as accepted_docs
         FROM applications a
-        LEFT JOIN documents d ON a.id = d.application_id
+        LEFT JOIN documents d ON a.id = d.applicationId
         WHERE a.id = $1
         GROUP BY a.id, a.status
       `, [applicationId]);

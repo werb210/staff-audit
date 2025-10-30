@@ -31,20 +31,20 @@ router.post("/policies", async (req: any, res: any) => {
 router.get("/holds", async (_req, res) => {
   const r = await db.execute(sql`
     SELECT * FROM legal_holds 
-    ORDER BY created_at DESC
+    ORDER BY createdAt DESC
   `);
   res.json(r.rows || []);
 });
 
 router.post("/holds", async (req: any, res) => {
-  const { scope, contact_id, application_id, reason, expires_at } = req.body || {};
-  if (!scope || (!contact_id && !application_id)) {
+  const { scope, contact_id, applicationId, reason, expires_at } = req.body || {};
+  if (!scope || (!contact_id && !applicationId)) {
     return res.status(400).json({ error: "scope and ID required" });
   }
   
   await db.execute(sql`
-    INSERT INTO legal_holds(scope, contact_id, application_id, reason, expires_at, created_by_user_id)
-    VALUES (${scope}, ${contact_id || null}, ${application_id || null}, ${reason || null}, 
+    INSERT INTO legal_holds(scope, contact_id, applicationId, reason, expires_at, created_by_user_id)
+    VALUES (${scope}, ${contact_id || null}, ${applicationId || null}, ${reason || null}, 
             ${expires_at || null}, ${req.user?.id || null})
   `);
   
@@ -60,14 +60,14 @@ router.delete("/holds/:id", async (req: any, res: any) => {
 router.get("/erasure/queue", async (_req, res) => {
   const r = await db.execute(sql`
     SELECT * FROM erasure_requests 
-    ORDER BY created_at DESC
+    ORDER BY createdAt DESC
   `);
   res.json(r.rows || []);
 });
 
 router.post("/erasure", async (req: any, res) => {
-  const { scope, contact_id, application_id, reason } = req.body || {};
-  if (!scope || (!contact_id && !application_id)) {
+  const { scope, contact_id, applicationId, reason } = req.body || {};
+  if (!scope || (!contact_id && !applicationId)) {
     return res.status(400).json({ error: "scope and ID required" });
   }
   
@@ -75,7 +75,7 @@ router.post("/erasure", async (req: any, res) => {
   const holdCheck = await db.execute(sql`
     SELECT id FROM legal_holds 
     WHERE scope = ${scope} 
-      AND (contact_id = ${contact_id || null} OR application_id = ${application_id || null})
+      AND (contact_id = ${contact_id || null} OR applicationId = ${applicationId || null})
       AND (expires_at IS NULL OR expires_at > now())
   `);
   
@@ -84,8 +84,8 @@ router.post("/erasure", async (req: any, res) => {
   }
   
   const ins = await db.execute(sql`
-    INSERT INTO erasure_requests(scope, contact_id, application_id, reason, created_by_user_id)
-    VALUES (${scope}, ${contact_id || null}, ${application_id || null}, ${reason || null}, ${req.user?.id || null})
+    INSERT INTO erasure_requests(scope, contact_id, applicationId, reason, created_by_user_id)
+    VALUES (${scope}, ${contact_id || null}, ${applicationId || null}, ${reason || null}, ${req.user?.id || null})
     RETURNING id
   `);
   
@@ -129,16 +129,16 @@ router.get("/erasure/:id/dry-run", async (req: any, res: any) => {
       documents: 3,
       audit_logs: 8
     };
-    apps = [{ id: 'app-1', created_at: new Date() }, { id: 'app-2', created_at: new Date() }];
+    apps = [{ id: 'app-1', createdAt: new Date() }, { id: 'app-2', createdAt: new Date() }];
   } else if (request.scope === 'application') {
-    const appId = request.application_id;
+    const appId = request.applicationId;
     counts = {
       application: 1,
       documents: 2,
       communications: 4,
       audit_logs: 6
     };
-    apps = [{ id: appId, created_at: new Date() }];
+    apps = [{ id: appId, createdAt: new Date() }];
   }
   
   res.json({ counts, apps, total: Object.values(counts).reduce((sum: number, count) => sum + (count as number), 0) });
@@ -183,7 +183,7 @@ router.post("/erasure/:id/purge", async (req: any, res) => {
     if (request.scope === 'contact') {
       result = await purgeContactData(request.contact_id);
     } else if (request.scope === 'application') {
-      result = await purgeApplicationData(request.application_id);
+      result = await purgeApplicationData(request.applicationId);
     } else {
       throw new Error(`Unknown scope: ${request.scope}`);
     }
@@ -221,15 +221,15 @@ router.post("/sweep", async (_req, res) => {
       let query: any;
       
       if (policy.target === 'comm_messages') {
-        query = sql`DELETE FROM comm_messages WHERE created_at < ${cutoffDate.toISOString()}`;
+        query = sql`DELETE FROM comm_messages WHERE createdAt < ${cutoffDate.toISOString()}`;
       } else if (policy.target === 'audit_log') {
-        query = sql`DELETE FROM audit_log WHERE created_at < ${cutoffDate.toISOString()}`;
+        query = sql`DELETE FROM audit_log WHERE createdAt < ${cutoffDate.toISOString()}`;
       } else if (policy.target === 'lender_activity') {
-        query = sql`DELETE FROM lender_activity WHERE created_at < ${cutoffDate.toISOString()}`;
+        query = sql`DELETE FROM lender_activity WHERE createdAt < ${cutoffDate.toISOString()}`;
       } else if (policy.target === 'decision_traces') {
-        query = sql`DELETE FROM decision_traces WHERE created_at < ${cutoffDate.toISOString()}`;
+        query = sql`DELETE FROM decision_traces WHERE createdAt < ${cutoffDate.toISOString()}`;
       } else if (policy.target === 'integration_events') {
-        query = sql`DELETE FROM integration_events WHERE created_at < ${cutoffDate.toISOString()}`;
+        query = sql`DELETE FROM integration_events WHERE createdAt < ${cutoffDate.toISOString()}`;
       } else {
         results[policy.target] = { error: `Unknown target: ${policy.target}` };
         continue;

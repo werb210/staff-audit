@@ -21,8 +21,8 @@ function normalizeApp(raw: any) {
                    (raw.contact_first_name && raw.contact_last_name ? `${raw.contact_first_name} ${raw.contact_last_name}` : '') ||
                    raw.primary_contact || raw.ownerName || '',
     contactPhone:  raw.contactPhone || raw.contact_phone || raw.phone || raw.mobile || raw.form_data?.phone || raw.form_data?.mobile || '',
-    createdAt:     raw.createdAt || raw.created_at || raw.submitted_at || null,
-    updatedAt:     raw.updatedAt || raw.updated_at || raw.last_activity_at || raw.createdAt || null,
+    createdAt:     raw.createdAt || raw.createdAt || raw.submitted_at || null,
+    updatedAt:     raw.updatedAt || raw.updatedAt || raw.last_activity_at || raw.createdAt || null,
     // keep everything else so the drawer can render ALL fields
     _raw:          raw,
   };
@@ -37,11 +37,11 @@ router.get('/normalized', requireAuth, async (req: any, res: any) => {
     const enhancedQuery = `
       SELECT 
         a.id, a.status, a.stage, a.contact_email, a.contact_first_name, a.contact_last_name, 
-        a.created_at, a.updated_at, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
+        a.createdAt, a.updatedAt, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
         b.business_name, b.business_type, b.industry
       FROM applications a 
-      LEFT JOIN businesses b ON a.business_id = b.id
-      ORDER BY a.created_at DESC
+      LEFT JOIN businesses b ON a.businessId = b.id
+      ORDER BY a.createdAt DESC
       LIMIT 500
     `;
     
@@ -74,7 +74,7 @@ router.get('/normalized/:id', requireAuth, async (req: any, res: any) => {
       SELECT 
         a.*, b.business_name, b.business_type, b.industry
       FROM applications a 
-      LEFT JOIN businesses b ON a.business_id = b.id
+      LEFT JOIN businesses b ON a.businessId = b.id
       WHERE a.id = $1
     `;
     
@@ -97,11 +97,11 @@ router.get('/board/normalized', requireAuth, async (req: any, res: any) => {
     const enhancedQuery = `
       SELECT 
         a.id, a.status, a.stage, a.contact_email, a.contact_first_name, a.contact_last_name, 
-        a.created_at, a.updated_at, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
+        a.createdAt, a.updatedAt, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
         b.business_name, b.business_type, b.industry
       FROM applications a 
-      LEFT JOIN businesses b ON a.business_id = b.id
-      ORDER BY a.created_at DESC
+      LEFT JOIN businesses b ON a.businessId = b.id
+      ORDER BY a.createdAt DESC
       LIMIT 500
     `;
     

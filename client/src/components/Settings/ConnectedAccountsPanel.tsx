@@ -1,9 +1,9 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, LinkIcon, UnlinkIcon } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, LinkIcon, UnlinkIcon } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface ConnectedAccount {
   provider: string;
@@ -13,9 +13,9 @@ interface ConnectedAccount {
 }
 
 const PROVIDERS = [
-  { id: 'microsoft', name: 'Microsoft Office 365', icon: '🏢' },
-  { id: 'google', name: 'Google Workspace', icon: '🔍' },
-  { id: 'linkedin', name: 'LinkedIn', icon: '💼' }
+  { id: "microsoft", name: "Microsoft Office 365", icon: "🏢" },
+  { id: "google", name: "Google Workspace", icon: "🔍" },
+  { id: "linkedin", name: "LinkedIn", icon: "💼" },
 ];
 
 export default function ConnectedAccountsPanel() {
@@ -23,24 +23,24 @@ export default function ConnectedAccountsPanel() {
 
   // Fetch connected accounts status
   const { data: accounts, isLoading } = useQuery({
-    queryKey: ['connected-accounts'],
+    queryKey: ["connected-accounts"],
     queryFn: async () => {
-      const response = await fetch('/api/settings/connected-accounts');
+      const response = await fetch("/api/settings/connected-accounts");
       if (!response.ok) {
-        throw new Error('Failed to fetch connected accounts');
+        throw new Error("Failed to fetch connected accounts");
       }
       return response.json() as Record<string, ConnectedAccount>;
-    }
+    },
   });
 
   // Connect account mutation
   const connectMutation = useMutation({
     mutationFn: async (provider: string) => {
       const response = await fetch(`/api/settings/connect/${provider}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
         throw new Error(`Failed to connect ${provider}`);
@@ -53,16 +53,16 @@ export default function ConnectedAccountsPanel() {
         window.location.href = data.redirectUrl;
       } else {
         // Refresh accounts data
-        queryClient.invalidateQueries({ queryKey: ['connected-accounts'] });
+        queryClient.invalidateQueries({ queryKey: ["connected-accounts"] });
       }
-    }
+    },
   });
 
   // Disconnect account mutation
   const disconnectMutation = useMutation({
     mutationFn: async (provider: string) => {
       const response = await fetch(`/api/settings/disconnect/${provider}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
       if (!response.ok) {
         throw new Error(`Failed to disconnect ${provider}`);
@@ -70,8 +70,8 @@ export default function ConnectedAccountsPanel() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['connected-accounts'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["connected-accounts"] });
+    },
   });
 
   const handleConnect = (provider: string) => {
@@ -112,31 +112,41 @@ export default function ConnectedAccountsPanel() {
         {PROVIDERS.map((provider) => {
           const account = accounts?.[provider.id];
           const isConnected = account?.connected || false;
-          const isConnecting = connectMutation.isPending && connectMutation.variables === provider.id;
-          const isDisconnecting = disconnectMutation.isPending && disconnectMutation.variables === provider.id;
+          const isConnecting =
+            connectMutation.isPending &&
+            connectMutation.variables === provider.id;
+          const isDisconnecting =
+            disconnectMutation.isPending &&
+            disconnectMutation.variables === provider.id;
 
           return (
-            <div key={provider.id} className="flex items-center justify-between p-4 border rounded-lg">
+            <div
+              key={provider.id}
+              className="flex items-center justify-between p-4 border rounded-lg"
+            >
               <div className="flex items-center space-x-3">
                 <div className="text-2xl">{provider.icon}</div>
                 <div>
                   <h3 className="font-medium">{provider.name}</h3>
                   {isConnected && account?.email && (
-                    <p className="text-sm text-muted-foreground">{account.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {account.email}
+                    </p>
                   )}
                   {isConnected && account?.connectedAt && (
                     <p className="text-xs text-muted-foreground">
-                      Connected on {new Date(account.connectedAt).toLocaleDateString()}
+                      Connected on{" "}
+                      {new Date(account.connectedAt).toLocaleDateString()}
                     </p>
                   )}
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Badge variant={isConnected ? "default" : "secondary"}>
                   {isConnected ? "Connected" : "Not Connected"}
                 </Badge>
-                
+
                 {isConnected ? (
                   <Button
                     variant="outline"

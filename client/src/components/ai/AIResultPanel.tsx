@@ -2,7 +2,15 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Loader2, AlertTriangle, CheckCircle, Copy, ExternalLink, RefreshCw, X } from "lucide-react";
+import {
+  Loader2,
+  AlertTriangle,
+  CheckCircle,
+  Copy,
+  ExternalLink,
+  RefreshCw,
+  X,
+} from "lucide-react";
 
 interface Citation {
   source: string;
@@ -57,19 +65,22 @@ export default function AIResultPanel({
 
   const openLogs = () => {
     if (data?.requestId) {
-      window.open(`/staff/admin/ai/logs?requestId=${data.requestId}`, '_blank');
+      window.open(`/staff/admin/ai/logs?requestId=${data.requestId}`, "_blank");
     }
   };
 
   const renderCitations = (citations: Citation[]) => {
     if (!citations?.length) return null;
-    
+
     return (
       <div className="mt-3 p-2 bg-blue-50 rounded-lg">
         <div className="text-sm font-medium text-blue-900 mb-2">Sources:</div>
         <div className="space-y-1">
           {citations.map((citation, idx) => (
-            <div key={idx} className="text-xs text-blue-700 flex items-center gap-2">
+            <div
+              key={idx}
+              className="text-xs text-blue-700 flex items-center gap-2"
+            >
               <ExternalLink className="w-3 h-3" />
               {citation.source}
               {citation.page && <span>• Page {citation.page}</span>}
@@ -85,15 +96,19 @@ export default function AIResultPanel({
     );
   };
 
-  const renderMetadata = (metadata: AIResultData['metadata']) => {
+  const renderMetadata = (metadata: AIResultData["metadata"]) => {
     if (!metadata) return null;
-    
+
     return (
       <div className="text-xs text-gray-500 mt-2 flex items-center gap-3">
         {metadata.model && <span>Model: {metadata.model}</span>}
         {metadata.tokens && <span>Tokens: {metadata.tokens}</span>}
         {metadata.latency && <span>Latency: {metadata.latency}ms</span>}
-        {metadata.cached && <Badge variant="secondary" className="text-xs">Cached</Badge>}
+        {metadata.cached && (
+          <Badge variant="secondary" className="text-xs">
+            Cached
+          </Badge>
+        )}
       </div>
     );
   };
@@ -106,9 +121,11 @@ export default function AIResultPanel({
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-red-600">
             <AlertTriangle className="w-4 h-4" />
-            <span className="font-medium">Error: {data.code || 'Unknown'}</span>
+            <span className="font-medium">Error: {data.code || "Unknown"}</span>
           </div>
-          <div className="text-sm text-red-700">{data.message || data.error}</div>
+          <div className="text-sm text-red-700">
+            {data.message || data.error}
+          </div>
           {data.hint && (
             <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
               💡 {data.hint}
@@ -121,7 +138,11 @@ export default function AIResultPanel({
                 Retry
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={() => copyToClipboard(data.error || '')}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => copyToClipboard(data.error || "")}
+            >
               <Copy className="w-3 h-3 mr-1" />
               Copy Error
             </Button>
@@ -142,33 +163,43 @@ export default function AIResultPanel({
           <CheckCircle className="w-4 h-4" />
           <span className="font-medium">Success</span>
         </div>
-        
+
         {/* Main result content */}
         <div className="space-y-2">
-          {typeof data.result === 'string' ? (
+          {typeof data.result === "string" ? (
             <div className="text-sm">{data.result}</div>
           ) : data.result ? (
             <div className="text-sm">
               {/* Format common result types */}
               {data.result.score !== undefined && (
-                <div>Score: <span className="font-mono">{data.result.score}</span></div>
+                <div>
+                  Score: <span className="font-mono">{data.result.score}</span>
+                </div>
               )}
               {data.result.probability !== undefined && (
-                <div>Probability: <span className="font-mono">{Math.round(data.result.probability * 100)}%</span></div>
+                <div>
+                  Probability:{" "}
+                  <span className="font-mono">
+                    {Math.round(data.result.probability * 100)}%
+                  </span>
+                </div>
               )}
               {data.result.summary && (
                 <div className="mt-2">{data.result.summary}</div>
               )}
-              {data.result.recommendations && Array.isArray(data.result.recommendations) && (
-                <div className="mt-2">
-                  <div className="font-medium">Recommendations:</div>
-                  <ul className="list-disc list-inside text-sm mt-1">
-                    {data.result.recommendations.map((rec: string, idx: number) => (
-                      <li key={idx}>{rec}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {data.result.recommendations &&
+                Array.isArray(data.result.recommendations) && (
+                  <div className="mt-2">
+                    <div className="font-medium">Recommendations:</div>
+                    <ul className="list-disc list-inside text-sm mt-1">
+                      {data.result.recommendations.map(
+                        (rec: string, idx: number) => (
+                          <li key={idx}>{rec}</li>
+                        ),
+                      )}
+                    </ul>
+                  </div>
+                )}
             </div>
           ) : null}
         </div>
@@ -186,13 +217,15 @@ export default function AIResultPanel({
             variant="outline"
             onClick={() => setShowRaw(!showRaw)}
           >
-            {showRaw ? 'Hide' : 'Show'} Raw Data
+            {showRaw ? "Hide" : "Show"} Raw Data
           </Button>
           {data.result && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => copyToClipboard(JSON.stringify(data.result, null, 2))}
+              onClick={() =>
+                copyToClipboard(JSON.stringify(data.result, null, 2))
+              }
             >
               <Copy className="w-3 h-3 mr-1" />
               Copy Result
@@ -211,8 +244,8 @@ export default function AIResultPanel({
   };
 
   return (
-    <Card 
-      data-testid="ai-result-panel" 
+    <Card
+      data-testid="ai-result-panel"
       className={`p-4 border-l-4 border-l-blue-500 ${className}`}
     >
       <div className="flex items-center justify-between mb-3">
@@ -253,7 +286,11 @@ export default function AIResultPanel({
                 Retry
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={() => copyToClipboard(error)}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => copyToClipboard(error)}
+            >
               <Copy className="w-3 h-3 mr-1" />
               Copy Error
             </Button>

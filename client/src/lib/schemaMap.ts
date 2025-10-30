@@ -24,5 +24,5 @@ export const FIELD_MAP: Record<string, string[]> = {
   ownershipPct: ["ownership_pct", "ownershipPercent"],
   rentOrOwn: ["rent_or_own", "occupancy"],
   propertyVal: ["property_value"],
-  mortgageBal: ["mortgage_balance"]
+  mortgageBal: ["mortgage_balance"],
 };

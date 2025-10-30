@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import React from "react";
 import { useAuth } from "./useAuth";
 
-export default function Protected({ children }:{ children: JSX.Element }){
+export default function Protected({ children }: { children: JSX.Element }) {
   const { user, loading } = useAuth();
   const [, navigate] = useLocation();
 
@@ -17,6 +17,6 @@ export default function Protected({ children }:{ children: JSX.Element }){
 
   // SAFE role normalization
   const role = typeof user?.role === "string" ? user.role.toLowerCase() : "";
-  
+
   return <>{children}</>;
 }

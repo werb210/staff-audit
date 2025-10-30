@@ -6,7 +6,7 @@ export const users = pgTable('users', {
   phone: varchar('phone', { length: 32 }).notNull().unique(),
   role: varchar('role', { length: 32 }).notNull(),          // admin | staff | marketing | lender | referrer
   name: varchar('name', { length: 255 }).notNull(),
-  createdAt: timestamp('created_at').defaultNow()
+  createdAt: timestamp('createdAt').defaultNow()
 });
 
 export const contacts = pgTable('contacts', {
@@ -16,7 +16,7 @@ export const contacts = pgTable('contacts', {
   phone: varchar('phone', { length: 32 }),
   ownerId: uuid('owner_id').references(()=>users.id),
   tags: text('tags'),                            // comma-separated
-  createdAt: timestamp('created_at').defaultNow()
+  createdAt: timestamp('createdAt').defaultNow()
 });
 
 export const applications = pgTable('applications', {
@@ -27,12 +27,12 @@ export const applications = pgTable('applications', {
   submission_country: text('submission_country'),
   product_category: varchar('product_category', { length: 64 }),
   application_canon: jsonb('application_canon').notNull().default({}),
-  created_at: timestamp('created_at').defaultNow()
+  createdAt: timestamp('createdAt').defaultNow()
 });
 
 export const documents = pgTable('documents', {
   id: uuid('id').defaultRandom().primaryKey(),
-  applicationId: uuid('application_id').references(()=>applications.id).notNull(),
+  applicationId: uuid('applicationId').references(()=>applications.id).notNull(),
   category: varchar('category', { length: 64 }).notNull(),   // Balance Sheet, Bank Statements, etc.
   name: varchar('name', { length: 255 }).notNull(),
   s3Key: text('s3_key').notNull(),
@@ -42,7 +42,7 @@ export const documents = pgTable('documents', {
   status: varchar('status', { length: 32 }).notNull().default('pending'), // pending|accepted|rejected
   rejectReason: text('reject_reason'),
   uploadedBy: varchar('uploaded_by', { length: 64 }).notNull(), // client-portal|staff
-  createdAt: timestamp('created_at').defaultNow()
+  createdAt: timestamp('createdAt').defaultNow()
 });
 
 export const lenderProducts = pgTable('lender_products', {
@@ -68,7 +68,7 @@ export const comms = pgTable('comms', {
   subject: text('subject'),
   body: text('body'),
   meta: text('meta'),
-  createdAt: timestamp('created_at').defaultNow()
+  createdAt: timestamp('createdAt').defaultNow()
 });
 
 export const audits = pgTable('audits', {
@@ -78,5 +78,5 @@ export const audits = pgTable('audits', {
   entityId: uuid('entity_id').notNull(),
   userId: uuid('user_id'),
   data: text('data'),
-  createdAt: timestamp('created_at').defaultNow()
+  createdAt: timestamp('createdAt').defaultNow()
 });

@@ -14,9 +14,9 @@ router.get("/applications", async (req: any, res: any) => {
   const client = await pgc();
   try {
     const query = `
-      SELECT id, user_id, requested_amount, status, use_of_funds, created_at, updated_at
+      SELECT id, user_id, requested_amount, status, use_of_funds, createdAt, updatedAt
       FROM applications 
-      ORDER BY created_at DESC 
+      ORDER BY createdAt DESC 
       LIMIT 50
     `;
     
@@ -27,8 +27,8 @@ router.get("/applications", async (req: any, res: any) => {
       amount: Number(row.requested_amount) || 0,
       stage: row.status || 'new',
       description: row.use_of_funds || '',
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt
     }));
     
     res.json(applications);
@@ -84,7 +84,7 @@ router.patch("/applications/:id", async (req: any, res: any) => {
     
     const query = `
       UPDATE applications 
-      SET updated_at = NOW(), 
+      SET updatedAt = NOW(), 
           requested_amount = COALESCE($2, requested_amount),
           use_of_funds = COALESCE($3, use_of_funds)
       WHERE id = $1

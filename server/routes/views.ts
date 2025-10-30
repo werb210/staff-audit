@@ -8,7 +8,7 @@ r.use(requireAuth);
 
 r.get("/views", async (req: any, res) => {
   const scope = String(req.query.scope || "");
-  const { rows } = await db.execute(sql`select * from saved_views where scope=${scope} and (user_id is null or user_id=${req.user.sub}) order by is_default desc, created_at desc`);
+  const { rows } = await db.execute(sql`select * from saved_views where scope=${scope} and (user_id is null or user_id=${req.user.sub}) order by is_default desc, createdAt desc`);
   res.json({ ok: true, items: rows });
 });
 

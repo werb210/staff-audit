@@ -84,7 +84,7 @@ router.patch("/:id", async (req: any, res: any) => {
       return res.status(400).json({ error: "No fields to update" });
     }
 
-    fields.push(`updated_at = NOW()`);
+    fields.push(`updatedAt = NOW()`);
     values.push(id);
 
     await q(`
@@ -107,7 +107,7 @@ router.delete("/:id", async (req: any, res: any) => {
   try {
     await q(`
       UPDATE comm_templates 
-      SET is_active = false, updated_at = NOW()
+      SET is_active = false, updatedAt = NOW()
       WHERE id = $1
     `, [id]);
 

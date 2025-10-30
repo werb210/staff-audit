@@ -235,7 +235,7 @@ export async function buildBankingAnalysis(applicationId: string, periodStart: s
     // Store the analysis in the database for future reference
     await client.query(`
       UPDATE applications 
-      SET banking_analysis = $1, updated_at = NOW() 
+      SET banking_analysis = $1, updatedAt = NOW() 
       WHERE id = $2
     `, [JSON.stringify(sampleData), applicationId]);
 

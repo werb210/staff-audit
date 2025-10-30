@@ -27,7 +27,7 @@ async function getTokens() {
 async function saveTokens(tokens: any) {
   try {
     await db.execute(`
-      INSERT INTO google_ads_integrations (id, refresh_token, access_token, token_expiry, login_customer_id, developer_token, updated_at)
+      INSERT INTO google_ads_integrations (id, refresh_token, access_token, token_expiry, login_customer_id, developer_token, updatedAt)
       VALUES ('default', $1, $2, $3, $4, $5, now())
       ON CONFLICT (id) DO UPDATE SET
         refresh_token = EXCLUDED.refresh_token,
@@ -35,7 +35,7 @@ async function saveTokens(tokens: any) {
         token_expiry = EXCLUDED.token_expiry,
         login_customer_id = EXCLUDED.login_customer_id,
         developer_token = EXCLUDED.developer_token,
-        updated_at = now()
+        updatedAt = now()
     `, [
       tokens.refresh_token || null,
       tokens.access_token || null,

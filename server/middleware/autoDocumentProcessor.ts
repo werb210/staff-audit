@@ -52,7 +52,7 @@ export async function processDocument(documentId: string, applicationId: string,
           INSERT INTO ocr_results (
             id,
             document_id,
-            application_id,
+            applicationId,
             extracted_data,
             confidence,
             processing_time_ms,
@@ -119,11 +119,11 @@ export async function processApplicationDocuments(applicationId: string): Promis
 
     // Get all bank statement documents for the application
     const documentsResult = await db.execute(sql`
-      SELECT id, file_name, document_type
+      SELECT id, name, document_type
       FROM documents 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
       AND document_type = 'bank_statements'
-      ORDER BY created_at
+      ORDER BY createdAt
     `);
 
     if (!documentsResult.rows.length) {
@@ -137,7 +137,7 @@ export async function processApplicationDocuments(applicationId: string): Promis
 
     // Process each document
     for (const doc of documentsResult.rows) {
-      const result = await processDocument(doc.id, applicationId, doc.file_name, doc.document_type);
+      const result = await processDocument(doc.id, applicationId, doc.name, doc.document_type);
       results.push(result);
     }
 

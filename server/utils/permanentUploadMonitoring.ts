@@ -21,7 +21,7 @@ export async function findZeroDocumentApplications(hours: number = 24): Promise<
     console.log(`🔍 [MONITORING] Checking for applications with zero documents in last ${hours} hours`);
     
     const result = await db.execute(sql`
-      SELECT a.id as application_id, 
+      SELECT a.id as applicationId, 
              a.legal_business_name,
              a.contact_email,
              a.createdAt,

@@ -17,7 +17,7 @@ r.post("/analytics/roi/map/run", async (_req,res)=>{
     `)).rows;
     for (const app of apps){
       await db.execute(sql`
-        insert into roi_mappings(application_id, contact_id, source, campaign_id, day, cost_micros, conversions)
+        insert into roi_mappings(applicationId, contact_id, source, campaign_id, day, cost_micros, conversions)
         values(${app.id}, ${app.contact_id}, 'google_ads', ${String(a.campaign_id||'')}, ${a.day}, ${Number(a.cost_micros||0)}, ${Number(a.conversions||0)})
         on conflict do nothing
       `);
@@ -28,10 +28,10 @@ r.post("/analytics/roi/map/run", async (_req,res)=>{
   const ga4 = (await db.execute(sql`select day, event_name, value, count from ga4_conversions where day >= current_date - 60`)).rows;
   for (const g of ga4){
     // If gclid was captured on contacts/apps (from your landing page), map by day +/- 30
-    const apps = (await db.execute(sql`select id, contact_id from applications where gclid is not null and created_at between ${g.day}::date - 30 and ${g.day}::date + 30`)).rows;
+    const apps = (await db.execute(sql`select id, contact_id from applications where gclid is not null and createdAt between ${g.day}::date - 30 and ${g.day}::date + 30`)).rows;
     for (const app of apps){
       await db.execute(sql`
-        insert into roi_mappings(application_id, contact_id, source, event_name, day, revenue_cents)
+        insert into roi_mappings(applicationId, contact_id, source, event_name, day, revenue_cents)
         values(${app.id}, ${app.contact_id}, 'ga4', ${g.event_name}, ${g.day}, ${Math.round(Number(g.value||0)*100)})
         on conflict do nothing
       `);
@@ -50,7 +50,7 @@ r.get("/analytics/roi/summary", async (_req,res)=>{
   const { rows: rev } = await db.execute(sql`
     select m.campaign_id, sum(coalesce(m.revenue_cents,0))::int as revenue_cents
     from roi_mappings m
-    left join applications a on a.id = m.application_id
+    left join applications a on a.id = m.applicationId
     where m.day >= current_date - 60 and a.funded = true
     group by m.campaign_id
   `);

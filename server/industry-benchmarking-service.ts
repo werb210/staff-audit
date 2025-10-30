@@ -667,7 +667,7 @@ Use realistic values based on industry standards and current economic data.`;
         pool.query(`
           SELECT COUNT(*) as count 
           FROM benchmark_comparisons 
-          WHERE created_at > NOW() - INTERVAL '30 days'
+          WHERE createdAt > NOW() - INTERVAL '30 days'
         `)
       ]);
 

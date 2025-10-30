@@ -1,0 +1,12 @@
+export const API_ROOT = "/api";
+export const AUTH_BASE_PATH = `${API_ROOT}/auth`;
+export const AUTH_SESSION_ENDPOINT = `${AUTH_BASE_PATH}/session`;
+export const TWILIO_BASE_PATH = `${API_ROOT}/twilio`;
+export const TWILIO_TOKEN_ENDPOINT = `${TWILIO_BASE_PATH}/token`;
+export const COMMUNICATIONS_BASE_PATH = `${API_ROOT}/communications`;
+export const DOCUMENTS_BASE_PATH = `${API_ROOT}/documents`;
+export const PIPELINE_BASE_PATH = `${API_ROOT}/pipeline`;
+export const ANALYTICS_BASE_PATH = `${API_ROOT}/analytics`;
+export const CLIENT_BASE_PATH = `${API_ROOT}/client`;
+export const STAFF_BASE_PATH = `${API_ROOT}/staff`;
+export const ADMIN_CODEX_BASE_PATH = `${API_ROOT}/admin/codex`;

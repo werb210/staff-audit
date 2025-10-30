@@ -78,9 +78,9 @@ r.get("/marketing/bulk/status", async (req: any, res: any) => {
   try {
     const { rows } = await db.execute(sql`
       SELECT platform, COUNT(*) as operations, 
-             MAX(created_at) as last_operation
+             MAX(createdAt) as last_operation
       FROM audience_sync_logs 
-      WHERE created_at > NOW() - INTERVAL '7 days'
+      WHERE createdAt > NOW() - INTERVAL '7 days'
       GROUP BY platform
       ORDER BY last_operation DESC
     `);

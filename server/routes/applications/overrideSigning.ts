@@ -43,7 +43,7 @@ router.patch('/:id/override-signing', async (req: any, res: any) => {
         signing_status = 'completed',
         signed_at = NOW(),
         stage = 'Lender Match',
-        updated_at = NOW()
+        updatedAt = NOW()
       WHERE id = $1
       RETURNING id, signed, signing_status, stage, signed_at
     `;

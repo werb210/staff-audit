@@ -16,7 +16,7 @@ const mockLinkedInDb = {
   
   // Settings operations
   saveSettings: (userId: string, settings: any) => {
-    mockLinkedInDb.settings.set(userId, { ...settings, updated_at: new Date().toISOString() });
+    mockLinkedInDb.settings.set(userId, { ...settings, updatedAt: new Date().toISOString() });
     return mockLinkedInDb.settings.get(userId);
   },
   
@@ -25,7 +25,7 @@ const mockLinkedInDb = {
   // Posts operations
   createPost: (data: any) => {
     const id = mockLinkedInDb.generateId();
-    const post = { id, ...data, created_at: new Date().toISOString(), status: 'draft' };
+    const post = { id, ...data, createdAt: new Date().toISOString(), status: 'draft' };
     mockLinkedInDb.posts.set(id, post);
     return post;
   },
@@ -36,7 +36,7 @@ const mockLinkedInDb = {
   // Ads operations
   createAd: (data: any) => {
     const id = mockLinkedInDb.generateId();
-    const ad = { id, ...data, created_at: new Date().toISOString(), status: 'draft' };
+    const ad = { id, ...data, createdAt: new Date().toISOString(), status: 'draft' };
     mockLinkedInDb.ads.set(id, ad);
     return ad;
   },

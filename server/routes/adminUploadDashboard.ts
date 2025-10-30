@@ -19,8 +19,8 @@ router.get('/metrics', async (req: any, res: any) => {
       SELECT 
         status,
         COUNT(*) as count,
-        MIN(created_at) as first_attempt,
-        MAX(created_at) as last_attempt
+        MIN(createdAt) as first_attempt,
+        MAX(createdAt) as last_attempt
       FROM document_upload_log
       GROUP BY status
       ORDER BY 
@@ -45,12 +45,12 @@ router.get('/metrics', async (req: any, res: any) => {
     // Get recent upload activity (last 24 hours)
     const recentActivity = await db.execute(sql`
       SELECT 
-        DATE_TRUNC('hour', created_at) as hour,
+        DATE_TRUNC('hour', createdAt) as hour,
         status,
         COUNT(*) as count
       FROM document_upload_log
-      WHERE created_at >= NOW() - INTERVAL '24 hours'
-      GROUP BY DATE_TRUNC('hour', created_at), status
+      WHERE createdAt >= NOW() - INTERVAL '24 hours'
+      GROUP BY DATE_TRUNC('hour', createdAt), status
       ORDER BY hour DESC
     `);
 
@@ -58,15 +58,15 @@ router.get('/metrics', async (req: any, res: any) => {
     const fallbackDocs = await db.execute(sql`
       SELECT 
         d.id,
-        d.application_id,
-        d.file_name,
-        d.file_size,
-        d.created_at,
+        d.applicationId,
+        d.name,
+        d.size,
+        d.createdAt,
         d.file_path,
         CASE WHEN d.file_path IS NOT NULL THEN 'file_exists' ELSE 'file_missing' END as file_status
       FROM documents d
       WHERE d.storage_status = 'fallback'
-      ORDER BY d.created_at DESC
+      ORDER BY d.createdAt DESC
       LIMIT 50
     `);
 
@@ -138,7 +138,7 @@ router.get('/health', async (req: any, res: any) => {
     const recentUploads = await db.execute(sql`
       SELECT COUNT(*) as count
       FROM document_upload_log
-      WHERE created_at >= NOW() - INTERVAL '1 hour'
+      WHERE createdAt >= NOW() - INTERVAL '1 hour'
     `);
 
     const recentUploadCount = parseInt(recentUploads.rows[0]?.count || '0');
@@ -188,7 +188,7 @@ router.post('/retry-upload/:documentId', async (req: any, res: any) => {
 
     // Get document details
     const doc = await db.execute(sql`
-      SELECT id, application_id, file_name, file_path, storage_status
+      SELECT id, applicationId, name, file_path, storage_status
       FROM documents
       WHERE id = ${documentId} AND storage_status = 'fallback'
     `);
@@ -278,7 +278,7 @@ router.get('/audit-report', async (req: any, res: any) => {
         (SELECT COUNT(*) FROM documents WHERE storage_status = 'fallback') as fallback_count,
         (SELECT COUNT(*) FROM documents WHERE storage_status = 'success') as success_count,
         (SELECT COUNT(*) FROM document_upload_log WHERE status = 'failure') as failure_count,
-        (SELECT MAX(created_at) FROM document_upload_log) as last_upload
+        (SELECT MAX(createdAt) FROM document_upload_log) as last_upload
     `);
 
     res.json({

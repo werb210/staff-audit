@@ -56,11 +56,11 @@ router.post("/", async (req: any, res: any) => {
         contact_phone,
         annual_revenue,
         years_in_business,
-        created_at, 
-        updated_at
+        createdAt, 
+        updatedAt
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
-      RETURNING id, status, requested_amount, created_at
+      RETURNING id, status, requested_amount, createdAt
     `;
     
     const formData = {
@@ -91,7 +91,7 @@ router.post("/", async (req: any, res: any) => {
         id: app.id,
         status: app.status,
         amount: app.requested_amount,
-        created_at: app.created_at
+        createdAt: app.createdAt
       },
       input: {
         product_id, country, amount, industry

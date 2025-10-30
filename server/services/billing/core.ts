@@ -80,7 +80,7 @@ export async function meter(opts:{ tenant?:string; metric:string; qty?:number; r
   await ensureCounter(tenant, metric, period);
   await db.execute(sql`
     UPDATE usage_counters
-       SET value = value + ${qty}::bigint, updated_at = now()
+       SET value = value + ${qty}::bigint, updatedAt = now()
      WHERE tenant_key=${tenant} AND metric=${metric} AND period_start=${period}
   `);
   await db.execute(sql`

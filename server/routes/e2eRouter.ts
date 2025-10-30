@@ -69,7 +69,7 @@ r.post("/applications", async (req: any, res: any, next: any) => {
     const id = crypto.randomUUID();
     const now = new Date();
     await q(
-      `insert into applications (id, user_id, status, requested_amount, use_of_funds, created_at, updated_at)
+      `insert into applications (id, user_id, status, requested_amount, use_of_funds, createdAt, updatedAt)
        values ($1,$2,$3,$4,$5,$6,$7)`,
       [id, "test-user", "draft", a.amountRequested || 250000, a.useOfFunds || "Working capital", now, now]
     );
@@ -82,7 +82,7 @@ r.get("/applications/:id", async (req: any, res: any, next: any) => {
   try {
     const [app] = await q<any>(`select * from applications where id=$1`, [req.params.id]);
     if (!app) return res.status(404).json({ error: "not_found" });
-    const docs = await q<any>(`select id, application_id, document_type as category, file_type as mime_type, file_size as size_bytes, file_path as s3_key, status from documents where application_id=$1 order by created_at asc`, [req.params.id]);
+    const docs = await q<any>(`select id, applicationId, document_type as category, file_type as mime_type, size as size_bytes, file_path as s3_key, status from documents where applicationId=$1 order by createdAt asc`, [req.params.id]);
     res.json({ ...app, documents: docs });
   } catch (e) { next(e); }
 });
@@ -96,7 +96,7 @@ r.post("/applications/:id/documents", upload.single("file"), async (req: any, re
     const key = `applications/${req.params.id}/${id}-${req.file.originalname}`;
     await s3Put(key, req.file.buffer, req.file.mimetype || "application/octet-stream");
     await q(
-      `insert into documents (id, application_id, file_name, file_type, file_size, document_type, file_path)
+      `insert into documents (id, applicationId, name, file_type, size, document_type, file_path)
        values ($1,$2,$3,$4,$5,$6,$7)`,
       [id, req.params.id, req.file.originalname, req.file.mimetype || "application/pdf", req.file.size, category.toLowerCase(), key]
     );
@@ -107,12 +107,12 @@ r.post("/applications/:id/documents", upload.single("file"), async (req: any, re
 // Accept document (staff analogue for e2e)
 r.patch("/documents/:id/accept", async (req: any, res: any, next: any) => {
   try {
-    const [doc] = await q<any>(`update documents set status='accepted', updated_at=now(), verified_at=now() where id=$1 returning id, application_id`, [req.params.id]);
+    const [doc] = await q<any>(`update documents set status='accepted', updatedAt=now(), verified_at=now() where id=$1 returning id, applicationId`, [req.params.id]);
     if (!doc) return res.status(404).json({ error: "not_found" });
     // Rule: if all required docs are accepted, bump stage (lightweight)
-    const pending = await q<any>(`select 1 from documents where application_id=$1 and status <> 'accepted' limit 1`, [doc.application_id]);
+    const pending = await q<any>(`select 1 from documents where applicationId=$1 and status <> 'accepted' limit 1`, [doc.applicationId]);
     if (pending.length === 0) {
-      await q(`update applications set status='under_review' where id=$1`, [doc.application_id]);
+      await q(`update applications set status='under_review' where id=$1`, [doc.applicationId]);
     }
     res.json({ ok: true });
   } catch (e) { next(e); }

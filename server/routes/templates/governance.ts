@@ -12,8 +12,8 @@ router.get("/sets", async (req: any, res) => {
            COUNT(CASE WHEN v.status='published' THEN 1 END) as published_count
     FROM comm_template_sets s
     LEFT JOIN comm_template_versions v ON v.set_id = s.id
-    GROUP BY s.id, s.set_key, s.description, s.created_at
-    ORDER BY s.created_at DESC
+    GROUP BY s.id, s.set_key, s.description, s.createdAt
+    ORDER BY s.createdAt DESC
   `);
   res.json(sets.rows || []);
 });
@@ -38,7 +38,7 @@ router.get("/sets/:setId/versions", async (req: any, res) => {
     LEFT JOIN users u ON u.id = v.created_by_user_id
     LEFT JOIN users a ON a.id = v.approved_by_user_id
     WHERE v.set_id = ${setId}
-    ORDER BY v.created_at DESC
+    ORDER BY v.createdAt DESC
   `);
   res.json(versions.rows || []);
 });

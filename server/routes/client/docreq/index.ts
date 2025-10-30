@@ -10,11 +10,11 @@ router.get("/", async (req:any, res)=>{
   const contactId = req.contact?.id || String(req.query.contactId || "");
   if (!contactId) return res.status(401).json({ error: "Unauthorized" });
   const r = await db.execute(sql`
-    SELECT r.*, a.id AS application_id
+    SELECT r.*, a.id AS applicationId
     FROM applications a
-    JOIN doc_requests r ON r.application_id=a.id
+    JOIN doc_requests r ON r.applicationId=a.id
     WHERE a.contact_id=${contactId}
-    ORDER BY r.created_at ASC
+    ORDER BY r.createdAt ASC
   `);
   res.json(r.rows || []);
 });
@@ -26,14 +26,14 @@ router.post("/presign", async (req:any, res)=>{
   if (!contactId) return res.status(401).json({ error: "Unauthorized" });
   // find app & ensure contact owns it
   const rq = await db.execute(sql`
-    SELECT r.id, r.application_id
+    SELECT r.id, r.applicationId
     FROM doc_requests r
-    JOIN applications a ON a.id=r.application_id
+    JOIN applications a ON a.id=r.applicationId
     WHERE r.id=${requestId} AND a.contact_id=${contactId}
     LIMIT 1
   `);
   const row = rq.rows?.[0]; if (!row) return res.status(404).json({ error: "not found" });
-  const key = `requests/${row.application_id}/${requestId}/${Date.now()}_${String(filename||'file').replace(/\s+/g,'_')}`;
+  const key = `requests/${row.applicationId}/${requestId}/${Date.now()}_${String(filename||'file').replace(/\s+/g,'_')}`;
   const ps = await presignPut({ key, contentType });
   res.json(ps);
 });
@@ -44,14 +44,14 @@ router.post("/finalize", async (req:any, res)=>{
   const { requestId, filename, s3_key, contentType } = req.body || {};
   if (!contactId) return res.status(401).json({ error: "Unauthorized" });
   const rq = await db.execute(sql`
-    SELECT r.id, r.application_id FROM doc_requests r
-    JOIN applications a ON a.id=r.application_id WHERE r.id=${requestId} AND a.contact_id=${contactId} LIMIT 1
+    SELECT r.id, r.applicationId FROM doc_requests r
+    JOIN applications a ON a.id=r.applicationId WHERE r.id=${requestId} AND a.contact_id=${contactId} LIMIT 1
   `);
   const row = rq.rows?.[0]; if (!row) return res.status(404).json({ error: "not found" });
 
   const insDoc = await db.execute(sql`
-    INSERT INTO documents(application_id, filename, s3_key, category, source)
-    VALUES (${row.application_id}, ${filename}, ${s3_key}, 'request', 'client')
+    INSERT INTO documents(applicationId, filename, s3_key, category, source)
+    VALUES (${row.applicationId}, ${filename}, ${s3_key}, 'request', 'client')
     RETURNING id
   `);
   const docId = insDoc.rows?.[0]?.id;
@@ -59,7 +59,7 @@ router.post("/finalize", async (req:any, res)=>{
     INSERT INTO doc_request_uploads(request_id, document_id, filename, s3_key, content_type, uploaded_by)
     VALUES (${requestId}, ${docId}, ${filename}, ${s3_key}, ${contentType||null}, 'client')
   `);
-  await db.execute(sql`UPDATE doc_requests SET status=CASE WHEN status='pending' THEN 'submitted' ELSE status END, updated_at=now() WHERE id=${requestId}`);
+  await db.execute(sql`UPDATE doc_requests SET status=CASE WHEN status='pending' THEN 'submitted' ELSE status END, updatedAt=now() WHERE id=${requestId}`);
   res.json({ ok: true, document_id: docId });
 });
 

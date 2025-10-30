@@ -81,7 +81,7 @@ router.post('/', async (req: any, res: any) => {
       application_canon_version: version,
       application_field_count: fieldCount,
       application_canon_hash: hash,
-      created_at: new Date(),
+      createdAt: new Date(),
     }).returning({ id: applications.id });
 
     console.log(`✅ [MONITOR] Application created id=${row.id} fieldCount=${fieldCount} hash=${hash.slice(0,8)}...`);

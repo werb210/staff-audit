@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/queryClient';
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/queryClient";
 
 // V1 API Product interface (matches our verified server endpoints)
 export interface V1LenderProduct {
@@ -9,7 +9,7 @@ export interface V1LenderProduct {
   productCategory: string;
   minimumLendingAmount: number;
   maximumLendingAmount: number;
-  countryOffered: 'CA' | 'US';
+  countryOffered: "CA" | "US";
   isActive: boolean;
 }
 
@@ -26,7 +26,7 @@ export interface LenderProduct {
   name: string;
   lender_id: string;
   lender_name: string;
-  country: 'CA' | 'US';
+  country: "CA" | "US";
   category: string;
   min_amount: number;
   max_amount: number;
@@ -63,8 +63,8 @@ export interface CatalogFieldsResponse {
 // Hook to fetch V1 lender products (42 products verified)
 export function useV1Products() {
   return useQuery<V1LenderProduct[]>({
-    queryKey: ['/api/v1/products'],
-    queryFn: () => api('/api/v1/products'),
+    queryKey: ["/api/v1/products"],
+    queryFn: () => api("/api/v1/products"),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });
@@ -73,8 +73,8 @@ export function useV1Products() {
 // Hook to fetch V1 lenders (12 lenders verified)
 export function useV1Lenders() {
   return useQuery<{ lenders: V1Lender[] }>({
-    queryKey: ['/api/v1/lenders'],
-    queryFn: () => api('/api/v1/lenders'),
+    queryKey: ["/api/v1/lenders"],
+    queryFn: () => api("/api/v1/lenders"),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });
@@ -83,8 +83,8 @@ export function useV1Lenders() {
 // Hook to fetch lender catalog data (legacy - for backward compatibility)
 export function useLenderCatalog() {
   return useQuery<LenderCatalogResponse>({
-    queryKey: ['/api/catalog/export-products'],
-    queryFn: () => api('/api/catalog/export-products'),
+    queryKey: ["/api/catalog/export-products"],
+    queryFn: () => api("/api/catalog/export-products"),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });
@@ -93,25 +93,29 @@ export function useLenderCatalog() {
 // Hook to fetch catalog schema fields
 export function useCatalogFields() {
   return useQuery<CatalogFieldsResponse>({
-    queryKey: ['/api/catalog/fields'],
-    queryFn: () => api('/api/catalog/fields'),
+    queryKey: ["/api/catalog/fields"],
+    queryFn: () => api("/api/catalog/fields"),
     staleTime: 15 * 60 * 1000, // 15 minutes
     refetchOnWindowFocus: false,
   });
 }
 
 // Hook to fetch catalog dump with filtering
-export function useLenderCatalogDump(limit: number = 50, lender_id?: string, country?: string) {
+export function useLenderCatalogDump(
+  limit: number = 50,
+  lender_id?: string,
+  country?: string,
+) {
   const params = new URLSearchParams();
-  if (limit) params.set('limit', limit.toString());
-  if (lender_id) params.set('lender_id', lender_id);
-  if (country) params.set('country', country);
-  
+  if (limit) params.set("limit", limit.toString());
+  if (lender_id) params.set("lender_id", lender_id);
+  if (country) params.set("country", country);
+
   const queryString = params.toString();
-  const url = `/api/catalog/dump${queryString ? `?${queryString}` : ''}`;
-  
+  const url = `/api/catalog/dump${queryString ? `?${queryString}` : ""}`;
+
   return useQuery<LenderCatalogResponse & { canonical_fields: string[] }>({
-    queryKey: ['/api/catalog/dump', limit, lender_id, country],
+    queryKey: ["/api/catalog/dump", limit, lender_id, country],
     queryFn: () => api(url),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,

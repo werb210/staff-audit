@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useMutation } from '@tanstack/react-query';
-import { Loader2, Sparkles, Copy, Check, RefreshCw } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
+import { Loader2, Sparkles, Copy, Check, RefreshCw } from "lucide-react";
 
 interface SmartReplyPanelProps {
   threadHistory?: string;
@@ -21,25 +27,29 @@ interface ReplyOption {
   characterCount: number;
 }
 
-export default function SmartReplyPanel({ 
-  threadHistory = '', 
+export default function SmartReplyPanel({
+  threadHistory = "",
   onReplySelect,
   contactName,
-  applicationId 
+  applicationId,
 }: SmartReplyPanelProps) {
-  const [replyType, setReplyType] = useState<'sms' | 'email' | 'professional'>('professional');
-  const [tone, setTone] = useState<'professional' | 'friendly' | 'formal'>('professional');
+  const [replyType, setReplyType] = useState<"sms" | "email" | "professional">(
+    "professional",
+  );
+  const [tone, setTone] = useState<"professional" | "friendly" | "formal">(
+    "professional",
+  );
   const [customHistory, setCustomHistory] = useState(threadHistory);
-  const [selectedReply, setSelectedReply] = useState<string>('');
+  const [selectedReply, setSelectedReply] = useState<string>("");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Generate single smart reply
   const smartReplyMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/ai/smart-reply', {
-        method: 'POST',
+      const response = await fetch("/api/ai/smart-reply", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           threadHistory: customHistory,
@@ -47,62 +57,62 @@ export default function SmartReplyPanel({
           tone,
           context: {
             contactName,
-            applicationId
-          }
+            applicationId,
+          },
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to generate smart reply');
+        throw new Error("Failed to generate smart reply");
       }
       return response.json();
-    }
+    },
   });
 
   // Generate multiple reply options
   const replyOptionsMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/ai/reply-options', {
-        method: 'POST',
+      const response = await fetch("/api/ai/reply-options", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           threadHistory: customHistory,
           replyType,
           context: {
             contactName,
-            applicationId
-          }
+            applicationId,
+          },
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to generate reply options');
+        throw new Error("Failed to generate reply options");
       }
       return response.json();
-    }
+    },
   });
 
   // Generate follow-up suggestions
   const followupMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/ai/followup-suggestions', {
-        method: 'POST',
+      const response = await fetch("/api/ai/followup-suggestions", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           threadHistory: customHistory,
           context: {
             contactName,
-            applicationId
-          }
+            applicationId,
+          },
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to generate followup suggestions');
+        throw new Error("Failed to generate followup suggestions");
       }
       return response.json();
-    }
+    },
   });
 
   const handleCopyReply = async (text: string, index: number) => {
@@ -111,7 +121,7 @@ export default function SmartReplyPanel({
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
     } catch (error) {
-      console.error('Failed to copy text:', error);
+      console.error("Failed to copy text:", error);
     }
   };
 
@@ -124,7 +134,8 @@ export default function SmartReplyPanel({
 
   const singleReply = smartReplyMutation.data?.reply;
   const replyOptions: ReplyOption[] = replyOptionsMutation.data?.options || [];
-  const followupSuggestions: string[] = followupMutation.data?.suggestions || [];
+  const followupSuggestions: string[] =
+    followupMutation.data?.suggestions || [];
 
   return (
     <div className="space-y-6">
@@ -141,8 +152,14 @@ export default function SmartReplyPanel({
           {(contactName || applicationId) && (
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <span>Context:</span>
-              {contactName && <Badge variant="outline">Contact: {contactName}</Badge>}
-              {applicationId && <Badge variant="outline">App: {applicationId.slice(0, 8)}</Badge>}
+              {contactName && (
+                <Badge variant="outline">Contact: {contactName}</Badge>
+              )}
+              {applicationId && (
+                <Badge variant="outline">
+                  App: {applicationId.slice(0, 8)}
+                </Badge>
+              )}
             </div>
           )}
 
@@ -150,7 +167,10 @@ export default function SmartReplyPanel({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Reply Type</label>
-              <Select value={replyType} onValueChange={(value: any) => setReplyType(value)}>
+              <Select
+                value={replyType}
+                onValueChange={(value: any) => setReplyType(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -164,7 +184,10 @@ export default function SmartReplyPanel({
 
             <div>
               <label className="text-sm font-medium">Tone</label>
-              <Select value={tone} onValueChange={(value: any) => setTone(value)}>
+              <Select
+                value={tone}
+                onValueChange={(value: any) => setTone(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -191,7 +214,7 @@ export default function SmartReplyPanel({
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-2">
-            <Button 
+            <Button
               onClick={() => smartReplyMutation.mutate()}
               disabled={!customHistory.trim() || smartReplyMutation.isPending}
             >
@@ -203,7 +226,7 @@ export default function SmartReplyPanel({
               Generate Reply
             </Button>
 
-            <Button 
+            <Button
               variant="outline"
               onClick={() => replyOptionsMutation.mutate()}
               disabled={!customHistory.trim() || replyOptionsMutation.isPending}
@@ -216,7 +239,7 @@ export default function SmartReplyPanel({
               Get Options
             </Button>
 
-            <Button 
+            <Button
               variant="outline"
               onClick={() => followupMutation.mutate()}
               disabled={!customHistory.trim() || followupMutation.isPending}
@@ -240,9 +263,15 @@ export default function SmartReplyPanel({
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <Badge variant="outline">{smartReplyMutation.data?.metadata?.replyType}</Badge>
-                  <Badge variant="outline">{smartReplyMutation.data?.metadata?.tone}</Badge>
-                  <span>{smartReplyMutation.data?.metadata?.characterCount} chars</span>
+                  <Badge variant="outline">
+                    {smartReplyMutation.data?.metadata?.replyType}
+                  </Badge>
+                  <Badge variant="outline">
+                    {smartReplyMutation.data?.metadata?.tone}
+                  </Badge>
+                  <span>
+                    {smartReplyMutation.data?.metadata?.characterCount} chars
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -320,7 +349,10 @@ export default function SmartReplyPanel({
           <CardContent>
             <div className="space-y-2">
               {followupSuggestions.map((suggestion, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-2 bg-muted/50 rounded"
+                >
                   <span className="text-sm">{suggestion}</span>
                   <Button
                     size="sm"
@@ -344,7 +376,9 @@ export default function SmartReplyPanel({
       {selectedReply && (
         <Card className="border-green-200 bg-green-50">
           <CardHeader>
-            <CardTitle className="text-lg text-green-800">Selected Reply</CardTitle>
+            <CardTitle className="text-lg text-green-800">
+              Selected Reply
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-green-700">{selectedReply}</p>

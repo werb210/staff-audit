@@ -70,7 +70,7 @@ r.put("/:id", async (req: any, res: any) => {
       first_name: firstName,
       last_name: lastName,
       profile_image_url: req.body.profileImageUrl || null,
-      updated_at: new Date()
+      updatedAt: new Date()
     }).where(eq(users.id, id));
 
     res.json({ ok: true });

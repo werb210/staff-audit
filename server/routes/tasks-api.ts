@@ -22,7 +22,7 @@ router.get('/', (req: any, res: any) => {
         id: 'ct-bf-001',
         name: 'Maya Thompson'
       },
-      created_at: '2024-08-20T10:00:00Z',
+      createdAt: '2024-08-20T10:00:00Z',
       tags: ['documentation', 'urgent']
     },
     {
@@ -39,7 +39,7 @@ router.get('/', (req: any, res: any) => {
         id: 'app-bf-001',
         name: 'Quick Mart LLC Application'
       },
-      created_at: '2024-08-19T14:00:00Z',
+      createdAt: '2024-08-19T14:00:00Z',
       tags: ['follow-up', 'call']
     },
     {
@@ -56,7 +56,7 @@ router.get('/', (req: any, res: any) => {
         id: 'app-bf-002',
         name: 'Denver Construction Application'
       },
-      created_at: '2024-08-21T09:00:00Z',
+      createdAt: '2024-08-21T09:00:00Z',
       tags: ['review', 'appraisal']
     },
     {
@@ -68,7 +68,7 @@ router.get('/', (req: any, res: any) => {
       assignee_name: 'Mike Chen',
       priority: 'low',
       status: 'open',
-      created_at: '2024-08-20T16:30:00Z',
+      createdAt: '2024-08-20T16:30:00Z',
       tags: ['presentation', 'lender']
     },
     {
@@ -80,7 +80,7 @@ router.get('/', (req: any, res: any) => {
       assignee_name: 'Alex Rodriguez',
       priority: 'low',
       status: 'open',
-      created_at: '2024-08-21T11:00:00Z',
+      createdAt: '2024-08-21T11:00:00Z',
       tags: ['crm', 'maintenance']
     }
   ];
@@ -140,15 +140,15 @@ router.get('/:id', (req: any, res: any) => {
       id: 'ct-bf-001',
       name: 'Maya Thompson'
     },
-    created_at: '2024-08-20T10:00:00Z',
-    updated_at: '2024-08-21T08:30:00Z',
+    createdAt: '2024-08-20T10:00:00Z',
+    updatedAt: '2024-08-21T08:30:00Z',
     tags: ['documentation', 'urgent'],
     comments: [
       {
         id: 'c1',
         author: 'You',
         text: 'Maya confirmed she can provide statements by end of day',
-        created_at: '2024-08-21T08:30:00Z'
+        createdAt: '2024-08-21T08:30:00Z'
       }
     ],
     attachments: [],
@@ -187,8 +187,8 @@ router.post('/', (req: any, res: any) => {
     priority: priority || 'medium',
     status: 'open',
     relatedTo: relatedTo || null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     tags: tags || [],
     comments: [],
     attachments: [],
@@ -213,7 +213,7 @@ router.put('/:id', (req: any, res: any) => {
     task: { 
       id, 
       ...updates, 
-      updated_at: new Date().toISOString() 
+      updatedAt: new Date().toISOString() 
     }
   });
 });
@@ -236,7 +236,7 @@ router.patch('/:id/status', (req: any, res: any) => {
     task: { 
       id, 
       status, 
-      updated_at: new Date().toISOString() 
+      updatedAt: new Date().toISOString() 
     }
   });
 });
@@ -257,7 +257,7 @@ router.post('/:id/comments', (req: any, res: any) => {
     id: `c-${Date.now()}`,
     author: 'You', // Would come from auth
     text,
-    created_at: new Date().toISOString()
+    createdAt: new Date().toISOString()
   };
 
   res.json({

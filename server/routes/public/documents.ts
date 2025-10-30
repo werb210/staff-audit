@@ -65,8 +65,8 @@ router.post("/documents/confirm", async (req: Request, res: Response) => {
     // Record in database
     const { rows } = await pool.query(`
       INSERT INTO documents (
-        id, application_id, file_name, document_type, 
-        storage_key, checksum, mime_type, created_at, updated_at
+        id, applicationId, name, document_type, 
+        storage_key, checksum, mime_type, createdAt, updatedAt
       ) VALUES (
         gen_random_uuid(), $1, $2, $3, $4, $5, $6, now(), now()
       ) RETURNING id
@@ -94,10 +94,10 @@ router.get("/applications/:id/documents.zip", async (req: Request, res: Response
     
     // Get documents for this application
     const { rows } = await pool.query(`
-      SELECT file_name, storage_key, document_type 
+      SELECT name, storage_key, document_type 
       FROM documents 
-      WHERE application_id = $1 
-      ORDER BY created_at ASC
+      WHERE applicationId = $1 
+      ORDER BY createdAt ASC
     `, [applicationId]);
 
     if (rows.length === 0) {
@@ -121,8 +121,8 @@ router.get("/applications/:id/documents.zip", async (req: Request, res: Response
 
     // Add placeholder content (in production, fetch from S3)
     for (const doc of rows) {
-      const content = `Document: ${doc.file_name}\nType: ${doc.document_type}\nStorage: ${doc.storage_key}\n\n[File content would be fetched from S3 in production]`;
-      archive.append(content, { name: doc.file_name });
+      const content = `Document: ${doc.name}\nType: ${doc.document_type}\nStorage: ${doc.storage_key}\n\n[File content would be fetched from S3 in production]`;
+      archive.append(content, { name: doc.name });
     }
 
     // Finalize archive

@@ -21,18 +21,18 @@ type Application = {
   contact_phone: string;
   documents: { type: string }[];
   status: "QUEUED"|"PROCESSING"|"SENT"|"FAILED";
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
   files: StoredFile[]; // include files
 };
 
 // naive in-memory (replace with DB later)
 const DB = new Map<string, Application>();
 
-export async function saveApplication(data: Omit<Application,"id"|"status"|"created_at"|"updated_at"|"files">) {
+export async function saveApplication(data: Omit<Application,"id"|"status"|"createdAt"|"updatedAt"|"files">) {
   const id = `app_${Date.now()}_${Math.random().toString(36).slice(2,12)}`;
   const now = new Date().toISOString();
-  DB.set(id, { id, ...data, status: "QUEUED", created_at: now, updated_at: now, files: [] });
+  DB.set(id, { id, ...data, status: "QUEUED", createdAt: now, updatedAt: now, files: [] });
   return id;
 }
 
@@ -44,13 +44,13 @@ export async function appendFiles(id: string, files: StoredFile[]) {
   const app = DB.get(id);
   if (!app) throw new Error("Application not found");
   app.files.push(...files);
-  app.updated_at = new Date().toISOString();
+  app.updatedAt = new Date().toISOString();
   DB.set(id, app);
 }
 
 export async function updateApplication(id: string, updates: Partial<Application>): Promise<void> {
   const existing = DB.get(id);
   if (existing) {
-    DB.set(id, { ...existing, ...updates, updated_at: new Date().toISOString() });
+    DB.set(id, { ...existing, ...updates, updatedAt: new Date().toISOString() });
   }
 }

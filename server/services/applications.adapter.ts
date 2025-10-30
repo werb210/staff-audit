@@ -30,9 +30,9 @@ export const stageFromRaw = (s: string = ''): App['stage'] => {
 };
 
 export function normalizeApp(r: RawApp): App {
-  const id = r.id || r.appId || r.application_id || String(r.uuid || r._id);
-  const createdAt = r.createdAt || r.created_at || r.inserted_at || r.created || r.created_time || null;
-  const updatedAt = r.updatedAt || r.updated_at || r.modified || r.modified_time || createdAt || null;
+  const id = r.id || r.appId || r.applicationId || String(r.uuid || r._id);
+  const createdAt = r.createdAt || r.createdAt || r.inserted_at || r.created || r.created_time || null;
+  const updatedAt = r.updatedAt || r.updatedAt || r.modified || r.modified_time || createdAt || null;
   const businessName = r.businessName || r.company || r.legal_business_name || r.biz_name || r.business_name;
   const businessType = r.businessType || r.entity_type || r.naics || r.industry;
   const amount = Number(r.amount ?? r.requested_amount ?? r.loan_amount ?? r.capital_needed ?? 0) || 0;

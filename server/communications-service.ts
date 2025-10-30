@@ -131,7 +131,7 @@ export class CommunicationsService {
         INSERT INTO email_messages (
           account_id, message_id, subject, from_address, to_addresses, cc_addresses,
           bcc_addresses, body, body_html, body_text, message_date, is_sent,
-          contact_id, application_id, category, priority, tags
+          contact_id, applicationId, category, priority, tags
         ) VALUES (
           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), true, $11, $12, $13, $14, $15
         ) RETURNING id
@@ -220,7 +220,7 @@ export class CommunicationsService {
         isStarred: row.is_starred,
         hasAttachments: row.has_attachments,
         contactId: row.contact_id,
-        applicationId: row.application_id,
+        applicationId: row.applicationId,
         category: row.category,
         priority: row.priority,
         tags: row.tags
@@ -247,7 +247,7 @@ export class CommunicationsService {
       const result = await pool.query(`
         INSERT INTO sms_messages (
           message_sid, from_number, to_number, body, direction, status,
-          contact_id, application_id, is_automated, automation_type
+          contact_id, applicationId, is_automated, automation_type
         ) VALUES (
           $1, $2, $3, $4, 'outbound', 'sent', $5, $6, $7, $8
         ) RETURNING id
@@ -299,12 +299,12 @@ export class CommunicationsService {
       }
 
       if (applicationId) {
-        query += ` AND application_id = $${paramIndex}`;
+        query += ` AND applicationId = $${paramIndex}`;
         params.push(applicationId);
         paramIndex++;
       }
 
-      query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+      query += ` ORDER BY createdAt DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
       params.push(limit, offset);
 
       const result = await pool.query(query, params);
@@ -318,7 +318,7 @@ export class CommunicationsService {
         direction: row.direction,
         status: row.status,
         contactId: row.contact_id,
-        applicationId: row.application_id,
+        applicationId: row.applicationId,
         isProcessed: row.is_processed,
         isAutomated: row.is_automated,
         automationType: row.automation_type
@@ -345,7 +345,7 @@ export class CommunicationsService {
       const result = await pool.query(`
         INSERT INTO voice_calls (
           call_sid, from_number, to_number, direction, status,
-          contact_id, application_id, user_id, call_purpose
+          contact_id, applicationId, user_id, call_purpose
         ) VALUES (
           $1, $2, $3, 'outbound', 'initiated', $4, $5, $6, $7
         ) RETURNING id
@@ -397,7 +397,7 @@ export class CommunicationsService {
       }
 
       if (applicationId) {
-        query += ` AND application_id = $${paramIndex}`;
+        query += ` AND applicationId = $${paramIndex}`;
         params.push(applicationId);
         paramIndex++;
       }
@@ -408,7 +408,7 @@ export class CommunicationsService {
         paramIndex++;
       }
 
-      query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+      query += ` ORDER BY createdAt DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
       params.push(limit, offset);
 
       const result = await pool.query(query, params);
@@ -423,7 +423,7 @@ export class CommunicationsService {
         duration: row.duration,
         recordingUrl: row.recording_url,
         contactId: row.contact_id,
-        applicationId: row.application_id,
+        applicationId: row.applicationId,
         userId: row.user_id,
         notes: row.notes,
         callPurpose: row.call_purpose,
@@ -462,7 +462,7 @@ export class CommunicationsService {
       // Store OTP verification in database
       const result = await pool.query(`
         INSERT INTO otp_verifications (
-          phone_number, code, purpose, user_id, application_id,
+          phone_number, code, purpose, user_id, applicationId,
           expires_at, ip_address, user_agent
         ) VALUES (
           $1, $2, $3, $4, $5, $6, $7, $8
@@ -521,7 +521,7 @@ export class CommunicationsService {
       const result = await pool.query(`
         SELECT * FROM otp_verifications 
         WHERE phone_number = $1 AND purpose = $2 AND is_verified = false 
-        ORDER BY created_at DESC 
+        ORDER BY createdAt DESC 
         LIMIT 1
       `, [phoneNumber, purpose]);
 
@@ -555,7 +555,7 @@ export class CommunicationsService {
       // Increment attempts
       await pool.query(`
         UPDATE otp_verifications 
-        SET attempts = attempts + 1, updated_at = NOW() 
+        SET attempts = attempts + 1, updatedAt = NOW() 
         WHERE id = $1
       `, [otp.id]);
 
@@ -570,7 +570,7 @@ export class CommunicationsService {
       // Mark as verified
       await pool.query(`
         UPDATE otp_verifications 
-        SET is_verified = true, verified_at = NOW(), updated_at = NOW() 
+        SET is_verified = true, verified_at = NOW(), updatedAt = NOW() 
         WHERE id = $1
       `, [otp.id]);
 
@@ -696,7 +696,7 @@ export class CommunicationsService {
             COUNT(*) as total_emails,
             COUNT(*) FILTER (WHERE is_sent = true) as sent_emails,
             COUNT(*) FILTER (WHERE is_read = false) as unread_emails,
-            COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours') as emails_today
+            COUNT(*) FILTER (WHERE createdAt > NOW() - INTERVAL '24 hours') as emails_today
           FROM email_messages
         `),
         pool.query(`
@@ -704,7 +704,7 @@ export class CommunicationsService {
             COUNT(*) as total_sms,
             COUNT(*) FILTER (WHERE direction = 'outbound') as sent_sms,
             COUNT(*) FILTER (WHERE direction = 'inbound') as received_sms,
-            COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours') as sms_today
+            COUNT(*) FILTER (WHERE createdAt > NOW() - INTERVAL '24 hours') as sms_today
           FROM sms_messages
         `),
         pool.query(`

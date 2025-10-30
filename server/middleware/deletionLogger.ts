@@ -10,7 +10,7 @@ import { db } from '../db.js';
 import { sql } from 'drizzle-orm';
 
 interface DeletionLogEntry {
-  application_id: string;
+  applicationId: string;
   user_id?: string;
   user_email?: string;
   source: 'staff_ui' | 'api_call' | 'admin_cleanup' | 'auto_cleanup' | 'system_maintenance';
@@ -27,16 +27,16 @@ export class ApplicationDeletionLogger {
     try {
       await db.execute(sql`
         INSERT INTO application_deletion_log (
-          application_id, user_id, user_email, source, deletion_reason,
+          applicationId, user_id, user_email, source, deletion_reason,
           ip_address, user_agent, deleted_at, application_data
         ) VALUES (
-          ${entry.application_id}, ${entry.user_id || null}, ${entry.user_email || null}, 
+          ${entry.applicationId}, ${entry.user_id || null}, ${entry.user_email || null}, 
           ${entry.source}, ${entry.deletion_reason || null}, ${entry.ip_address || null}, 
           ${entry.user_agent || null}, ${entry.deleted_at}, ${JSON.stringify(entry.application_data) || null}
         )
       `);
       
-      console.log(`🗑️ [DELETION LOG] Application ${entry.application_id} deleted by ${entry.user_email || 'system'} via ${entry.source}`);
+      console.log(`🗑️ [DELETION LOG] Application ${entry.applicationId} deleted by ${entry.user_email || 'system'} via ${entry.source}`);
     } catch (error) {
       console.error('❌ [DELETION LOG] Failed to log deletion:', error);
     }
@@ -52,7 +52,7 @@ export class ApplicationDeletionLogger {
     // Check if application has fallback documents
     const fallbackDocs = await db.execute(sql`
       SELECT COUNT(*) as count FROM documents 
-      WHERE application_id = ${applicationId} AND storage_status = 'fallback'
+      WHERE applicationId = ${applicationId} AND storage_status = 'fallback'
     `);
     
     const hasFallbackDocs = (fallbackDocs.rows[0] as any)?.count > 0;
@@ -77,7 +77,7 @@ export function deletionLoggingMiddleware(req: Request, res: Response, next: Nex
       
       if (applicationId) {
         const logEntry: DeletionLogEntry = {
-          application_id: applicationId,
+          applicationId: applicationId,
           user_email: (req as any).user?.email || 'unknown',
           user_id: (req as any).user?.id,
           source: req.headers['x-admin-delete'] ? 'admin_cleanup' : 'staff_ui',

@@ -53,7 +53,7 @@ r.get("/lenders", async (req,res)=>{
     SELECT p.id, p.lender_id, coalesce(l.company_name,l.contact_name) AS lender_name,
            p.name, p.description, p.is_active::text AS status, p.category,
            p.term_max AS term_months, p.amount_min AS min_amount, p.amount_max AS max_amount,
-           p.created_at, p.updated_at
+           p.createdAt, p.updatedAt
     FROM "${Product}" p
     LEFT JOIN "${Lender}" l ON l.id=p.lender_id
     ${whereSQL}

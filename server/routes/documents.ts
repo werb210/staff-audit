@@ -157,8 +157,8 @@ export function mountDocumentRoutes(app: MountTarget, basePath = "/api") {
       // Insert document record into database using SQL template literal
       await db.execute(sql`
         INSERT INTO documents (
-          application_id, storage_key, object_storage_key, mime_type, file_size, 
-          sha256, file_name, status, document_type, created_at
+          applicationId, storage_key, object_storage_key, mime_type, size, 
+          sha256, name, status, document_type, createdAt
         ) VALUES (
           ${applicationId}, ${key}, ${key}, ${contentType}, ${size}, 
           ${sha256 || null}, ${filename}, 'pending', 'bank_statement', NOW()

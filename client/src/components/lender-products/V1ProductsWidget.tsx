@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 export default function V1ProductsWidget() {
   const { data: products, isLoading: productsLoading } = useV1Products();
   const { data: lendersData, isLoading: lendersLoading } = useV1Lenders();
-  
+
   const lenders = lendersData?.lenders || [];
 
   if (productsLoading || lendersLoading) {
@@ -23,9 +23,11 @@ export default function V1ProductsWidget() {
   }
 
   // Quick stats
-  const caProducts = products?.filter(p => p.countryOffered === 'CA').length || 0;
-  const usProducts = products?.filter(p => p.countryOffered === 'US').length || 0;
-  const categories = new Set(products?.map(p => p.productCategory)).size;
+  const caProducts =
+    products?.filter((p) => p.countryOffered === "CA").length || 0;
+  const usProducts =
+    products?.filter((p) => p.countryOffered === "US").length || 0;
+  const categories = new Set(products?.map((p) => p.productCategory)).size;
 
   return (
     <Card>
@@ -60,12 +62,16 @@ export default function V1ProductsWidget() {
         </div>
 
         <div className="pt-2">
-          <div className="text-sm font-medium mb-2">Top Lenders by Products:</div>
+          <div className="text-sm font-medium mb-2">
+            Top Lenders by Products:
+          </div>
           <div className="space-y-1">
             {lenders.slice(0, 5).map((lender) => (
               <div key={lender.id} className="flex justify-between text-xs">
                 <span className="truncate">{lender.name}</span>
-                <span className="text-muted-foreground">{lender.product_count}</span>
+                <span className="text-muted-foreground">
+                  {lender.product_count}
+                </span>
               </div>
             ))}
           </div>

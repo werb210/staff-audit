@@ -4,14 +4,14 @@ import { LenderReport, ReportPrefs, TenantId } from "../types";
 
 export const lenderReportsRepo = {
   async listAll() {
-    return q<LenderReport>(`SELECT * FROM lender_reports ORDER BY created_at DESC`);
+    return q<LenderReport>(`SELECT * FROM lender_reports ORDER BY createdAt DESC`);
   },
   async listForLender(tenantId: TenantId, lenderId: string) {
-    return q<LenderReport>(`SELECT * FROM lender_reports WHERE lender_id=$1 ORDER BY created_at DESC`, [lenderId]);
+    return q<LenderReport>(`SELECT * FROM lender_reports WHERE lender_id=$1 ORDER BY createdAt DESC`, [lenderId]);
   },
   async create(r: Partial<LenderReport> & { id: string; lender_id: string; name: string; type: string }) {
     return q<LenderReport>(
-      `INSERT INTO lender_reports (id, lender_id, name, type, url, embed_url, created_at)
+      `INSERT INTO lender_reports (id, lender_id, name, type, url, embed_url, createdAt)
        VALUES ($1,$2,$3,$4,$5,$6,NOW()) RETURNING *`,
       [r.id, r.lender_id, r.name, r.type, r.url||null, r.embed_url||null]
     ).then(rows => rows[0]);
@@ -25,6 +25,6 @@ export const lenderReportsRepo = {
   },
   async setPrefs(lenderId: string, reports: string[]) {
     // For now, return the input as preferences aren't stored separately
-    return { lender_id: lenderId, reports, updated_at: new Date().toISOString() };
+    return { lender_id: lenderId, reports, updatedAt: new Date().toISOString() };
   }
 };

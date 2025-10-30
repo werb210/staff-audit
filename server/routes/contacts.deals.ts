@@ -9,10 +9,10 @@ r.use(requireAuth);
 // List deals (pipeline applications) for a contact
 r.get("/contacts/:id/deals", async (req: any, res: any) => {
   const { rows } = await db.execute(sql`
-    select id, full_name as name, stage, amount, created_at
+    select id, full_name as name, stage, amount, createdAt
     from applications
     where contact_id = ${req.params.id}
-    order by created_at desc
+    order by createdAt desc
   `);
   res.json({ ok: true, items: rows });
 });

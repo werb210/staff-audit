@@ -21,11 +21,11 @@ router.post("/seed", async (req:any,res:any)=>{
       id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
       email text UNIQUE NOT NULL, role text NOT NULL DEFAULT 'admin',
       password_hash text NOT NULL, is_active boolean NOT NULL DEFAULT true,
-      must_change_password boolean NOT NULL DEFAULT false, created_at timestamptz NOT NULL DEFAULT now())`);
+      must_change_password boolean NOT NULL DEFAULT false, createdAt timestamptz NOT NULL DEFAULT now())`);
   }
   const hash = await hashPassword(password);
   await db.execute(sql`
-    INSERT INTO ${sql.raw(tb)}(email, role, password_hash, is_active, must_change_password, created_at)
+    INSERT INTO ${sql.raw(tb)}(email, role, password_hash, is_active, must_change_password, createdAt)
     VALUES (${email}, 'admin', ${hash}, true, false, now())
     ON CONFLICT (email) DO UPDATE SET password_hash=EXCLUDED.password_hash, role='admin', is_active=true, must_change_password=false
   `);

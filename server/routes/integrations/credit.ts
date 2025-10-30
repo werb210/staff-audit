@@ -22,7 +22,7 @@ router.post("/pull/:applicationId", async (req:any, res)=>{
   }
 
   const ins = await db.execute(sql`
-    INSERT INTO credit_reports(application_id, provider, bureau_ref, score, score_band, tradelines, inquiries, public_records, raw)
+    INSERT INTO credit_reports(applicationId, provider, bureau_ref, score, score_band, tradelines, inquiries, public_records, raw)
     VALUES (${appId}, ${report.provider}, ${report.bureau_ref}, ${report.score}, ${report.score_band}, ${report.tradelines || []}, ${report.inquiries || []}, ${report.public_records || []}, ${report.raw || {} })
     RETURNING id
   `);
@@ -36,7 +36,7 @@ router.post("/pull/:applicationId", async (req:any, res)=>{
 
 router.get("/report/:applicationId", async (req: any, res: any)=>{
   const appId = String((req as any).params.applicationId);
-  const r = (await db.execute(sql`SELECT * FROM credit_reports WHERE application_id=${appId} ORDER BY created_at DESC LIMIT 1`)).rows?.[0];
+  const r = (await db.execute(sql`SELECT * FROM credit_reports WHERE applicationId=${appId} ORDER BY createdAt DESC LIMIT 1`)).rows?.[0];
   if (!r) return res.status(404).json({ error:"not found" });
   // redact raw for UI unless explicitly requested
   r.raw = undefined;

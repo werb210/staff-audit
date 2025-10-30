@@ -18,7 +18,7 @@ r.post("/schedule/links", async (req:any,res)=>{
     values(${slug}, ${b.ownerIds||[req.user.sub]}, ${b.duration||30}, ${b.bufferBefore||10}, ${b.bufferAfter||10}, ${b.tz||'America/Edmonton'}) returning *`);
   res.json({ ok:true, item: rows[0] });
 });
-r.get("/schedule/links", async (_req:any,res)=>{ const { rows } = await db.execute(sql`select * from schedule_links where active=true order by created_at desc`); res.json({ ok:true, items: rows }); });
+r.get("/schedule/links", async (_req:any,res)=>{ const { rows } = await db.execute(sql`select * from schedule_links where active=true order by createdAt desc`); res.json({ ok:true, items: rows }); });
 
 // PUBLIC: show slots for a given date (now returns human-readable labels + buffers)
 r.get("/public/s/:slug/slots", async (req:any,res)=>{

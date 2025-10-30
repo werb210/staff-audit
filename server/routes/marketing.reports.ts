@@ -85,11 +85,11 @@ r.get("/marketing/reports/pdf", async (req: any, res: any) => {
 
     y -= 30;
     const { rows: recentEnrollments } = await db.execute(sql`
-      select e.status, s.name as sequence_name, c.full_name as contact_name, e.created_at
+      select e.status, s.name as sequence_name, c.full_name as contact_name, e.createdAt
       from marketing_enrollments e
       left join marketing_sequences s on e.sequence_id = s.id
       left join contacts c on e.contact_id = c.id
-      order by e.created_at desc
+      order by e.createdAt desc
       limit 10
     `);
 

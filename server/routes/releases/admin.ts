@@ -8,7 +8,7 @@ const router = Router();
 
 /* ----- Admin: list/create/update ----- */
 router.get("/", async (_req,res)=>{
-  const r = await db.execute(sql`SELECT * FROM releases ORDER BY created_at DESC`);
+  const r = await db.execute(sql`SELECT * FROM releases ORDER BY createdAt DESC`);
   res.json(r.rows || []);
 });
 
@@ -18,7 +18,7 @@ router.post("/", async (req:any,res)=>{
   const up = await db.execute(sql`
     INSERT INTO releases(version, codename, notes_md, rollout_flag_key)
     VALUES (${version}, ${codename}, ${notes_md}, ${rollout_flag_key})
-    ON CONFLICT (version) DO UPDATE SET codename=EXCLUDED.codename, notes_md=EXCLUDED.notes_md, rollout_flag_key=EXCLUDED.rollout_flag_key, updated_at=now()
+    ON CONFLICT (version) DO UPDATE SET codename=EXCLUDED.codename, notes_md=EXCLUDED.notes_md, rollout_flag_key=EXCLUDED.rollout_flag_key, updatedAt=now()
     RETURNING *
   `);
   res.json({ ok:true, release: up.rows?.[0] });
@@ -26,7 +26,7 @@ router.post("/", async (req:any,res)=>{
 
 /* ----- Transitions ----- */
 router.post("/:id/stage", async (req,res)=>{
-  await db.execute(sql`UPDATE releases SET status='staged', staged_at=now(), updated_at=now() WHERE id=${req.params.id}`);
+  await db.execute(sql`UPDATE releases SET status='staged', staged_at=now(), updatedAt=now() WHERE id=${req.params.id}`);
   res.json({ ok:true });
 });
 router.post("/:id/live", async (req,res)=>{
@@ -35,7 +35,7 @@ router.post("/:id/live", async (req,res)=>{
   await db.execute(sql`BEGIN`);
   try {
     await db.execute(sql`UPDATE releases SET status='archived', archived_at=now() WHERE status='live'`);
-    await db.execute(sql`UPDATE releases SET status='live', live_at=now(), updated_at=now() WHERE id=${id}`);
+    await db.execute(sql`UPDATE releases SET status='live', live_at=now(), updatedAt=now() WHERE id=${id}`);
     await db.execute(sql`COMMIT`);
   } catch(e){
     await db.execute(sql`ROLLBACK`);
@@ -44,13 +44,13 @@ router.post("/:id/live", async (req,res)=>{
   res.json({ ok:true });
 });
 router.post("/:id/archive", async (req,res)=>{
-  await db.execute(sql`UPDATE releases SET status='archived', archived_at=now(), updated_at=now() WHERE id=${req.params.id}`);
+  await db.execute(sql`UPDATE releases SET status='archived', archived_at=now(), updatedAt=now() WHERE id=${req.params.id}`);
   res.json({ ok:true });
 });
 
 /* ----- Tasks (whitelisted jobs) ----- */
 router.get("/:id/tasks", async (req,res)=>{
-  const r = await db.execute(sql`SELECT * FROM release_tasks WHERE release_id=${req.params.id} ORDER BY created_at`);
+  const r = await db.execute(sql`SELECT * FROM release_tasks WHERE release_id=${req.params.id} ORDER BY createdAt`);
   res.json(r.rows || []);
 });
 router.post("/:id/tasks", async (req,res)=>{

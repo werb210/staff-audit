@@ -16,7 +16,7 @@ router.get('/jobs/:requestId', async (req: any, res: any) => {
     const response: any = {
       ok: true,
       status: job.status,
-      created_at: job.created_at,
+      createdAt: job.createdAt,
       started_at: job.started_at,
       completed_at: job.completed_at
     };

@@ -6,19 +6,19 @@ const upload = multer({ dest: 'uploads/' });
 
 router.post('/', upload.single('file'), async (req: any, res: any) => {
   try {
-    if (!req.file || !req.body.application_id || !req.body.category) {
+    if (!req.file || !req.body.applicationId || !req.body.category) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const documentId = uuidv4();
     await db.insert(documents).values({
       id: documentId,
-      application_id: req.body.application_id,
+      applicationId: req.body.applicationId,
       category: req.body.category,
       filename: req.file.originalname,
       path: req.file.path,
       mimetype: req.file.mimetype,
-      created_at: new Date(),
+      createdAt: new Date(),
     });
 
     console.log('✅ Document uploaded:', documentId);

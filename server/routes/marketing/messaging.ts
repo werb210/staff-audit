@@ -19,8 +19,8 @@ router.get("/api/marketing/messaging/sequences", async (req: any, res: any) => {
       FROM linkedin_sequences ls
       LEFT JOIN linkedin_sequence_steps lss ON ls.id = lss.sequence_id
       LEFT JOIN linkedin_sequence_contacts lsc ON ls.id = lsc.sequence_id
-      GROUP BY ls.id, ls.name, ls.status, ls.target_filters, ls.created_at, ls.updated_at
-      ORDER BY ls.created_at DESC
+      GROUP BY ls.id, ls.name, ls.status, ls.target_filters, ls.createdAt, ls.updatedAt
+      ORDER BY ls.createdAt DESC
     `);
 
     console.log(`💬 Found ${sequencesResult.length} sequences`);
@@ -34,8 +34,8 @@ router.get("/api/marketing/messaging/sequences", async (req: any, res: any) => {
       totalContacts: Number(seq.total_contacts) || 0,
       activeContacts: Number(seq.active_contacts) || 0,
       completedContacts: Number(seq.completed_contacts) || 0,
-      createdAt: seq.created_at,
-      updatedAt: seq.updated_at
+      createdAt: seq.createdAt,
+      updatedAt: seq.updatedAt
     }));
 
     res.json({
@@ -118,7 +118,7 @@ router.get("/api/marketing/messaging/sequences/:id/steps", async (req: any, res:
       delayDays: step.delay_days,
       delayHours: step.delay_hours,
       action: step.action,
-      createdAt: step.created_at
+      createdAt: step.createdAt
     }));
 
     res.json({ steps });
@@ -167,7 +167,7 @@ router.post("/api/marketing/messaging/sequences", async (req: any, res: any) => 
     
     // Insert sequence
     await db.execute(sql`
-      INSERT INTO linkedin_sequences (id, name, target_filters, status, created_at, updated_at)
+      INSERT INTO linkedin_sequences (id, name, target_filters, status, createdAt, updatedAt)
       VALUES (${sequenceId}, ${name}, ${JSON.stringify(targetFilters)}, 'draft', NOW(), NOW())
     `);
 
@@ -176,7 +176,7 @@ router.post("/api/marketing/messaging/sequences", async (req: any, res: any) => 
       for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
         await db.execute(sql`
-          INSERT INTO linkedin_sequence_steps (id, sequence_id, step_number, message_template, delay_days, delay_hours, action, created_at)
+          INSERT INTO linkedin_sequence_steps (id, sequence_id, step_number, message_template, delay_days, delay_hours, action, createdAt)
           VALUES (${`step_${Date.now()}_${i}`}, ${sequenceId}, ${i + 1}, ${step.messageTemplate}, ${step.delayDays || 0}, ${step.delayHours || 0}, ${step.action || 'message'}, NOW())
         `);
       }

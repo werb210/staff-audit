@@ -91,7 +91,7 @@ router.post("/applications", async (req: Request, res: Response) => {
         const last  = legacy.step4?.lastName ?? "";
         const phone = legacy.step4?.phone ?? legacy.step3?.businessPhone ?? "000-000-0000";
         const insU = `
-          INSERT INTO users (id, email, password_hash, phone, first_name, last_name, role, created_at, updated_at)
+          INSERT INTO users (id, email, password_hash, phone, first_name, last_name, role, createdAt, updatedAt)
           VALUES (gen_random_uuid(), $1, 'public-api-no-password', $2, $3, $4, 'client', now(), now())
           RETURNING id
         `;
@@ -123,8 +123,8 @@ router.post("/applications", async (req: Request, res: Response) => {
 
       const insApp = `
         INSERT INTO applications (
-          id, user_id, contact_id, business_id, tenant_id, business_name, 
-          requested_amount, use_of_funds, status, created_at, updated_at
+          id, user_id, contact_id, businessId, tenant_id, business_name, 
+          requested_amount, use_of_funds, status, createdAt, updatedAt
         ) VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, 'submitted', now(), now())
         RETURNING id, status
       `;
@@ -148,7 +148,7 @@ router.post("/applications", async (req: Request, res: Response) => {
 
     // Minimal: upsert user then create application
     const user = await pool.query(`
-      INSERT INTO users (email, phone, first_name, last_name, role, created_at, updated_at)
+      INSERT INTO users (email, phone, first_name, last_name, role, createdAt, updatedAt)
       VALUES ($1,$2,$3,$4,'client',now(),now())
       ON CONFLICT (email) DO UPDATE SET phone=EXCLUDED.phone
       RETURNING id
@@ -157,7 +157,7 @@ router.post("/applications", async (req: Request, res: Response) => {
     const userId = user.rows[0].id;
 
     const app = await pool.query(`
-      INSERT INTO applications (user_id, business_name, funding_amount, purpose, country, currency, status, created_at, updated_at)
+      INSERT INTO applications (user_id, business_name, funding_amount, purpose, country, currency, status, createdAt, updatedAt)
       VALUES ($1,$2,$3,$4,$5,$6,'submitted',now(),now())
       RETURNING id, status
     `, [userId, step3.businessName, step1.fundingAmount, step1.fundsPurpose, step1.country, step1.currency]);

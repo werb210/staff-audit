@@ -8,12 +8,12 @@ export async function getLenderProducts(req: any, res: any) {
       SELECT 
         lp.id, lp.lender_id, lp.name, lp.category, lp.status,
         lp.min_amount, lp.max_amount, lp.interest_rate_min, lp.interest_rate_max,
-        lp.description, lp.created_at, lp.updated_at,
+        lp.description, lp.createdAt, lp.updatedAt,
         l.id as lender_id, l.name as lender_name
       FROM lender_products lp
       LEFT JOIN lenders l ON lp.lender_id = l.id
       WHERE lp.status = 'active' OR lp.status IS NULL
-      ORDER BY lp.created_at DESC
+      ORDER BY lp.createdAt DESC
     `);
 
     const products = result.rows.map((row: any) => ({

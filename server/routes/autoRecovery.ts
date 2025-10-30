@@ -303,7 +303,7 @@ router.get('/status', async (req: any, res: any) => {
     }
     
     // Get recent recovery logs
-    const logsQuery = 'SELECT COUNT(*) as count FROM recovery_logs WHERE created_at > NOW() - INTERVAL \'24 hours\'';
+    const logsQuery = 'SELECT COUNT(*) as count FROM recovery_logs WHERE createdAt > NOW() - INTERVAL \'24 hours\'';
     const logsResult = await pool.query(logsQuery);
     const recentRecoveries = parseInt(logsResult.rows[0].count || 0);
     
@@ -422,7 +422,7 @@ router.post('/recover-application/:applicationId', async (req: any, res: any) =>
     console.log(`🔄 [AUTO-RECOVERY API] Starting application-level recovery for: ${applicationId}`);
     
     // Get all documents for this application
-    const docsQuery = 'SELECT id, file_name, application_id FROM documents WHERE application_id = $1';
+    const docsQuery = 'SELECT id, name, applicationId FROM documents WHERE applicationId = $1';
     const docsResult = await pool.query(docsQuery, [applicationId]);
     const documents = docsResult.rows;
     
@@ -446,7 +446,7 @@ router.post('/recover-application/:applicationId', async (req: any, res: any) =>
         const result = await fileRecoveryService.recoverMissingDocument(doc.id);
         results.push({
           documentId: doc.id,
-          fileName: doc.file_name,
+          fileName: doc.name,
           success: result.success,
           recoveryMethod: result.recoveryMethod,
           newPath: result.newPath,
@@ -455,20 +455,20 @@ router.post('/recover-application/:applicationId', async (req: any, res: any) =>
         
         if (result.success) {
           successCount++;
-          console.log(`✅ [AUTO-RECOVERY APP] Recovered: ${doc.file_name}`);
+          console.log(`✅ [AUTO-RECOVERY APP] Recovered: ${doc.name}`);
         } else {
           failureCount++;
-          console.log(`❌ [AUTO-RECOVERY APP] Failed: ${doc.file_name} - ${result.error}`);
+          console.log(`❌ [AUTO-RECOVERY APP] Failed: ${doc.name} - ${result.error}`);
         }
       } catch (error: unknown) {
         failureCount++;
         results.push({
           documentId: doc.id,
-          fileName: doc.file_name,
+          fileName: doc.name,
           success: false,
           error: error instanceof Error ? error.message : String(error)
         });
-        console.log(`❌ [AUTO-RECOVERY APP] Error recovering ${doc.file_name}:`, error);
+        console.log(`❌ [AUTO-RECOVERY APP] Error recovering ${doc.name}:`, error);
       }
     }
     

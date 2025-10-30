@@ -42,7 +42,7 @@ async function triggerPipelineAsync(req: any, changeType: 'upload' | 'status_cha
     const applicationId = req.params.applicationId || 
                          req.params.id || 
                          req.body.applicationId || 
-                         req.body.application_id;
+                         req.body.applicationId;
     
     if (applicationId) {
       console.log(`🎯 [PIPELINE TRIGGER] Document ${changeType} detected for ${applicationId}`);

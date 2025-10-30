@@ -85,11 +85,11 @@ async function sendStageTransitionSMS(applicationId: string, fromStage: string, 
         to_number,
         body,
         direction,
-        application_id,
+        applicationId,
         automation_type,
         status,
         twilio_sid,
-        created_at
+        createdAt
       ) VALUES (
         ${process.env.TWILIO_PHONE_NUMBER || '+18254511768'},
         ${phoneNumber},

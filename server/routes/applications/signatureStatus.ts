@@ -24,7 +24,7 @@ signatureStatusRouter.get("/:id/signature-status", async (req: any, res: any) =>
 
     return res.json({
       success: true,
-      application_id: app.id,
+      applicationId: app.id,
       signing_status: app.signingStatus || 'not_required',
       signed_at: app.signedAt,
     });

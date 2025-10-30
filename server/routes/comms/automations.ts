@@ -91,7 +91,7 @@ router.post("/triggers/missing-docs", async (req: any, res: any) => {
           WHERE a.stage IN ('Requires Docs', 'In Review')
           AND EXISTS (
             SELECT 1 FROM documents d 
-            WHERE d.application_id = a.id AND d.status IN ('uploaded', 'rejected')
+            WHERE d.applicationId = a.id AND d.status IN ('uploaded', 'rejected')
           )
           LIMIT 50
         `);

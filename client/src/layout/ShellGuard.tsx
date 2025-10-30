@@ -16,7 +16,7 @@ const ShellGuard: React.FC = () => {
   return (
     <div data-app-shell="true">
       <SiloBoundary>
-          <Shell key={`shell-${tenant}`} />
+        <Shell key={`shell-${tenant}`} />
       </SiloBoundary>
     </div>
   );

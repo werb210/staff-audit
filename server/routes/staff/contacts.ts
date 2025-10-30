@@ -36,7 +36,7 @@ r.get("/contacts", async (req: Request, res: Response) => {
       'BF ONLY'::text AS "tenant"
     FROM users u
     WHERE ${where}
-    ORDER BY u.updated_at DESC NULLS LAST, u.id DESC
+    ORDER BY u.updatedAt DESC NULLS LAST, u.id DESC
     LIMIT 100
   `;
   const { rows } = await pool.query(sql, params);

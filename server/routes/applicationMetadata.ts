@@ -53,7 +53,7 @@ router.get('/:id', async (req: any, res: any) => {
         requested_amount,
         dba_name,
         business_name,
-        created_at
+        createdAt
       FROM applications 
       WHERE id = $1
       LIMIT 1
@@ -92,7 +92,7 @@ router.get('/:id', async (req: any, res: any) => {
         businessName: businessName,
         productCategory: category,
         requestedAmount: application.requested_amount || 'Amount Not Set',
-        createdAt: application.created_at,
+        createdAt: application.createdAt,
         requiredDocuments: requiredDocuments
       }
     };

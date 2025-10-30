@@ -14,17 +14,19 @@ export const ProductWithRulesSchema = z.object({
   maxTermMonths: z.number().int().min(0).optional(),
   active: z.boolean().default(true),
   description: z.string().optional(),
-  rules: z.object({
-    minCreditScore: z.number().int().min(0).max(900).optional(),
-    minAnnualRevenue: z.number().nonnegative().optional(),
-    timeInBusinessMonths: z.number().int().min(0).optional(),
-    maxDebtToIncome: z.number().min(0).max(5).optional(),
-    preferredIndustries: z.array(z.string()).optional(),
-    excludedIndustries: z.array(z.string()).optional(),
-    requiredDocs: z.array(z.string()).optional(),
-    excludedRegions: z.array(z.string()).optional(),
-    advancedLogic: z.string().optional(),
-  }).default({})
+  rules: z
+    .object({
+      minCreditScore: z.number().int().min(0).max(900).optional(),
+      minAnnualRevenue: z.number().nonnegative().optional(),
+      timeInBusinessMonths: z.number().int().min(0).optional(),
+      maxDebtToIncome: z.number().min(0).max(5).optional(),
+      preferredIndustries: z.array(z.string()).optional(),
+      excludedIndustries: z.array(z.string()).optional(),
+      requiredDocs: z.array(z.string()).optional(),
+      excludedRegions: z.array(z.string()).optional(),
+      advancedLogic: z.string().optional(),
+    })
+    .default({}),
 });
 
 export type ProductWithRulesInput = z.infer<typeof ProductWithRulesSchema>;

@@ -10,8 +10,8 @@ await pool.query(`
     email TEXT,
     roles TEXT[] NOT NULL DEFAULT ARRAY['user'],
     tenant_id UUID,
-    created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
+    createdAt TIMESTAMPTZ DEFAULT now(),
+    updatedAt TIMESTAMPTZ DEFAULT now()
   );
 `);
 
@@ -24,7 +24,7 @@ if(q.rows.length){
   const row=q.rows[0];
   const haveAdmin = (row.roles||[]).includes('admin');
   if(!haveAdmin){
-    await pool.query("UPDATE users SET roles=$2, full_name=$3, updated_at=now() WHERE phone_e164=$1",[phone,roles,name]);
+    await pool.query("UPDATE users SET roles=$2, full_name=$3, updatedAt=now() WHERE phone_e164=$1",[phone,roles,name]);
     console.log("✅ Updated existing user to admin:", phone);
   } else {
     console.log("✅ Admin exists:", phone);

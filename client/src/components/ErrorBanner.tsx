@@ -7,13 +7,15 @@ interface ErrorBannerProps {
   className?: string;
 }
 
-const ErrorBanner: React.FC<ErrorBannerProps> = ({ 
-  message, 
-  onDismiss, 
-  className = "" 
+const ErrorBanner: React.FC<ErrorBannerProps> = ({
+  message,
+  onDismiss,
+  className = "",
 }) => {
   return (
-    <div className={`bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md flex items-center justify-between ${className}`}>
+    <div
+      className={`bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md flex items-center justify-between ${className}`}
+    >
       <div className="flex items-center gap-2">
         <AlertCircle className="h-4 w-4" />
         <span className="text-sm">{message}</span>

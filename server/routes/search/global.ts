@@ -29,14 +29,14 @@ router.post("/", async (req: any, res) => {
       const appResults = await db.execute(sql`
         SELECT a.id, a.legal_business_name as business_name, a.contact_first_name as first_name, 
                a.contact_last_name as last_name, a.business_email as email, a.business_phone as phone, 
-               a.status, a.created_at, 'application' as type
+               a.status, a.createdAt, 'application' as type
         FROM applications a 
         WHERE LOWER(a.legal_business_name) LIKE ${searchTerm} 
            OR LOWER(a.contact_first_name) LIKE ${searchTerm}
            OR LOWER(a.contact_last_name) LIKE ${searchTerm}
            OR LOWER(a.business_email) LIKE ${searchTerm}
            OR a.business_phone LIKE ${searchTerm}
-        ORDER BY a.created_at DESC
+        ORDER BY a.createdAt DESC
         LIMIT ${limit} OFFSET ${offset}
       `);
       results.applications = appResults.rows || [];
@@ -46,14 +46,14 @@ router.post("/", async (req: any, res) => {
     if (!filters?.types || filters.types.includes('contacts')) {
       const contactResults = await db.execute(sql`
         SELECT c.id, c.first_name, c.last_name, c.email, c.phone, c.company,
-               c.created_at, 'contact' as type
+               c.createdAt, 'contact' as type
         FROM contacts c
         WHERE LOWER(c.first_name) LIKE ${searchTerm}
            OR LOWER(c.last_name) LIKE ${searchTerm}
            OR LOWER(c.email) LIKE ${searchTerm}
            OR c.phone LIKE ${searchTerm}
            OR LOWER(c.company) LIKE ${searchTerm}
-        ORDER BY c.created_at DESC
+        ORDER BY c.createdAt DESC
         LIMIT ${limit} OFFSET ${offset}
       `);
       results.contacts = contactResults.rows || [];
@@ -62,13 +62,13 @@ router.post("/", async (req: any, res) => {
     // Search Documents
     if (!filters?.types || filters.types.includes('documents')) {
       const docResults = await db.execute(sql`
-        SELECT d.id, d.filename, d.category, d.application_id, d.created_at,
+        SELECT d.id, d.filename, d.category, d.applicationId, d.createdAt,
                a.legal_business_name as business_name, a.contact_first_name as first_name, a.contact_last_name as last_name, 'document' as type
         FROM documents d
-        LEFT JOIN applications a ON a.id = d.application_id
+        LEFT JOIN applications a ON a.id = d.applicationId
         WHERE LOWER(d.filename) LIKE ${searchTerm}
            OR LOWER(d.category) LIKE ${searchTerm}
-        ORDER BY d.created_at DESC
+        ORDER BY d.createdAt DESC
         LIMIT ${limit} OFFSET ${offset}
       `);
       results.documents = docResults.rows || [];
@@ -77,11 +77,11 @@ router.post("/", async (req: any, res) => {
     // Search Lender Partners
     if (!filters?.types || filters.types.includes('lenders')) {
       const lenderResults = await db.execute(sql`
-        SELECT l.id, l.name, l.email, l.created_at, 'lender' as type
+        SELECT l.id, l.name, l.email, l.createdAt, 'lender' as type
         FROM lender_partners l
         WHERE LOWER(l.name) LIKE ${searchTerm}
            OR LOWER(l.email) LIKE ${searchTerm}
-        ORDER BY l.created_at DESC
+        ORDER BY l.createdAt DESC
         LIMIT ${limit} OFFSET ${offset}
       `);
       results.lenders = lenderResults.rows || [];
@@ -91,12 +91,12 @@ router.post("/", async (req: any, res) => {
     if (!filters?.types || filters.types.includes('communications')) {
       try {
         const commResults = await db.execute(sql`
-          SELECT c.id, c.body, c.channel, c.created_at, c.application_id,
+          SELECT c.id, c.body, c.channel, c.createdAt, c.applicationId,
                  a.legal_business_name as business_name, a.contact_first_name as first_name, a.contact_last_name as last_name, 'communication' as type
           FROM comm_messages c
-          LEFT JOIN applications a ON a.id = c.application_id
+          LEFT JOIN applications a ON a.id = c.applicationId
           WHERE LOWER(c.body) LIKE ${searchTerm}
-          ORDER BY c.created_at DESC
+          ORDER BY c.createdAt DESC
           LIMIT ${limit} OFFSET ${offset}
         `);
         results.communications = commResults.rows || [];
@@ -211,7 +211,7 @@ router.post("/advanced", async (req: any, res) => {
     }
 
     if (dateRange?.start && dateRange?.end) {
-      whereConditions.push(`a.created_at BETWEEN $${++paramIndex} AND $${++paramIndex}`);
+      whereConditions.push(`a.createdAt BETWEEN $${++paramIndex} AND $${++paramIndex}`);
       params.push(dateRange.start, dateRange.end);
     }
 
@@ -226,10 +226,10 @@ router.post("/advanced", async (req: any, res) => {
 
     const queryString = `
       SELECT a.id, a.legal_business_name as business_name, a.contact_first_name as first_name, a.contact_last_name as last_name, a.business_email as email, 
-             a.business_phone as phone, a.status, a.created_at, 'application' as type
+             a.business_phone as phone, a.status, a.createdAt, 'application' as type
       FROM applications a 
       ${whereClause}
-      ORDER BY a.created_at DESC
+      ORDER BY a.createdAt DESC
       LIMIT $${++paramIndex} OFFSET $${++paramIndex}
     `;
     

@@ -18,9 +18,9 @@ r.get("/auth/users", async (req: any, res: any) => {
         email,
         phone,
         role,
-        created_at
+        createdAt
       FROM users 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `);
     
     const users = result.rows.map(row => ({
@@ -33,7 +33,7 @@ r.get("/auth/users", async (req: any, res: any) => {
       phone: row.phone,
       role: row.role || 'user',
       active: true,
-      created_at: row.created_at
+      createdAt: row.createdAt
     }));
     
     await client.end();

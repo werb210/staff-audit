@@ -33,8 +33,8 @@ router.post("/clone", requireAnyRole(["admin","manager"]), async (req: any, res)
       lifecycle_stage: "Lead",
       owner_user_id: req.user?.id,
       tags: ["qualified", "hot-lead"],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
     // Create new contact in target tenant
@@ -42,8 +42,8 @@ router.post("/clone", requireAnyRole(["admin","manager"]), async (req: any, res)
       ...sourceContact,
       id: `cloned-${Date.now()}`,
       tenant_id: targetTenant,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
     // Audit logging
@@ -86,8 +86,8 @@ router.post("/bulk-import", requireAnyRole(["admin","manager"]), async (req: any
       ...contact,
       id: `imported-${Date.now()}-${index}`,
       tenant_id: targetTenant,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }));
     
     // Audit logging

@@ -21,7 +21,7 @@ export async function trackAIUsage(metrics: AIMetrics) {
   try {
     await db.execute(sql`
       INSERT INTO ai_usage (
-        action, user_id, tenant_id, application_id, contact_id,
+        action, user_id, tenant_id, applicationId, contact_id,
         request_id, model, tokens_used, latency_ms, cost_cents,
         cached, success, error_code
       ) VALUES (
@@ -100,7 +100,7 @@ export async function getAIMetrics(
         AVG(CASE WHEN success THEN 1.0 ELSE 0.0 END) as success_rate
       FROM ai_usage
       WHERE tenant_id = ${tenantId}
-      AND created_at BETWEEN ${startDate} AND ${endDate}
+      AND createdAt BETWEEN ${startDate} AND ${endDate}
     `);
     
     // Top actions
@@ -111,7 +111,7 @@ export async function getAIMetrics(
         SUM(cost_cents) as cost_cents
       FROM ai_usage
       WHERE tenant_id = ${tenantId}
-      AND created_at BETWEEN ${startDate} AND ${endDate}
+      AND createdAt BETWEEN ${startDate} AND ${endDate}
       GROUP BY action
       ORDER BY count DESC
       LIMIT 10
@@ -120,13 +120,13 @@ export async function getAIMetrics(
     // Daily usage
     const dailyUsage = await db.execute(sql`
       SELECT 
-        DATE(created_at) as date,
+        DATE(createdAt) as date,
         COUNT(*) as requests,
         SUM(cost_cents) as cost_cents
       FROM ai_usage
       WHERE tenant_id = ${tenantId}
-      AND created_at BETWEEN ${startDate} AND ${endDate}
-      GROUP BY DATE(created_at)
+      AND createdAt BETWEEN ${startDate} AND ${endDate}
+      GROUP BY DATE(createdAt)
       ORDER BY date
     `);
     

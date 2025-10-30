@@ -53,7 +53,7 @@ export async function runDocumentStartupAudit() {
     // Backfill SHA256 checksums
     let hashesAdded = 0;
     for (const doc of missingHashDocs as any[]) {
-      const filePath = path.join("uploads", "documents", `${doc.id}.${doc.file_name.split('.').pop() || 'txt'}`);
+      const filePath = path.join("uploads", "documents", `${doc.id}.${doc.name.split('.').pop() || 'txt'}`);
       
       if (!fs.existsSync(filePath)) {
         console.log(`⚠️ [STARTUP AUDIT] File not found for checksum: ${filePath}`);
@@ -69,7 +69,7 @@ export async function runDocumentStartupAudit() {
         WHERE id = ${doc.id}
       `;
       
-      console.log(`✅ [STARTUP AUDIT] SHA256 added for ${doc.file_name}: ${sha256.substring(0, 16)}...`);
+      console.log(`✅ [STARTUP AUDIT] SHA256 added for ${doc.name}: ${sha256.substring(0, 16)}...`);
       hashesAdded++;
     }
 
@@ -83,7 +83,7 @@ export async function runDocumentStartupAudit() {
     // Backfill Object Storage keys
     let storageKeysAdded = 0;
     for (const doc of missingStorageDocs as any[]) {
-      const filePath = path.join("uploads", "documents", `${doc.id}.${doc.file_name.split('.').pop() || 'txt'}`);
+      const filePath = path.join("uploads", "documents", `${doc.id}.${doc.name.split('.').pop() || 'txt'}`);
       
       if (!fs.existsSync(filePath)) {
         console.log(`⚠️ [STARTUP AUDIT] File not found for storage backup: ${filePath}`);
@@ -97,7 +97,7 @@ export async function runDocumentStartupAudit() {
         // Upload to S3 first, then store the key
         const { uploadToS3 } = await import('../utils/s3');
         const s3Storage = new (await import('../utils/s3')).S3Storage();
-        const storageKey = await s3Storage.set(buffer, doc.file_name, doc.application_id);
+        const storageKey = await s3Storage.set(buffer, doc.name, doc.applicationId);
         
         await sql`
           UPDATE documents 
@@ -105,7 +105,7 @@ export async function runDocumentStartupAudit() {
           WHERE id = ${doc.id}
         `;
         
-        console.log(`☁️ [STARTUP AUDIT] S3 storage key added for ${doc.file_name}: ${storageKey}`);
+        console.log(`☁️ [STARTUP AUDIT] S3 storage key added for ${doc.name}: ${storageKey}`);
         storageKeysAdded++;
       } catch (err) {
         console.error(`❌ [STARTUP AUDIT] S3 upload failed for ${doc.id}:`, err);

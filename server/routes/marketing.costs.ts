@@ -150,7 +150,7 @@ r.get("/marketing/roi/enhanced", async (req: any, res: any) => {
         COUNT(*) as conversions,
         SUM(r.revenue) as total_revenue
       FROM roi_tracking r 
-      WHERE r.created_at >= NOW() - INTERVAL '${days} days'
+      WHERE r.createdAt >= NOW() - INTERVAL '${days} days'
     `;
 
     if (experiment_id) {

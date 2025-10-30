@@ -11,7 +11,7 @@ r.get("/templates", async (req: any, res: any) => {
   try {
     const { rows } = await db.execute(sql`
       SELECT * FROM comm_templates 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `);
     res.json({ ok: true, items: rows });
   } catch (error: unknown) {

@@ -1,9 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Shield, CheckCircle, AlertCircle, Settings } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import {
+  ExternalLink,
+  Shield,
+  CheckCircle,
+  AlertCircle,
+  Settings,
+} from "lucide-react";
 
 interface GoogleAdsStatus {
   linked: boolean;
@@ -16,7 +28,7 @@ interface GoogleAdsStatus {
 export default function GoogleAdsIntegration() {
   const [status, setStatus] = useState<GoogleAdsStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authUrl, setAuthUrl] = useState<string>('');
+  const [authUrl, setAuthUrl] = useState<string>("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -26,15 +38,15 @@ export default function GoogleAdsIntegration() {
   const checkStatus = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/google/ads/auth/status', {});
+      const response = await fetch("/api/google/ads/auth/status", {});
       const data = await response.json();
       setStatus(data);
     } catch (error) {
-      console.error('Error checking Google Ads status:', error);
+      console.error("Error checking Google Ads status:", error);
       toast({
         title: "Error",
         description: "Failed to check Google Ads integration status",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -43,10 +55,10 @@ export default function GoogleAdsIntegration() {
 
   const handleConnect = async () => {
     try {
-      const response = await fetch('/api/google/ads/auth/url', {});
+      const response = await fetch("/api/google/ads/auth/url", {});
       const data = await response.json();
       if (data.url) {
-        window.open(data.url, '_blank', 'width=600,height=600');
+        window.open(data.url, "_blank", "width=600,height=600");
         // Poll for connection status after opening auth window
         const pollInterval = setInterval(() => {
           checkStatus().then(() => {
@@ -59,30 +71,30 @@ export default function GoogleAdsIntegration() {
             }
           });
         }, 2000);
-        
+
         // Stop polling after 2 minutes
         setTimeout(() => clearInterval(pollInterval), 120000);
       }
     } catch (error) {
-      console.error('Error getting auth URL:', error);
+      console.error("Error getting auth URL:", error);
       toast({
         title: "Error",
         description: "Failed to generate authorization URL",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
 
   const testConnection = async () => {
     try {
-      const response = await fetch('/api/google/ads/accounts', {});
+      const response = await fetch("/api/google/ads/accounts", {});
       const data = await response.json();
-      
+
       if (data.error) {
         toast({
           title: "Connection Test Failed",
           description: data.error,
-          variant: "destructive"
+          variant: "destructive",
         });
       } else {
         toast({
@@ -91,43 +103,44 @@ export default function GoogleAdsIntegration() {
         });
       }
     } catch (error) {
-      console.error('Error testing connection:', error);
+      console.error("Error testing connection:", error);
       toast({
         title: "Connection Test Failed",
         description: "Failed to test Google Ads API connection",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
 
   const createConversions = async () => {
     try {
-      const response = await fetch('/api/google/ads/conversion-actions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+      const response = await fetch("/api/google/ads/conversion-actions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
-      
+
       const data = await response.json();
-      
+
       if (data.error) {
         toast({
           title: "Conversion Creation Failed",
           description: data.error,
-          variant: "destructive"
+          variant: "destructive",
         });
       } else {
         toast({
           title: "Conversion Actions Created",
-          description: "Lead, Qualified, and Funded conversion actions have been created",
+          description:
+            "Lead, Qualified, and Funded conversion actions have been created",
         });
-        console.log('Conversion actions created:', data);
+        console.log("Conversion actions created:", data);
       }
     } catch (error) {
-      console.error('Error creating conversions:', error);
+      console.error("Error creating conversions:", error);
       toast({
         title: "Error",
         description: "Failed to create conversion actions",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -151,7 +164,8 @@ export default function GoogleAdsIntegration() {
           Google Ads Integration
         </CardTitle>
         <CardDescription>
-          Connect your Google Ads account to track commission-based conversions and optimize for ROAS
+          Connect your Google Ads account to track commission-based conversions
+          and optimize for ROAS
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -171,7 +185,7 @@ export default function GoogleAdsIntegration() {
               </Badge>
             )}
           </div>
-          
+
           {!status?.linked && (
             <Button onClick={handleConnect} className="flex items-center gap-2">
               <ExternalLink className="h-4 w-4" />
@@ -183,23 +197,33 @@ export default function GoogleAdsIntegration() {
         {/* Configuration Details */}
         <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
           <div>
-            <span className="text-sm font-medium text-gray-600">Customer ID:</span>
-            <p className="text-sm">{status?.loginCustomerId || 'Not set'}</p>
+            <span className="text-sm font-medium text-gray-600">
+              Customer ID:
+            </span>
+            <p className="text-sm">{status?.loginCustomerId || "Not set"}</p>
           </div>
           <div>
-            <span className="text-sm font-medium text-gray-600">Developer Token:</span>
-            <p className="text-sm">{status?.hasDevToken ? '✓ Configured' : '✗ Missing'}</p>
+            <span className="text-sm font-medium text-gray-600">
+              Developer Token:
+            </span>
+            <p className="text-sm">
+              {status?.hasDevToken ? "✓ Configured" : "✗ Missing"}
+            </p>
           </div>
           <div>
-            <span className="text-sm font-medium text-gray-600">Kill Switch:</span>
+            <span className="text-sm font-medium text-gray-600">
+              Kill Switch:
+            </span>
             <Badge variant={status?.killSwitch ? "destructive" : "default"}>
-              {status?.killSwitch ? 'Enabled (Safe)' : 'Disabled'}
+              {status?.killSwitch ? "Enabled (Safe)" : "Disabled"}
             </Badge>
           </div>
           <div>
-            <span className="text-sm font-medium text-gray-600">Sandbox Mode:</span>
+            <span className="text-sm font-medium text-gray-600">
+              Sandbox Mode:
+            </span>
             <Badge variant={status?.sandboxMode ? "secondary" : "default"}>
-              {status?.sandboxMode ? 'Enabled (Testing)' : 'Production'}
+              {status?.sandboxMode ? "Enabled (Testing)" : "Production"}
             </Badge>
           </div>
         </div>
@@ -210,8 +234,8 @@ export default function GoogleAdsIntegration() {
             <Button variant="outline" onClick={testConnection}>
               Test Connection
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={createConversions}
               disabled={status?.killSwitch}
             >
@@ -231,21 +255,32 @@ export default function GoogleAdsIntegration() {
               <span className="font-medium">Safety Mode Active</span>
             </div>
             <p className="text-sm text-yellow-700 mt-1">
-              Kill switch is enabled. No ads will spend until this is disabled in environment settings.
+              Kill switch is enabled. No ads will spend until this is disabled
+              in environment settings.
             </p>
           </div>
         )}
 
         {/* Conversion Tracking Info */}
         <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-2">Value-Based Tracking</h4>
+          <h4 className="font-medium text-blue-900 mb-2">
+            Value-Based Tracking
+          </h4>
           <p className="text-sm text-blue-800">
-            This integration tracks <strong>commission values</strong> instead of cheap leads:
+            This integration tracks <strong>commission values</strong> instead
+            of cheap leads:
           </p>
           <ul className="text-sm text-blue-700 mt-2 space-y-1">
-            <li>• <strong>Lead Submitted</strong> - Initial application conversion</li>
-            <li>• <strong>Qualified Lead</strong> - Pre-qualified for lending</li>
-            <li>• <strong>Deal Funded</strong> - Commission earned (ROAS optimization)</li>
+            <li>
+              • <strong>Lead Submitted</strong> - Initial application conversion
+            </li>
+            <li>
+              • <strong>Qualified Lead</strong> - Pre-qualified for lending
+            </li>
+            <li>
+              • <strong>Deal Funded</strong> - Commission earned (ROAS
+              optimization)
+            </li>
           </ul>
         </div>
       </CardContent>

@@ -60,10 +60,10 @@ router.get("/subscriptions", async (req: any, res: any) => {
     }
 
     const { rows } = await db.query(`
-      SELECT id, endpoint, user_agent, created_at 
+      SELECT id, endpoint, user_agent, createdAt 
       FROM push_subscriptions 
       WHERE user_id = $1 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `, [req.user.id]);
 
     res.json({ subscriptions: rows });

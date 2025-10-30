@@ -32,9 +32,9 @@ export async function purgeContactData(contactId: string) {
       
       if (appIds.length > 0) {
         // Delete related data
-        await db.execute(sql`DELETE FROM documents WHERE application_id = ANY(${appIds})`);
-        await db.execute(sql`DELETE FROM lender_activity WHERE application_id = ANY(${appIds})`);
-        await db.execute(sql`DELETE FROM decision_traces WHERE application_id = ANY(${appIds})`);
+        await db.execute(sql`DELETE FROM documents WHERE applicationId = ANY(${appIds})`);
+        await db.execute(sql`DELETE FROM lender_activity WHERE applicationId = ANY(${appIds})`);
+        await db.execute(sql`DELETE FROM decision_traces WHERE applicationId = ANY(${appIds})`);
         
         // Anonymize applications instead of deleting (for compliance)
         const anonResult = await db.execute(sql`
@@ -49,7 +49,7 @@ export async function purgeContactData(contactId: string) {
             state = 'XX',
             zip = '00000',
             employer = 'REDACTED',
-            updated_at = now()
+            updatedAt = now()
           WHERE contact_id = ${contactId}
         `);
         results.anonymized.applications = anonResult.rowsAffected || 0;
@@ -96,7 +96,7 @@ export async function purgeApplicationData(applicationId: string) {
     // 1. Delete related documents
     try {
       const docsResult = await db.execute(sql`
-        DELETE FROM documents WHERE application_id = ${applicationId}
+        DELETE FROM documents WHERE applicationId = ${applicationId}
       `);
       results.tables.documents = docsResult.rowsAffected || 0;
     } catch (error) {
@@ -106,7 +106,7 @@ export async function purgeApplicationData(applicationId: string) {
     // 2. Delete communications
     try {
       const commResult = await db.execute(sql`
-        DELETE FROM comm_messages WHERE application_id = ${applicationId}
+        DELETE FROM comm_messages WHERE applicationId = ${applicationId}
       `);
       results.tables.comm_messages = commResult.rowsAffected || 0;
     } catch (error) {
@@ -116,7 +116,7 @@ export async function purgeApplicationData(applicationId: string) {
     // 3. Delete lender activity
     try {
       const lenderResult = await db.execute(sql`
-        DELETE FROM lender_activity WHERE application_id = ${applicationId}
+        DELETE FROM lender_activity WHERE applicationId = ${applicationId}
       `);
       results.tables.lender_activity = lenderResult.rowsAffected || 0;
     } catch (error) {
@@ -126,7 +126,7 @@ export async function purgeApplicationData(applicationId: string) {
     // 4. Delete decision traces
     try {
       const decisionResult = await db.execute(sql`
-        DELETE FROM decision_traces WHERE application_id = ${applicationId}
+        DELETE FROM decision_traces WHERE applicationId = ${applicationId}
       `);
       results.tables.decision_traces = decisionResult.rowsAffected || 0;
     } catch (error) {
@@ -147,7 +147,7 @@ export async function purgeApplicationData(applicationId: string) {
           state = 'XX',
           zip = '00000',
           employer = 'REDACTED',
-          updated_at = now()
+          updatedAt = now()
         WHERE id = ${applicationId}
       `);
       results.anonymized.applications = appResult.rowsAffected || 0;

@@ -62,7 +62,7 @@ export async function sendSMSNotification(data: SMSNotificationData): Promise<{ 
     // Check if SMS was already sent for this trigger
     const existingLogResult = await db.execute(sql`
       SELECT id FROM sms_messages 
-      WHERE application_id = ${data.applicationId} 
+      WHERE applicationId = ${data.applicationId} 
       AND automation_type = ${data.trigger}
       AND status IN ('sent', 'delivered')
       LIMIT 1
@@ -211,13 +211,13 @@ async function logSMSToDatabase(logEntry: SMSLogEntry): Promise<void> {
         direction,
         status,
         contact_id,
-        application_id,
+        applicationId,
         is_automated,
         automation_type,
         message_sid,
         error_message,
-        created_at,
-        updated_at
+        createdAt,
+        updatedAt
       ) VALUES (
         ${process.env.TWILIO_FROM_NUMBER || process.env.TWILIO_PHONE_NUMBER || '+17753146801'},
         ${logEntry.phoneNumber},
@@ -252,7 +252,7 @@ export async function checkAllDocumentsAccepted(applicationId: string): Promise<
         COUNT(*) as total_required,
         COUNT(CASE WHEN status = 'accepted' THEN 1 END) as accepted_count
       FROM documents 
-      WHERE application_id = ${applicationId} 
+      WHERE applicationId = ${applicationId} 
       AND is_required = true
     `);
     
@@ -278,14 +278,14 @@ export async function checkAnalysisCompleted(applicationId: string): Promise<boo
     const ocrResult = await db.execute(sql`
       SELECT COUNT(*) as ocr_count
       FROM ocr_results 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     // Check if banking analysis exists
     const bankingResult = await db.execute(sql`
       SELECT COUNT(*) as banking_count
       FROM banking_analysis 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     const ocrCount = parseInt((ocrResult.rows[0] as any).ocr_count);

@@ -5,10 +5,10 @@ export async function scanAndQueueReminders() {
     
     // Simple query without contact_id to avoid schema issues
     const applications = await q(`
-      SELECT id, applicant_name, email, stage, created_at 
+      SELECT id, applicant_name, email, stage, createdAt 
       FROM applications 
       WHERE stage IN ('requires_docs', 'in_review') 
-      AND created_at < NOW() - INTERVAL '24 hours'
+      AND createdAt < NOW() - INTERVAL '24 hours'
       LIMIT 10
     `);
     

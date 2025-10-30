@@ -6,7 +6,7 @@ export async function auditS3Documents() {
   
   try {
     // Find all active documents using direct SQL query
-    const result = await pool.query('SELECT id, file_name, storage_key, object_storage_key FROM documents');
+    const result = await pool.query('SELECT id, name, storage_key, object_storage_key FROM documents');
     const allDocuments = result.rows;
     
     console.log(`[S3-AUDIT] Found ${allDocuments.length} documents to audit`);
@@ -61,13 +61,13 @@ export async function auditS3Documents() {
     const path = await import('path');
     
     for (const doc of localDocuments) {
-      const filePath = path.resolve(`uploads/documents/${doc.id}.${doc.file_name?.split('.').pop() || 'pdf'}`);
+      const filePath = path.resolve(`uploads/documents/${doc.id}.${doc.name?.split('.').pop() || 'pdf'}`);
       
       try {
         await fs.access(filePath);
-        console.log(`[S3-AUDIT] ✅ Local file exists: ${doc.file_name}`);
+        console.log(`[S3-AUDIT] ✅ Local file exists: ${doc.name}`);
       } catch (err) {
-        console.error(`[S3-AUDIT] ❌ Missing local file: ${doc.file_name}`);
+        console.error(`[S3-AUDIT] ❌ Missing local file: ${doc.name}`);
         missing.push(doc.id);
       }
     }

@@ -20,9 +20,9 @@ export async function regenerateStorageKey(applicationId: string, fileName: stri
     // Update document with storage key
     const updateQuery = `
       UPDATE documents 
-      SET storage_key = $1, backup_status = 'completed', updated_at = NOW()
-      WHERE application_id = $2 AND file_name = $3 AND storage_key IS NULL
-      RETURNING id, file_name, storage_key
+      SET storage_key = $1, backup_status = 'completed', updatedAt = NOW()
+      WHERE applicationId = $2 AND name = $3 AND storage_key IS NULL
+      RETURNING id, name, storage_key
     `;
     
     const result = await pool.query(updateQuery, [storageKey, applicationId, fileName]);
@@ -50,8 +50,8 @@ export async function regenerateAllStorageKeys(applicationId: string): Promise<n
     
     // Get all documents without storage_key
     const selectQuery = `
-      SELECT id, file_name FROM documents 
-      WHERE application_id = $1 AND storage_key IS NULL
+      SELECT id, name FROM documents 
+      WHERE applicationId = $1 AND storage_key IS NULL
     `;
     
     const result = await pool.query(selectQuery, [applicationId]);

@@ -23,10 +23,10 @@ export function initGA() {
 export function pageview(path: string) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  window.gtag?.('event', 'page_view', { page_path: path });
+  window.gtag?.("event", "page_view", { page_path: path });
 }
 
 export function event(name: string, params: Record<string, any> = {}) {
   // @ts-ignore
-  window.gtag?.('event', name, params);
+  window.gtag?.("event", name, params);
 }

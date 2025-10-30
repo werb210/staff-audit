@@ -171,7 +171,7 @@ r.post("/applications", async (req: any, res: any) => {
       await pool.query(`
         INSERT INTO applications (
           id, business_name, contact_email, requested_amount, status, 
-          user_id, business_id, tenant_id, created_at, updated_at,
+          user_id, businessId, tenant_id, createdAt, updatedAt,
           form_data, fields_canonical
         ) 
         VALUES ($1, $2, $3, $4, 'created', $5, $6, $7, NOW(), NOW(), $8, $9)

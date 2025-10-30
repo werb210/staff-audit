@@ -52,10 +52,10 @@ router.post("/sync/balances", async (req:any,res)=>{
       await db.execute(sql`UPDATE bank_links SET institution=${out.institution}, last_sync_at=now() WHERE id=${link_id}`);
       for (const a of out.accounts || []){
         await db.execute(sql`
-          INSERT INTO bank_accounts(link_id, acct_id, name, mask, type, subtype, currency, available, current, updated_at)
+          INSERT INTO bank_accounts(link_id, acct_id, name, mask, type, subtype, currency, available, current, updatedAt)
           VALUES (${link_id}, ${a.acct_id}, ${a.name}, ${a.mask}, ${a.type}, ${a.subtype}, ${a.currency}, ${a.available}, ${a.current}, now())
           ON CONFLICT (link_id, acct_id) DO UPDATE
-          SET name=EXCLUDED.name, mask=EXCLUDED.mask, type=EXCLUDED.type, subtype=EXCLUDED.subtype, currency=EXCLUDED.currency, available=EXCLUDED.available, current=EXCLUDED.current, updated_at=now()
+          SET name=EXCLUDED.name, mask=EXCLUDED.mask, type=EXCLUDED.type, subtype=EXCLUDED.subtype, currency=EXCLUDED.currency, available=EXCLUDED.available, current=EXCLUDED.current, updatedAt=now()
         `);
       }
       return res.json({ ok:true, accounts: out.accounts?.length || 0 });

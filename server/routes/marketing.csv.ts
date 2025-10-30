@@ -60,7 +60,7 @@ r.post("/marketing/roi/upload-csv", upload.single('csvFile'), async (req: any, r
             action_type, 
             cost_dollars, 
             metadata, 
-            created_at
+            createdAt
           ) VALUES (
             ${experimentId},
             'ad_spend',
@@ -117,8 +117,8 @@ r.get("/marketing/roi/import-history", async (req: any, res) => {
         experiment_id,
         COUNT(*) as import_count,
         SUM(cost_dollars) as total_cost,
-        MIN(created_at) as first_import,
-        MAX(created_at) as last_import
+        MIN(createdAt) as first_import,
+        MAX(createdAt) as last_import
       FROM roi_tracking 
       WHERE action_type = 'ad_spend'
         AND metadata->>'source' IS NOT NULL

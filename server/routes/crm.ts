@@ -150,7 +150,7 @@ router.get('/companies', requireAuth, async (req: any, res: any) => {
         ) as name,
         COUNT(*) as contact_count
       FROM applications a
-      FULL OUTER JOIN contacts c ON a.id = c.application_id
+      FULL OUTER JOIN contacts c ON a.id = c.applicationId
       WHERE (
         a.form_data::json->'step3'->>'businessName' IS NOT NULL 
         OR a.form_data::json->'step3'->>'legalBusinessName' IS NOT NULL

@@ -35,7 +35,7 @@ r.use(aiLimiter);
 async function getApp(appId: string) {
   try {
     const result = await db.execute(sql`
-      SELECT id, business_name, contact_email, form_data, norm_data, status, created_at
+      SELECT id, business_name, contact_email, form_data, norm_data, status, createdAt
       FROM applications WHERE id = ${appId}
     `);
     if (!result.rows?.[0]) throw new Error("application_not_found");
@@ -48,8 +48,8 @@ async function getApp(appId: string) {
 async function getDocs(appId: string) {
   try {
     const result = await db.execute(sql`
-      SELECT id, document_type, file_name, s3_key, pages, dpi, file_size as bytes, uploaded_at
-      FROM documents WHERE application_id = ${appId} ORDER BY uploaded_at DESC
+      SELECT id, document_type, name, s3_key, pages, dpi, size as bytes, uploaded_at
+      FROM documents WHERE applicationId = ${appId} ORDER BY uploaded_at DESC
     `);
     return result.rows || [];
   } catch (e) {
@@ -68,7 +68,7 @@ function fail(res: Response, code: string, detail?: any, status = 422) {
 async function writeTimeline(appId: string, type: string, payload: any) {
   try {
     await db.execute(sql`
-      INSERT INTO timeline_events (application_id, type, payload, created_at)
+      INSERT INTO timeline_events (applicationId, type, payload, createdAt)
       VALUES (${appId}, ${type}, ${JSON.stringify(payload)}, ${new Date()})
     `);
   } catch (e) {
@@ -87,7 +87,7 @@ r.post("/report-issue", async (req: any, res: any) => {
 
     // Insert the reported issue into the database
     const insertResult = await db.execute(sql`
-      INSERT INTO reported_issues (name, email, message, page, screenshot, created_at)
+      INSERT INTO reported_issues (name, email, message, page, screenshot, createdAt)
       VALUES (
         ${name || 'Anonymous'},
         ${email || ''},
@@ -96,7 +96,7 @@ r.post("/report-issue", async (req: any, res: any) => {
         ${screenshot || ''},
         ${timestamp ? new Date(timestamp) : new Date()}
       )
-      RETURNING id, name, email, message, page, created_at
+      RETURNING id, name, email, message, page, createdAt
     `);
 
     const reportedIssue = insertResult.rows[0];
@@ -128,7 +128,7 @@ r.post("/request-human", async (req: any, res: any) => {
 
     // Log the human assistance request
     const insertResult = await db.execute(sql`
-      INSERT INTO chat_handoff_requests (session_id, user_id, message, context, created_at, status)
+      INSERT INTO chat_handoff_requests (session_id, user_id, message, context, createdAt, status)
       VALUES (
         ${sessionId},
         ${userId || null},
@@ -137,7 +137,7 @@ r.post("/request-human", async (req: any, res: any) => {
         ${timestamp ? new Date(timestamp) : new Date()},
         'pending'
       )
-      RETURNING id, session_id, message, created_at, status
+      RETURNING id, session_id, message, createdAt, status
     `);
 
     const handoffRequest = insertResult.rows[0];
@@ -182,7 +182,7 @@ r.get("/docs/scan", async (req: Request, res: Response) => {
 
     for (const d of docs) {
       // naive classifier (improve with real classifier later)
-      const t = (d.document_type || d.file_name || "").toLowerCase();
+      const t = (d.document_type || d.name || "").toLowerCase();
       let key = "";
       if (t.includes("bank")) key = "Bank Statements (last 6 months)";
       else if (t.includes("t2")) key = "T2 Corporate Return (latest)";
@@ -195,7 +195,7 @@ r.get("/docs/scan", async (req: Request, res: Response) => {
       // quality heuristics (improve with S3 metadata/OCR results)
       const dpi = d.dpi ?? 110;
       const pages = d.pages ?? 1;
-      const q = { id: d.id, file: d.file_name, dpi, pages, ok: dpi >= 150 && pages > 0 };
+      const q = { id: d.id, file: d.name, dpi, pages, ok: dpi >= 150 && pages > 0 };
       if (!q.ok) quality.push({ ...q, reason: dpi < 150 ? "low_dpi" : "unknown" });
     }
 
@@ -255,7 +255,7 @@ r.post("/financials/score", async (req: Request, res: Response) => {
 
     try {
       const bankFeatures = await db.execute(sql`
-        SELECT features_json FROM bank_features WHERE application_id = ${applicationId}
+        SELECT features_json FROM bank_features WHERE applicationId = ${applicationId}
       `);
       
       if (bankFeatures.rows?.[0]?.features_json) {
@@ -357,7 +357,7 @@ r.post("/credit-summary/generate", async (req: Request, res: Response) => {
     const id = `cs_${Date.now()}`;
     try {
       await db.execute(sql`
-        INSERT INTO credit_summaries (id, application_id, status, payload, created_at)
+        INSERT INTO credit_summaries (id, applicationId, status, payload, createdAt)
         VALUES (${id}, ${applicationId}, 'draft', ${JSON.stringify({ sections: ["Overview","Financials","Risks","Recommendations"] })}, ${new Date()})
       `);
     } catch (e) {

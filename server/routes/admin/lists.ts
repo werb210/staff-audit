@@ -13,11 +13,11 @@ function daterange(q:any, col:string){
 
 router.get("/contacts", async (req,res)=>{
   const { search, offset, limit } = qp(req.query);
-  const { from, to } = daterange(req.query, "c.created_at");
+  const { from, to } = daterange(req.query, "c.createdAt");
   const where = sql.join([ search ? sql`(lower(contacts.email) LIKE ${"%"+search.toLowerCase()+"%"} OR lower(contacts.full_name) LIKE ${"%"+search.toLowerCase()+"%"})` : sql`true`,
                            req.query.from ? from : sql`true`,
                            req.query.to ? to : sql`true` ], sql` AND `);
-  const r = await db.execute(sql`SELECT contacts.id, contacts.full_name, contacts.email, contacts.created_at FROM contacts WHERE ${where} ORDER BY contacts.created_at DESC OFFSET ${offset} LIMIT ${limit}`);
+  const r = await db.execute(sql`SELECT contacts.id, contacts.full_name, contacts.email, contacts.createdAt FROM contacts WHERE ${where} ORDER BY contacts.createdAt DESC OFFSET ${offset} LIMIT ${limit}`);
   res.json({ rows: r.rows||[], next: offset + (r.rows?.length||0) });
 });
 
@@ -28,11 +28,11 @@ router.get("/applications", async (req,res)=>{
     search ? sql`(a.id::text LIKE ${"%"+search+"%"} OR lower(a.status) LIKE ${"%"+search.toLowerCase()+"%"})` : sql`true`,
   ];
   if (status) whereParts.push(sql`a.status=${status}`);
-  const { from, to } = daterange(req.query, "a.created_at");
+  const { from, to } = daterange(req.query, "a.createdAt");
   if (req.query.from) whereParts.push(from);
   if (req.query.to) whereParts.push(to);
   const where = sql.join(whereParts, sql` AND `);
-  const r = await db.execute(sql`SELECT a.id, a.contact_id, a.status, a.created_at FROM applications a WHERE ${where} ORDER BY a.created_at DESC OFFSET ${offset} LIMIT ${limit}`);
+  const r = await db.execute(sql`SELECT a.id, a.contact_id, a.status, a.createdAt FROM applications a WHERE ${where} ORDER BY a.createdAt DESC OFFSET ${offset} LIMIT ${limit}`);
   res.json({ rows: r.rows||[], next: offset + (r.rows?.length||0) });
 });
 
@@ -49,9 +49,9 @@ router.post("/applications/bulk/status", async (req,res)=>{
 router.get("/search", async (req,res)=>{
   const q = String(req.query.q||"").trim().toLowerCase();
   if (!q) return res.json({ contacts:[], applications:[], documents:[] });
-  const contacts = await db.execute(sql`SELECT id, full_name, email FROM contacts WHERE lower(email) LIKE ${"%"+q+"%"} OR lower(full_name) LIKE ${"%"+q+"%"} ORDER BY created_at DESC LIMIT 10`);
-  const applications = await db.execute(sql`SELECT id, status FROM applications WHERE id::text LIKE ${"%"+q+"%"} OR lower(status) LIKE ${"%"+q+"%"} ORDER BY created_at DESC LIMIT 10`);
-  const documents = await db.execute(sql`SELECT id, type FROM documents WHERE id::text LIKE ${"%"+q+"%"} OR lower(type) LIKE ${"%"+q+"%"} ORDER BY created_at DESC LIMIT 10`);
+  const contacts = await db.execute(sql`SELECT id, full_name, email FROM contacts WHERE lower(email) LIKE ${"%"+q+"%"} OR lower(full_name) LIKE ${"%"+q+"%"} ORDER BY createdAt DESC LIMIT 10`);
+  const applications = await db.execute(sql`SELECT id, status FROM applications WHERE id::text LIKE ${"%"+q+"%"} OR lower(status) LIKE ${"%"+q+"%"} ORDER BY createdAt DESC LIMIT 10`);
+  const documents = await db.execute(sql`SELECT id, type FROM documents WHERE id::text LIKE ${"%"+q+"%"} OR lower(type) LIKE ${"%"+q+"%"} ORDER BY createdAt DESC LIMIT 10`);
   res.json({ contacts: contacts.rows||[], applications: applications.rows||[], documents: documents.rows||[] });
 });
 

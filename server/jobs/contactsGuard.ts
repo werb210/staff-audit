@@ -18,11 +18,11 @@ export function startContactsGuard() {
       const result = await pool.query(`
         SELECT 
           a.id, a.contact_email, a.contact_first_name, a.contact_last_name, 
-          a.created_at, a.updated_at, a.form_data, b.business_name
+          a.createdAt, a.updatedAt, a.form_data, b.business_name
         FROM applications a 
-        LEFT JOIN businesses b ON a.business_id = b.id
+        LEFT JOIN businesses b ON a.businessId = b.id
         WHERE a.contact_email IS NOT NULL
-        ORDER BY a.updated_at DESC
+        ORDER BY a.updatedAt DESC
       `);
       
       const emailBuckets = new Map();
@@ -44,8 +44,8 @@ export function startContactsGuard() {
           name: [row.contact_first_name, row.contact_last_name].filter(Boolean).join(' ') || 'Name Not Set',
           company: row.business_name || '—',
           phone: row.form_data?.phone || row.form_data?.mobile || '',
-          createdAt: row.created_at,
-          updatedAt: row.updated_at,
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
         });
       });
       
@@ -73,8 +73,8 @@ export function startContactsGuard() {
           phone: records.find((r: any) => r.phone)?.phone || existing.phone || '',
           applicationsCount: records.length,
           applications: records.map((r: any) => r.id),
-          created_at: existing.created_at || primary.createdAt || new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          createdAt: existing.createdAt || primary.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           mergedFrom: records.length > 1 ? records.length : undefined,
         };
         

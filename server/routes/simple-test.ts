@@ -36,7 +36,7 @@ router.post('/public-applications', async (req: any, res: any) => {
       requested_amount,
       loan_purpose,
       status: 'new',
-      created_at: new Date().toISOString()
+      createdAt: new Date().toISOString()
     };
 
     console.log('✅ [PUBLIC-APP] Application created:', applicationData.id);

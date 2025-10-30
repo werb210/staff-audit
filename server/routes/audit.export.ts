@@ -14,23 +14,23 @@ r.get("/audit/application/:id/export.zip", async (req: any, res: any) => {
     if (!app.rows?.[0]) return res.status(404).end();
     
     const docs = await db.execute(sql`
-      SELECT id, name, s3_key, mime_type, av_status, created_at, updated_at 
+      SELECT id, name, s3_key, mime_type, av_status, createdAt, updatedAt 
       FROM documents 
-      WHERE application_id=${appId} 
-      ORDER BY created_at
+      WHERE applicationId=${appId} 
+      ORDER BY createdAt
     `);
     
     const comms = await db.execute(sql`
-      SELECT id, kind, direction, body, meta, created_at 
+      SELECT id, kind, direction, body, meta, createdAt 
       FROM comms 
-      WHERE application_id=${appId} 
-      ORDER BY created_at
+      WHERE applicationId=${appId} 
+      ORDER BY createdAt
     `);
     
     const events = await db.execute(sql`
       SELECT * FROM audit_events 
-      WHERE application_id=${appId} 
-      ORDER BY created_at
+      WHERE applicationId=${appId} 
+      ORDER BY createdAt
     `).catch(() => ({ rows: [] }));
 
     res.setHeader("Content-Type", "application/zip");

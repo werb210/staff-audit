@@ -98,7 +98,7 @@ router.post('/start', chatStartLimiter, async (req: any, res: any) => {
     
     // Use safe parameterized SQL to work with existing database structure
     const sessionResult = await db.execute(sql`
-      INSERT INTO chat_sessions (session_id, user_name, user_email, user_phone, status, priority, started_at, last_activity, updated_at)
+      INSERT INTO chat_sessions (session_id, user_name, user_email, user_phone, status, priority, started_at, last_activity, updatedAt)
       VALUES (${sessionId}, ${validatedName}, ${validatedEmail}, ${validatedPhone}, ${'active'}, ${1}, ${new Date()}, ${new Date()}, NOW())
       RETURNING id, session_id
     `);
@@ -383,7 +383,7 @@ router.post('/leads', leadsLimiter, async (req: any, res: any) => {
 
     // Store lead using safe parameterized SQL
     const leadResult = await db.execute(sql`
-      INSERT INTO contacts (full_name, first_name, last_name, email, phone, role, source, created_at, updated_at)
+      INSERT INTO contacts (full_name, first_name, last_name, email, phone, role, source, createdAt, updatedAt)
       VALUES (${validatedName}, ${firstName}, ${lastName}, ${validatedEmail}, ${validatedPhone}, ${'Lead'}, ${'chat'}, NOW(), NOW())
       RETURNING id, email
     `);
@@ -885,7 +885,7 @@ router.post('/request-staff', escalationLimiter, async (req: any, res: any) => {
         userEmail: validatedUserEmail,
         requestType: validatedRequestType,
         status: 'pending',
-        created_at: escalationRecord.createdAt
+        createdAt: escalationRecord.createdAt
       });
     }
 

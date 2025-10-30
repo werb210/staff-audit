@@ -8,11 +8,11 @@ const sql = neon(process.env.DATABASE_URL!);
 
 interface DocumentRecord {
   id: string;
-  application_id: string;
-  file_name: string;
+  applicationId: string;
+  name: string;
   file_path: string;
   file_type: string;
-  created_at: string;
+  createdAt: string;
 }
 
 async function checkFileExists(filePath: string): Promise<boolean> {
@@ -30,7 +30,7 @@ router.get('/', async (req: Request, res: Response) => {
     console.log('🔍 Running comprehensive document audit...');
     
     // Get all documents from database
-    const documents = await sql`SELECT * FROM documents ORDER BY created_at DESC`;
+    const documents = await sql`SELECT * FROM documents ORDER BY createdAt DESC`;
     console.log(`📄 Found ${documents.length} documents in database`);
     
     const auditResults = {
@@ -50,10 +50,10 @@ router.get('/', async (req: Request, res: Response) => {
       
       const docAudit = {
         id: doc.id,
-        fileName: doc.file_name,
+        fileName: doc.name,
         filePath: doc.file_path,
-        applicationId: doc.application_id,
-        createdAt: doc.created_at,
+        applicationId: doc.applicationId,
+        createdAt: doc.createdAt,
         accessible: isAccessible,
         status: isAccessible ? 'OK' : 'MISSING'
       };
@@ -64,7 +64,7 @@ router.get('/', async (req: Request, res: Response) => {
         auditResults.summary.accessible++;
       } else {
         auditResults.summary.missing++;
-        auditResults.summary.missingFiles.push(doc.file_name);
+        auditResults.summary.missingFiles.push(doc.name);
       }
     }
     

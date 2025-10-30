@@ -283,10 +283,10 @@ router.get('/', async (req: any, res: any) => {
         description,
         severity,
         status,
-        created_at,
-        updated_at
+        createdAt,
+        updatedAt
       FROM chat_issue_reports
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
       LIMIT 100
     `);
     

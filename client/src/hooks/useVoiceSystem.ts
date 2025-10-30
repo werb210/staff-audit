@@ -1,5 +1,5 @@
-// Voice system hook
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
+import { API_BASE } from "../config";
 
 export interface VoiceSystemState {
   isConnected: boolean;
@@ -17,65 +17,33 @@ export const useVoiceSystem = () => {
   });
 
   const placeCall = useCallback(async (phoneNumber: string) => {
-    setState(prev => ({ ...prev, isDialing: true, error: null }));
-    
+    setState((prev) => ({ ...prev, isDialing: true, error: null }));
     try {
-      const response = await fetch(`${API_BASE}/voice/call', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: phoneNumber })
+      const response = await fetch(`${API_BASE}/voice/call`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: phoneNumber }),
       });
-      
-      if (!response.ok) {
-        throw new Error('Call failed');
-      }
-      
+      if (!response.ok) throw new Error("Call failed");
       const call = await response.json();
-      setState(prev => ({ 
-        ...prev, 
-        currentCall: call, 
-        isDialing: false,
-        isConnected: true 
-      }));
+      setState({ ...state, currentCall: call, isDialing: false, isConnected: true });
       return call;
     } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        isDialing: false, 
-        error: error instanceof Error ? error.message : 'Call failed' 
-      }));
+      setState({ ...state, isDialing: false, error: (error as Error).message });
       throw error;
     }
-  }, []);
+  }, [state]);
 
   const endCall = useCallback(async () => {
-    if (state.currentCall) {
-      try {
-        const response = await fetch(`${API_BASE}/voice/call/${state.currentCall.id}`, {
-          method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to end call');
-        }
-        
-        setState(prev => ({ 
-          ...prev, 
-          currentCall: null, 
-          isConnected: false 
-        }));
-      } catch (error) {
-        setState(prev => ({ 
-          ...prev, 
-          error: error instanceof Error ? error.message : 'Failed to end call' 
-        }));
-      }
+    if (!state.currentCall) return;
+    try {
+      const response = await fetch(`${API_BASE}/voice/call/${state.currentCall.id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to end call");
+      setState({ ...state, currentCall: null, isConnected: false });
+    } catch (error) {
+      setState({ ...state, error: (error as Error).message });
     }
-  }, [state.currentCall]);
+  }, [state]);
 
-  return {
-    ...state,
-    placeCall,
-    endCall,
-  };
+  return { ...state, placeCall, endCall };
 };

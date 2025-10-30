@@ -20,8 +20,8 @@ router.get("/api/marketing/email/templates", async (req: any, res: any) => {
       FROM email_templates et
       LEFT JOIN email_sends es ON et.id = es.template_id
       WHERE et.status = 'active'
-      GROUP BY et.id, et.name, et.subject, et.body_html, et.body_text, et.funnel_stage, et.trigger_event, et.send_delay_hours, et.status, et.created_at, et.updated_at
-      ORDER BY et.created_at DESC
+      GROUP BY et.id, et.name, et.subject, et.body_html, et.body_text, et.funnel_stage, et.trigger_event, et.send_delay_hours, et.status, et.createdAt, et.updatedAt
+      ORDER BY et.createdAt DESC
     `);
 
     console.log(`📧 Found ${templatesResult.length} templates`);
@@ -46,8 +46,8 @@ router.get("/api/marketing/email/templates", async (req: any, res: any) => {
         clickRate: template.total_sends > 0 ? ((Number(template.clicks) / Number(template.total_sends)) * 100).toFixed(2) : '0.00',
         bounceRate: template.total_sends > 0 ? ((Number(template.bounces) / Number(template.total_sends)) * 100).toFixed(2) : '0.00'
       },
-      createdAt: template.created_at,
-      updatedAt: template.updated_at
+      createdAt: template.createdAt,
+      updatedAt: template.updatedAt
     }));
 
     // Get funnel stage summary
@@ -194,7 +194,7 @@ router.post("/api/marketing/email/templates", async (req: any, res: any) => {
     const templateId = `email_${Date.now()}`;
     
     await db.execute(sql`
-      INSERT INTO email_templates (id, name, subject, body_html, body_text, funnel_stage, trigger_event, send_delay_hours, status, created_at, updated_at)
+      INSERT INTO email_templates (id, name, subject, body_html, body_text, funnel_stage, trigger_event, send_delay_hours, status, createdAt, updatedAt)
       VALUES (${templateId}, ${name}, ${subject}, ${bodyHtml}, ${bodyText}, ${funnelStage}, ${triggerEvent}, ${sendDelayHours || 0}, 'active', NOW(), NOW())
     `);
 

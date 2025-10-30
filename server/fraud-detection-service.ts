@@ -60,7 +60,7 @@ export class FraudDetectionService {
       // AI-powered fraud analysis
       const analysisPrompt = `Analyze this business document for potential fraud indicators:
 
-Document: ${document.file_name}
+Document: ${document.name}
 Type: ${document.document_type}
 Content: ${textContent.substring(0, 1500)}
 
@@ -151,7 +151,7 @@ Focus on detecting document manipulation, template usage, or suspicious patterns
       }
       
       const documentsResult = await db.execute(sql`
-        SELECT id FROM documents WHERE application_id = ${sql.placeholder('applicationId')}
+        SELECT id FROM documents WHERE applicationId = ${sql.placeholder('applicationId')}
       `, { applicationId: applicationId });
       
       const documents = documentsResult.rows;
@@ -215,7 +215,7 @@ Focus on detecting document manipulation, template usage, or suspicious patterns
     try {
       // Get other documents for comparison - Fixed SQL injection
       const otherDocsResult = await db.execute(sql`
-        SELECT d.id, d.file_name, d.document_type, o.extracted_data as ocr_text
+        SELECT d.id, d.name, d.document_type, o.extracted_data as ocr_text
         FROM documents d 
         LEFT JOIN ocr_results o ON d.id = o.document_id::text 
         WHERE d.id != ${Math.floor(Number(targetDocumentId))}
@@ -237,7 +237,7 @@ Focus on detecting document manipulation, template usage, or suspicious patterns
           if (similarityScore > 60) {
             similarities.push({
               documentId: doc.id,
-              documentName: doc.file_name,
+              documentName: doc.name,
               similarityScore,
               similarityType: 'content'
             });
@@ -336,7 +336,7 @@ Focus on detecting document manipulation, template usage, or suspicious patterns
     try {
       await db.execute(sql`
         INSERT INTO fraud_detection_results (
-          application_id, overall_fraud_score, risk_level, similar_documents,
+          applicationId, overall_fraud_score, risk_level, similar_documents,
           fraud_indicators, confidence_level, analysis_model, processing_time,
           flagged_for_manual_review, review_priority
         ) VALUES (
@@ -401,7 +401,7 @@ Focus on detecting document manipulation, template usage, or suspicious patterns
       const flaggedResult = await db.execute(sql`
         SELECT * FROM fraud_detection_results 
         WHERE flagged_for_manual_review = true 
-        ORDER BY overall_fraud_score DESC, created_at DESC
+        ORDER BY overall_fraud_score DESC, createdAt DESC
         LIMIT 50
       `);
       

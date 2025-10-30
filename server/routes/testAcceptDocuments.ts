@@ -15,10 +15,10 @@ router.post('/accept-all/:applicationId', async (req: any, res: any) => {
     const updateQuery = `
       UPDATE documents 
       SET status = 'accepted' 
-      WHERE application_id = $1 
+      WHERE applicationId = $1 
         AND storage_key IS NOT NULL 
         AND storage_key != ''
-      RETURNING id, file_name, status
+      RETURNING id, name, status
     `;
     
     const result = await pool.query(updateQuery, [applicationId]);

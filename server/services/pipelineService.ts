@@ -82,7 +82,7 @@ export class PipelineService {
       const expectedResult = await db.execute(sql`
         SELECT COUNT(*) as count 
         FROM expected_documents 
-        WHERE application_id = ${applicationId}
+        WHERE applicationId = ${applicationId}
       `);
       
       const expectedCount = Number(expectedResult.rows[0]?.count) || 0;
@@ -178,7 +178,7 @@ export class PipelineService {
           UPDATE applications 
           SET 
             stage = ${evaluation.suggestedStage},
-            updated_at = NOW()
+            updatedAt = NOW()
           WHERE id = ${applicationId}
         `);
         
@@ -262,12 +262,12 @@ export class PipelineService {
         .where(eq(applications.id, applicationId));
       
       // Update stage using raw SQL since stage column is not in schema
-      await db.execute(sql`UPDATE applications SET stage = ${evaluation.suggestedStage}, updated_at = CURRENT_TIMESTAMP WHERE id = ${applicationId}`);
+      await db.execute(sql`UPDATE applications SET stage = ${evaluation.suggestedStage}, updatedAt = CURRENT_TIMESTAMP WHERE id = ${applicationId}`);
       
       // Log the stage change using raw SQL since application_stage_history is not in schema
       await db.execute(sql`
         INSERT INTO application_stage_history (
-          application_id, previous_stage, new_stage, reason, changed_at
+          applicationId, previous_stage, new_stage, reason, changed_at
         ) VALUES (${applicationId}, ${evaluation.currentStage}, ${evaluation.suggestedStage}, ${evaluation.reason}, CURRENT_TIMESTAMP)
       `);
       

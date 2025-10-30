@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, RefreshCw, Trash2, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Loader2,
+  RefreshCw,
+  Trash2,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 
 interface RetryLog {
   id: string;
@@ -38,54 +45,68 @@ export default function RetryQueueDashboard() {
   const queryClient = useQueryClient();
 
   // Fetch retry logs
-  const { data: logsData, isLoading: logsLoading, error: logsError } = useQuery({
-    queryKey: ['retry-logs'],
+  const {
+    data: logsData,
+    isLoading: logsLoading,
+    error: logsError,
+  } = useQuery({
+    queryKey: ["retry-logs"],
     queryFn: async () => {
-      const response = await fetch('/api/admin/retry-queue/logs');
+      const response = await fetch("/api/admin/retry-queue/logs");
       if (!response.ok) {
-        throw new Error('Failed to fetch retry logs');
+        throw new Error("Failed to fetch retry logs");
       }
       return response.json();
     },
-    refetchInterval: 30000 // Refresh every 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Fetch queue status
   const { data: statusData, isLoading: statusLoading } = useQuery({
-    queryKey: ['retry-queue-status'],
+    queryKey: ["retry-queue-status"],
     queryFn: async () => {
-      const response = await fetch('/api/admin/retry-queue/status');
+      const response = await fetch("/api/admin/retry-queue/status");
       if (!response.ok) {
-        throw new Error('Failed to fetch queue status');
+        throw new Error("Failed to fetch queue status");
       }
       return response.json();
     },
-    refetchInterval: 10000 // Refresh every 10 seconds
+    refetchInterval: 10000, // Refresh every 10 seconds
   });
 
   // Manual retry mutation
   const retryMutation = useMutation({
-    mutationFn: async ({ applicationId, jobType }: { applicationId: string; jobType: string }) => {
-      const response = await fetch('/api/admin/retry-queue/retry', {
-        method: 'POST',
+    mutationFn: async ({
+      applicationId,
+      jobType,
+    }: {
+      applicationId: string;
+      jobType: string;
+    }) => {
+      const response = await fetch("/api/admin/retry-queue/retry", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ applicationId, jobType }),
       });
       if (!response.ok) {
-        throw new Error('Failed to retry job');
+        throw new Error("Failed to retry job");
       }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['retry-logs'] });
-      queryClient.invalidateQueries({ queryKey: ['retry-queue-status'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["retry-logs"] });
+      queryClient.invalidateQueries({ queryKey: ["retry-queue-status"] });
+    },
   });
 
   const logs: RetryLog[] = logsData?.logs || [];
-  const queueStatus: QueueStatus = statusData?.status || { totalJobs: 0, isProcessing: false, jobs: [] };
+  const queueStatus: QueueStatus = statusData?.status || {
+    totalJobs: 0,
+    isProcessing: false,
+    jobs: [],
+  };
 
   const getStatusIcon = (log: RetryLog) => {
     if (log.retrySuccess === true) {
@@ -125,8 +146,12 @@ export default function RetryQueueDashboard() {
       <Card>
         <CardContent className="py-12 text-center">
           <XCircle className="h-12 w-12 mx-auto text-red-500 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Failed to Load Retry Queue</h3>
-          <p className="text-muted-foreground">Please check your permissions and try again.</p>
+          <h3 className="text-lg font-semibold mb-2">
+            Failed to Load Retry Queue
+          </h3>
+          <p className="text-muted-foreground">
+            Please check your permissions and try again.
+          </p>
         </CardContent>
       </Card>
     );
@@ -140,10 +165,14 @@ export default function RetryQueueDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active Jobs</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Active Jobs
+                </p>
                 <p className="text-2xl font-bold">{queueStatus.totalJobs}</p>
               </div>
-              <RefreshCw className={`h-8 w-8 text-blue-500 ${queueStatus.isProcessing ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-8 w-8 text-blue-500 ${queueStatus.isProcessing ? "animate-spin" : ""}`}
+              />
             </div>
           </CardContent>
         </Card>
@@ -152,12 +181,16 @@ export default function RetryQueueDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Queue Status</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Queue Status
+                </p>
                 <p className="text-2xl font-bold">
-                  {queueStatus.isProcessing ? 'Processing' : 'Idle'}
+                  {queueStatus.isProcessing ? "Processing" : "Idle"}
                 </p>
               </div>
-              <div className={`h-3 w-3 rounded-full ${queueStatus.isProcessing ? 'bg-green-500' : 'bg-gray-300'}`} />
+              <div
+                className={`h-3 w-3 rounded-full ${queueStatus.isProcessing ? "bg-green-500" : "bg-gray-300"}`}
+              />
             </div>
           </CardContent>
         </Card>
@@ -166,7 +199,9 @@ export default function RetryQueueDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Logs</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Logs
+                </p>
                 <p className="text-2xl font-bold">{logs.length}</p>
               </div>
               <AlertCircle className="h-8 w-8 text-orange-500" />
@@ -184,24 +219,34 @@ export default function RetryQueueDashboard() {
           <CardContent>
             <div className="space-y-3">
               {queueStatus.jobs.map((job) => (
-                <div key={job.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={job.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <Badge variant="outline">{job.jobType}</Badge>
-                      <span className="font-medium">App {job.applicationId.slice(0, 8)}</span>
+                      <span className="font-medium">
+                        App {job.applicationId.slice(0, 8)}
+                      </span>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
                       Attempt {job.attempt}/{job.maxAttempts}
-                      {job.scheduledAt && ` • Next: ${new Date(job.scheduledAt).toLocaleTimeString()}`}
+                      {job.scheduledAt &&
+                        ` • Next: ${new Date(job.scheduledAt).toLocaleTimeString()}`}
                     </p>
                     {job.lastError && (
-                      <p className="text-sm text-red-600 mt-1">{job.lastError}</p>
+                      <p className="text-sm text-red-600 mt-1">
+                        {job.lastError}
+                      </p>
                     )}
                   </div>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleRetryJob(job.applicationId, job.jobType)}
+                    onClick={() =>
+                      handleRetryJob(job.applicationId, job.jobType)
+                    }
                     disabled={retryMutation.isPending}
                   >
                     {retryMutation.isPending ? (
@@ -228,12 +273,17 @@ export default function RetryQueueDashboard() {
         <CardContent>
           <div className="space-y-3">
             {logs.map((log) => (
-              <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+              <div
+                key={log.id}
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+              >
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(log)}
                     <Badge variant="outline">{log.documentType}</Badge>
-                    <span className="font-medium">App {log.applicationId.slice(0, 8)}</span>
+                    <span className="font-medium">
+                      App {log.applicationId.slice(0, 8)}
+                    </span>
                     {getStatusBadge(log)}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -243,15 +293,21 @@ export default function RetryQueueDashboard() {
                     {new Date(log.createdAt).toLocaleString()}
                   </p>
                   {log.errorMessage && (
-                    <p className="text-sm text-red-600 mt-1 truncate">{log.errorMessage}</p>
+                    <p className="text-sm text-red-600 mt-1 truncate">
+                      {log.errorMessage}
+                    </p>
                   )}
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleRetryJob(log.applicationId, log.documentType)}
-                    disabled={retryMutation.isPending || log.retrySuccess === true}
+                    onClick={() =>
+                      handleRetryJob(log.applicationId, log.documentType)
+                    }
+                    disabled={
+                      retryMutation.isPending || log.retrySuccess === true
+                    }
                   >
                     <RefreshCw className="h-4 w-4 mr-1" />
                     Retry
@@ -266,7 +322,7 @@ export default function RetryQueueDashboard() {
                 </div>
               </div>
             ))}
-            
+
             {logs.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 No retry logs found. The queue is empty.
@@ -287,19 +343,27 @@ export default function RetryQueueDashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="font-medium">Application ID</p>
-                  <p className="text-sm text-muted-foreground">{selectedLog.applicationId}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedLog.applicationId}
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium">File Name</p>
-                  <p className="text-sm text-muted-foreground">{selectedLog.fileName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedLog.fileName}
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium">Document Type</p>
-                  <p className="text-sm text-muted-foreground">{selectedLog.documentType}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedLog.documentType}
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium">Attempt</p>
-                  <p className="text-sm text-muted-foreground">{selectedLog.attempt}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedLog.attempt}
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium">Status</p>
@@ -312,31 +376,40 @@ export default function RetryQueueDashboard() {
                   </p>
                 </div>
               </div>
-              
+
               {selectedLog.errorMessage && (
                 <div>
                   <p className="font-medium">Error Message</p>
-                  <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{selectedLog.errorMessage}</p>
+                  <p className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                    {selectedLog.errorMessage}
+                  </p>
                 </div>
               )}
-              
+
               {selectedLog.finalErrorMessage && (
                 <div>
                   <p className="font-medium">Final Error</p>
-                  <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{selectedLog.finalErrorMessage}</p>
+                  <p className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                    {selectedLog.finalErrorMessage}
+                  </p>
                 </div>
               )}
-              
+
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setSelectedLog(null)}>
                   Close
                 </Button>
                 <Button
                   onClick={() => {
-                    handleRetryJob(selectedLog.applicationId, selectedLog.documentType);
+                    handleRetryJob(
+                      selectedLog.applicationId,
+                      selectedLog.documentType,
+                    );
                     setSelectedLog(null);
                   }}
-                  disabled={retryMutation.isPending || selectedLog.retrySuccess === true}
+                  disabled={
+                    retryMutation.isPending || selectedLog.retrySuccess === true
+                  }
                 >
                   <RefreshCw className="h-4 w-4 mr-1" />
                   Retry Job

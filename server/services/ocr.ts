@@ -246,21 +246,21 @@ Provide response in JSON format with:
         // Save detailed banking analysis if table exists
         try {
           await db.insert(bankingAnalysis).values({
-            application_id: applicationId,
+            applicationId: applicationId,
             average_daily_balance: results.bankingInsights.averageBalance,
             nsf_count: results.bankingInsights.nsfCount,
             volatility_score: results.bankingInsights.volatilityScore,
             monthly_revenue: results.bankingInsights.monthlyRevenue,
             cash_flow: results.bankingInsights.cashFlow
           }).onConflictDoUpdate({
-            target: bankingAnalysis.application_id,
+            target: bankingAnalysis.applicationId,
             set: {
               average_daily_balance: results.bankingInsights.averageBalance,
               nsf_count: results.bankingInsights.nsfCount,
               volatility_score: results.bankingInsights.volatilityScore,
               monthly_revenue: results.bankingInsights.monthlyRevenue,
               cash_flow: results.bankingInsights.cashFlow,
-              updated_at: new Date()
+              updatedAt: new Date()
             }
           });
         } catch (bankingError) {

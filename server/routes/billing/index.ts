@@ -16,7 +16,7 @@ router.post("/plans", async (req,res)=>{
   await db.execute(sql`
     INSERT INTO billing_plans(key, name, monthly_price_cents, limits)
     VALUES (${key}, ${name}, ${monthly_price_cents}, ${limits})
-    ON CONFLICT (key) DO UPDATE SET name=EXCLUDED.name, monthly_price_cents=EXCLUDED.monthly_price_cents, limits=EXCLUDED.limits, updated_at=now()
+    ON CONFLICT (key) DO UPDATE SET name=EXCLUDED.name, monthly_price_cents=EXCLUDED.monthly_price_cents, limits=EXCLUDED.limits, updatedAt=now()
   `);
   res.json({ ok:true });
 });

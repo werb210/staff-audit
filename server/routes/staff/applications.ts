@@ -7,7 +7,7 @@ const r = Router();
 r.get("/applications/:id", async (req: Request, res: Response) => {
   const id = String(req.params.id);
   const appQ = await pool.query(`
-    SELECT a.id, a.status, a.requested_amount, a.business_name, a.created_at, a.updated_at,
+    SELECT a.id, a.status, a.requested_amount, a.business_name, a.createdAt, a.updatedAt,
            u.id AS user_id, u.first_name AS user_first_name, u.last_name AS user_last_name,
            u.email AS user_email, u.phone AS user_phone
     FROM applications a
@@ -19,14 +19,14 @@ r.get("/applications/:id", async (req: Request, res: Response) => {
   const app = appQ.rows[0];
 
   const docs = await pool.query(
-    `SELECT COUNT(*)::int AS count FROM documents WHERE application_id = $1 AND status IN ('pending','accepted')`,
+    `SELECT COUNT(*)::int AS count FROM documents WHERE applicationId = $1 AND status IN ('pending','accepted')`,
     [id]
   );
   const acts = await pool.query(
-    `SELECT id, application_id, from_stage, to_stage, actor, note, created_at
+    `SELECT id, applicationId, from_stage, to_stage, actor, note, createdAt
        FROM pipeline_activity
-      WHERE application_id = $1
-      ORDER BY created_at DESC, id DESC
+      WHERE applicationId = $1
+      ORDER BY createdAt DESC, id DESC
       LIMIT 20`, [id]
   );
 
@@ -35,8 +35,8 @@ r.get("/applications/:id", async (req: Request, res: Response) => {
     status: app.status,
     fundingAmount: app.requested_amount,
     businessName: app.business_name,
-    createdAt: app.created_at,
-    updatedAt: app.updated_at,
+    createdAt: app.createdAt,
+    updatedAt: app.updatedAt,
     user: {
       id: app.user_id,
       firstName: app.user_first_name,

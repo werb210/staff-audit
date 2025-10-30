@@ -10,7 +10,7 @@ r.post('/api/contacts/:id/notes', (req,res)=>{ if(!FLAGS.O365_NOTES_ENABLED) ret
 
 r.post('/api/notes', (req,res)=>{
   const { body, contact_id } = req.body || {};
-  const note = { id: 'note_'+crypto.randomUUID(), body, contact_id, created_at: new Date().toISOString() };
+  const note = { id: 'note_'+crypto.randomUUID(), body, contact_id, createdAt: new Date().toISOString() };
   mem.notes.set(note.id, note);
   res.json({ ok:true, note });
 });

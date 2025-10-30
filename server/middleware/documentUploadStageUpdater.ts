@@ -15,8 +15,8 @@ export function createDocumentUploadStageUpdater() {
     
     res.json = function(body: any) {
       // Check if this was a successful document upload
-      if (body && body.success && body.document && body.document.application_id) {
-        const applicationId = body.document.application_id;
+      if (body && body.success && body.document && body.document.applicationId) {
+        const applicationId = body.document.applicationId;
         
         console.log(`📄 [DOC-UPLOAD-STAGE] Document uploaded for application: ${applicationId}`);
         

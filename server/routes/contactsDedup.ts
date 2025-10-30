@@ -23,7 +23,7 @@ router.get('/duplicates', limiter, async (req: any, res: any) => {
     
     // Get all contacts from the database - use actual column names from the contacts table
     const all = await db.execute(sql`
-      SELECT id, email, phone, full_name as fullName, status, updated_at as updatedAt
+      SELECT id, email, phone, full_name as fullName, status, updatedAt as updatedAt
       FROM contacts
     `);
     const groups = new Map<string, Contact[]>();
@@ -72,7 +72,7 @@ router.post('/merge', limiter, async (req: any, res: any) => {
     const ids = Array.from(new Set([survivorId, ...mergeIds]));
     const idList = ids.map(id => `'${id}'`).join(', ');
     const rows = await db.execute(sql`
-      SELECT id, email, phone, full_name as fullName, status, updated_at as updatedAt
+      SELECT id, email, phone, full_name as fullName, status, updatedAt as updatedAt
       FROM contacts
       WHERE id IN (${sql.raw(idList)})
     `);

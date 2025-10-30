@@ -33,7 +33,7 @@ router.get('/:id/presence', async (req: any, res: any) => {
 
 router.get('/latest/presence', async (_req, res) => {
   try {
-    const rows = await db.select().from(applications).orderBy(desc(applications.created_at)).limit(1);
+    const rows = await db.select().from(applications).orderBy(desc(applications.createdAt)).limit(1);
     if (rows.length === 0) return res.json({ hasCanon: false, canonCount: 0 });
     
     const app = rows[0] as any;
@@ -46,7 +46,7 @@ router.get('/latest/presence', async (_req, res) => {
       canonCount,
       fieldCount: app.application_field_count ?? canonCount,
       id: app.id,
-      createdAt: app.created_at
+      createdAt: app.createdAt
     });
   } catch (error: unknown) {
     console.error('❌ Latest presence check error:', error);

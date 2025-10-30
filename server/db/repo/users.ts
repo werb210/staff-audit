@@ -18,7 +18,7 @@ class UsersRepo extends TenantRepo {
   
   async create(req: any, u: Partial<User> & { id: string; email: string; role: Role }): Promise<User> {
     const rows = await this.run<User>(req,
-      `INSERT INTO users (id, tenant_id, email, role, created_at, updated_at)
+      `INSERT INTO users (id, tenant_id, email, role, createdAt, updatedAt)
        VALUES ($1, current_setting('app.tenant', true)::uuid, $2, $3, NOW(), NOW())
        RETURNING *`,
       [u.id, u.email, u.role]
@@ -28,7 +28,7 @@ class UsersRepo extends TenantRepo {
   
   async listAll(req: any): Promise<User[]> {
     return this.run<User>(req, 
-      `SELECT * FROM users WHERE tenant_id = current_setting('app.tenant', true)::uuid ORDER BY created_at DESC`
+      `SELECT * FROM users WHERE tenant_id = current_setting('app.tenant', true)::uuid ORDER BY createdAt DESC`
     );
   }
 }

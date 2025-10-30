@@ -158,11 +158,11 @@ router.post('/staff-upload/:applicationId', async (req: any, res: any) => upload
     // STEP 3: Save to database with storage_key
     const insertQuery = `
       INSERT INTO documents (
-        id, application_id, file_name, file_path, file_type, file_size, 
+        id, applicationId, name, file_path, file_type, size, 
         document_type, uploaded_by, checksum, storage_key, backup_status,
-        file_exists, is_required, is_verified, created_at, updated_at
+        file_exists, is_required, is_verified, createdAt, updatedAt
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW())
-      RETURNING id, file_name, file_size, checksum, storage_key
+      RETURNING id, name, size, checksum, storage_key
     `;
 
     const result = await pool.query(insertQuery, [
@@ -270,9 +270,9 @@ router.post('/:id/replace', async (req: any, res: any) => upload.single('file'),
     // Update document record with new checksum
     const updateQuery = `
       UPDATE documents 
-      SET file_name = $1, file_path = $2, file_type = $3, file_size = $4, checksum = $5, updated_at = NOW()
+      SET name = $1, file_path = $2, file_type = $3, size = $4, checksum = $5, updatedAt = NOW()
       WHERE id = $6
-      RETURNING id, file_name, file_size, checksum
+      RETURNING id, name, size, checksum
     `;
 
     const result = await pool.query(updateQuery, [
@@ -314,7 +314,7 @@ router.get('/:id/preview', async (req: Request, res) => {
     console.log(`📋 [PREVIEW LOG] IP: ${ipAddress}, User-Agent: ${userAgent}`);
     
     // Get document details including storage_key for S3 access
-    const docQuery = 'SELECT id, file_name, file_path, file_type, checksum, file_exists, storage_key FROM documents WHERE id = $1';
+    const docQuery = 'SELECT id, name, file_path, file_type, checksum, file_exists, storage_key FROM documents WHERE id = $1';
     const docResult = await pool.query(docQuery, [id]);
     
     if (docResult.rows.length === 0) {
@@ -343,7 +343,7 @@ router.get('/:id/preview', async (req: Request, res) => {
         const preSignedUrl = await generatePreSignedDownloadUrl(
           document.storage_key, 
           3600, // 1 hour expiration
-          document.file_name
+          document.name
         );
         
         previewStatus = 200;
@@ -355,12 +355,12 @@ router.get('/:id/preview', async (req: Request, res) => {
           [id, previewStatus, null, true, true, userAgent, ipAddress]
         );
         
-        console.log(`✅ [S3 PREVIEW] Generated pre-signed URL for ${document.file_name}`);
+        console.log(`✅ [S3 PREVIEW] Generated pre-signed URL for ${document.name}`);
         
         return res.json({
           success: true,
           url: preSignedUrl,
-          fileName: document.file_name,
+          fileName: document.name,
           fileType: document.file_type,
           source: 'S3',
           expiresIn: '1 hour'
@@ -388,7 +388,7 @@ router.get('/:id/preview', async (req: Request, res) => {
     console.log(`⚠️ [PREVIEW] No S3 storage key found for document ${id}, checking local files...`);
     
     let filePath: string | null = null;
-    let actualFileName = document.file_name || 'unknown';
+    let actualFileName = document.name || 'unknown';
     
     // Define possible local file paths
     const possiblePaths = [
@@ -443,7 +443,7 @@ router.get('/:id/preview', async (req: Request, res) => {
           checksumValid = false;
           previewStatus = 500;
           errorMessage = "File checksum mismatch - possible corruption";
-          console.error(`❌ [CHECKSUM] Mismatch for ${document.file_name}: expected ${document.checksum}, got ${currentChecksum}`);
+          console.error(`❌ [CHECKSUM] Mismatch for ${document.name}: expected ${document.checksum}, got ${currentChecksum}`);
           
           await pool.query(
             'INSERT INTO document_preview_log (document_id, status, error_message, file_exists, checksum_valid, user_agent, ip_address) VALUES ($1, $2, $3, $4, $5, $6, $7)',
@@ -453,13 +453,13 @@ router.get('/:id/preview', async (req: Request, res) => {
           return res.status(500).json({ error: errorMessage });
         } else {
           checksumValid = true;
-          console.log(`✅ [CHECKSUM] Valid for ${document.file_name}`);
+          console.log(`✅ [CHECKSUM] Valid for ${document.name}`);
         }
       } catch (checksumError) {
         checksumValid = null;
         previewStatus = 500;
         errorMessage = "Checksum validation failed";
-        console.error(`❌ [CHECKSUM] Validation error for ${document.file_name}:`, checksumError);
+        console.error(`❌ [CHECKSUM] Validation error for ${document.name}:`, checksumError);
         
         await pool.query(
           'INSERT INTO document_preview_log (document_id, status, error_message, file_exists, checksum_valid, user_agent, ip_address) VALUES ($1, $2, $3, $4, $5, $6, $7)',
@@ -470,7 +470,7 @@ router.get('/:id/preview', async (req: Request, res) => {
       }
     } else {
       checksumValid = null;
-      console.log(`ℹ️ [CHECKSUM] No checksum available for ${document.file_name}`);
+      console.log(`ℹ️ [CHECKSUM] No checksum available for ${document.name}`);
     }
     
     // Success - serve local file
@@ -485,10 +485,10 @@ router.get('/:id/preview', async (req: Request, res) => {
     );
     
     const processingTime = Date.now() - startTime;
-    console.log(`✅ [LOCAL PREVIEW] Success for ${document.file_name} (${processingTime}ms)`);
+    console.log(`✅ [LOCAL PREVIEW] Success for ${document.name} (${processingTime}ms)`);
     
     res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', `inline; filename="${document.file_name}"`);
+    res.setHeader('Content-Disposition', `inline; filename="${document.name}"`);
     res.setHeader('X-Local-Fallback', 'true');
     res.setHeader('X-Processing-Time', `${processingTime}ms`);
     
@@ -520,7 +520,7 @@ router.get('/:id/download', async (req: Request, res) => {
     console.log(`🔒 [S3 DOWNLOAD] Starting S3-first download for document: ${id}`);
     
     // Get document details including storage_key for S3 access
-    const docQuery = 'SELECT id, file_name, file_path, file_type, checksum, storage_key FROM documents WHERE id = $1';
+    const docQuery = 'SELECT id, name, file_path, file_type, checksum, storage_key FROM documents WHERE id = $1';
     const docResult = await pool.query(docQuery, [id]);
     
     if (docResult.rows.length === 0) {
@@ -540,15 +540,15 @@ router.get('/:id/download', async (req: Request, res) => {
         const preSignedUrl = await generatePreSignedDownloadUrl(
           document.storage_key, 
           3600, // 1 hour expiration
-          document.file_name
+          document.name
         );
         
-        console.log(`✅ [S3 DOWNLOAD] Generated pre-signed URL for ${document.file_name}`);
+        console.log(`✅ [S3 DOWNLOAD] Generated pre-signed URL for ${document.name}`);
         
         return res.json({
           success: true,
           url: preSignedUrl,
-          fileName: document.file_name,
+          fileName: document.name,
           fileType: document.file_type,
           source: 'S3',
           expiresIn: '1 hour'
@@ -589,7 +589,7 @@ router.get('/:id/download', async (req: Request, res) => {
           if (s3Response.Body) {
             // Set response headers for download
             res.setHeader('Content-Type', document.file_type || 'application/octet-stream');
-            res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+            res.setHeader('Content-Disposition', `attachment; filename="${document.name}"`);
             res.setHeader('X-Fallback-Source', 's3');
             res.setHeader('X-Bulletproof-Download', 's3-fallback');
             
@@ -651,7 +651,7 @@ router.get('/:id/download', async (req: Request, res) => {
     const fileStream = fs.createReadStream(filePath);
     
     res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${document.name}"`);
     
     fileStream.pipe(res);
     
@@ -667,7 +667,7 @@ router.get('/audit/report', async (req: Request, res) => {
     console.log(`🔍 [AUDIT REPORT] Starting comprehensive document audit...`);
     
     // Get all documents from database
-    const documentsQuery = 'SELECT id, file_name, file_path, checksum, created_at FROM documents ORDER BY created_at DESC';
+    const documentsQuery = 'SELECT id, name, file_path, checksum, createdAt FROM documents ORDER BY createdAt DESC';
     const documentsResult = await pool.query(documentsQuery);
     const allDocuments = documentsResult.rows;
     
@@ -724,12 +724,12 @@ router.get('/audit/report', async (req: Request, res) => {
       
       auditDetails.push({
         documentId: doc.id,
-        fileName: doc.file_name,
+        fileName: doc.name,
         filePath: doc.file_path,
         status,
         checksumStatus,
         notes: notes.join(', '),
-        createdAt: doc.created_at
+        createdAt: doc.createdAt
       });
     }
     
@@ -788,18 +788,18 @@ router.patch('/:id/accept', async (req: any, res: any) => {
           verified_at = NOW(), 
           accepted_at = NOW(), 
           reviewed_by = $1, 
-          updated_at = NOW()
+          updatedAt = NOW()
       WHERE id = $2`;
     await pool.query(updateQuery, [req.user?.id, documentId]);
 
     console.log(`✅ [STEP 4] Document ${documentId} accepted by ${req.user?.email}`);
     
     // Get application ID for this document
-    const appQuery = 'SELECT application_id FROM documents WHERE id = $1';
+    const appQuery = 'SELECT applicationId FROM documents WHERE id = $1';
     const appResult = await pool.query(appQuery, [documentId]);
     
     if (appResult.rows.length > 0) {
-      const applicationId = appResult.rows[0].application_id;
+      const applicationId = appResult.rows[0].applicationId;
       
       // Send SMS notification for document acceptance
       try {
@@ -826,7 +826,7 @@ router.patch('/:id/accept', async (req: any, res: any) => {
           console.log(`🚫 [AUTO] Skipping lender table check for test application: ${application.legalBusinessName}`);
         } else {
           // Check if all required documents are accepted
-          const allDocsQuery = 'SELECT COUNT(*) as total, COUNT(CASE WHEN is_verified = true THEN 1 END) as verified FROM documents WHERE application_id = $1';
+          const allDocsQuery = 'SELECT COUNT(*) as total, COUNT(CASE WHEN is_verified = true THEN 1 END) as verified FROM documents WHERE applicationId = $1';
           const allDocsResult = await pool.query(allDocsQuery, [applicationId]);
           
           if (allDocsResult.rows.length > 0) {
@@ -933,9 +933,9 @@ router.patch('/:id/reject', async (req: any, res: any) => {
 
     // Check if document exists and get application info
     const checkQuery = `
-      SELECT d.id, d.application_id, a.legal_business_name as businessname, a.contact_email as email, a.contact_phone as phone 
+      SELECT d.id, d.applicationId, a.legal_business_name as businessname, a.contact_email as email, a.contact_phone as phone 
       FROM documents d 
-      JOIN applications a ON d.application_id = a.id 
+      JOIN applications a ON d.applicationId = a.id 
       WHERE d.id = $1`;
     const checkResult = await pool.query(checkQuery, [documentId]);
     
@@ -944,13 +944,13 @@ router.patch('/:id/reject', async (req: any, res: any) => {
     }
 
     const row = checkResult.rows[0];
-    const applicationId = row.application_id;
+    const applicationId = row.applicationId;
     const businessName = row.businessname;
     const email = row.contact_email;
     const phone = row.contact_phone;
 
     // Get document file path for deletion
-    const docInfoQuery = 'SELECT file_path, file_name FROM documents WHERE id = $1';
+    const docInfoQuery = 'SELECT file_path, name FROM documents WHERE id = $1';
     const docInfoResult = await pool.query(docInfoQuery, [documentId]);
     const document = docInfoResult.rows[0];
 
@@ -1011,7 +1011,7 @@ router.get('/applications/:appId/zip', async (req: any, res: any) => {
     }
 
     // Get all documents for this application
-    const docsQuery = 'SELECT id, file_name, file_path, file_type FROM documents WHERE application_id = $1';
+    const docsQuery = 'SELECT id, name, file_path, file_type FROM documents WHERE applicationId = $1';
     const docsResult = await pool.query(docsQuery, [appId]);
     
     if (docsResult.rows.length === 0) {
@@ -1046,8 +1046,8 @@ router.get('/applications/:appId/zip', async (req: any, res: any) => {
       const fullFilePath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
       
       if (fs.existsSync(fullFilePath)) {
-        archive.file(fullFilePath, { name: document.file_name });
-        console.log(`📄 Added ${document.file_name} to ZIP`);
+        archive.file(fullFilePath, { name: document.name });
+        console.log(`📄 Added ${document.name} to ZIP`);
       } else {
         console.warn(`⚠️ File not found: ${fullFilePath}, skipping`);
       }
@@ -1182,18 +1182,18 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
     const docsQuery = `
       SELECT 
         id, 
-        file_name, 
+        name, 
         document_type, 
         storage_key, 
-        application_id, 
+        applicationId, 
         status,
-        created_at
+        createdAt
       FROM documents 
-      WHERE application_id = $1
+      WHERE applicationId = $1
         AND storage_key IS NOT NULL 
         AND storage_key != ''
         AND status = 'accepted'
-      ORDER BY document_type, file_name
+      ORDER BY document_type, name
     `;
     
     const docsResult = await pool.query(docsQuery, [applicationId]);
@@ -1202,7 +1202,7 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
     console.log(`📦 [ZIP-DOWNLOAD] Found ${documents.length} accepted documents with S3 storage keys`);
     console.log(`📦 [ZIP-DOWNLOAD] Sample documents:`, documents.slice(0, 3).map(d => ({ 
       id: d.id, 
-      file_name: d.file_name, 
+      name: d.name, 
       storage_key: d.storage_key,
       status: d.status 
     })));
@@ -1263,7 +1263,7 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
     // Add each document to ZIP
     for (const doc of documents) {
       try {
-        console.log(`📦 [ZIP-DOWNLOAD] Processing: ${doc.file_name} (${doc.document_type})`);
+        console.log(`📦 [ZIP-DOWNLOAD] Processing: ${doc.name} (${doc.document_type})`);
         
         const getCommand = new GetObjectCommand({
           Bucket: bucketName,
@@ -1275,7 +1275,7 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
         if (s3Response.Body) {
           // Organize files by document type in ZIP structure
           const folderName = doc.document_type || 'miscellaneous';
-          const filename = doc.file_name || `document_${doc.id}.pdf`;
+          const filename = doc.name || `document_${doc.id}.pdf`;
           const zipPath = `${sanitizedName}/${folderName}/${filename}`;
           
           // Add file to ZIP
@@ -1284,12 +1284,12 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
           
           console.log(`✅ [ZIP-DOWNLOAD] Added: ${zipPath}`);
         } else {
-          console.log(`⚠️ [ZIP-DOWNLOAD] Empty file body for: ${doc.file_name}`);
+          console.log(`⚠️ [ZIP-DOWNLOAD] Empty file body for: ${doc.name}`);
           errorCount++;
         }
         
       } catch (docError) {
-        console.error(`❌ [ZIP-DOWNLOAD] Failed to add ${doc.file_name}:`, docError);
+        console.error(`❌ [ZIP-DOWNLOAD] Failed to add ${doc.name}:`, docError);
         errorCount++;
         // Continue with other documents
       }

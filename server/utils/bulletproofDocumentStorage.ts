@@ -87,11 +87,11 @@ export async function saveDocumentToDiskAndDB(params: DocumentUploadParams) {
     // Step 4: Create database record AFTER disk verification and S3 backup
     const dbResult = await db.insert(documents).values({
       id: documentId,
-      application_id: applicationId,
+      applicationId: applicationId,
       document_type: documentType,
-      file_name: fileName,
+      name: fileName,
       file_path: filePath,
-      file_size: fileSize,
+      size: fileSize,
       file_type: mimeType,
       file_exists: true,
       checksum: checksum,
@@ -99,8 +99,8 @@ export async function saveDocumentToDiskAndDB(params: DocumentUploadParams) {
       backup_status: backupStatus, // Track backup status
       is_required: false,
       is_verified: false,
-      created_at: new Date(),
-      updated_at: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     }).returning();
 
     console.log(`💾 [BULLETPROOF STORAGE] Database record created successfully`);

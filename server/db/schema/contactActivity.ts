@@ -8,5 +8,5 @@ export const contactActivity = pgTable("contact_activity", {
   title: text("title"),
   body: text("body"),
   meta: text("meta"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
 });

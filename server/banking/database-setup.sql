@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS bank_transactions (
     type VARCHAR(10) NOT NULL CHECK (type IN ('debit', 'credit')),
     description TEXT NOT NULL,
     normalized_description TEXT,
-    merchant_name VARCHAR(255),
-    counterparty_name VARCHAR(255),
+    merchant_file_name VARCHAR(255),
+    counterparty_file_name VARCHAR(255),
     category VARCHAR(100),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()

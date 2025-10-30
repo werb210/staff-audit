@@ -3,14 +3,14 @@
  * AI-powered document explanation in plain English
  */
 
-import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { FileText, Brain, Loader } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
+import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FileText, Brain, Loader } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 interface DocumentExplainerProps {
   documentId: string;
@@ -18,14 +18,18 @@ interface DocumentExplainerProps {
   onClose?: () => void;
 }
 
-export function DocumentExplainer({ documentId, documentName, onClose }: DocumentExplainerProps) {
+export function DocumentExplainer({
+  documentId,
+  documentName,
+  onClose,
+}: DocumentExplainerProps) {
   const [explanation, setExplanation] = useState<string | null>(null);
 
   const explainMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('/api/ai-extended/explain-document', {
-        method: 'POST',
-        body: JSON.stringify({ documentId })
+      const response = await apiRequest("/api/ai-extended/explain-document", {
+        method: "POST",
+        body: JSON.stringify({ documentId }),
       });
       return response;
     },
@@ -33,7 +37,7 @@ export function DocumentExplainer({ documentId, documentName, onClose }: Documen
       if (data.success) {
         setExplanation(data.explanation);
       }
-    }
+    },
   });
 
   const handleExplain = () => {
@@ -47,11 +51,13 @@ export function DocumentExplainer({ documentId, documentName, onClose }: Documen
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-purple-600" />
             AI Document Explanation
-            <Badge variant="outline" className="text-xs">Feature 7</Badge>
+            <Badge variant="outline" className="text-xs">
+              Feature 7
+            </Badge>
           </CardTitle>
-          
+
           {!explanation && (
-            <Button 
+            <Button
               onClick={handleExplain}
               disabled={explainMutation.isPending}
               size="sm"
@@ -70,7 +76,7 @@ export function DocumentExplainer({ documentId, documentName, onClose }: Documen
             </Button>
           )}
         </div>
-        
+
         {documentName && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <FileText className="h-4 w-4" />
@@ -83,8 +89,9 @@ export function DocumentExplainer({ documentId, documentName, onClose }: Documen
         {!explanation && !explainMutation.isPending && (
           <Alert>
             <AlertDescription>
-              Click "Explain Document" to have AI analyze this document and provide 
-              a plain-English explanation of its contents and importance for loan processing.
+              Click "Explain Document" to have AI analyze this document and
+              provide a plain-English explanation of its contents and importance
+              for loan processing.
             </AlertDescription>
           </Alert>
         )}
@@ -96,12 +103,12 @@ export function DocumentExplainer({ documentId, documentName, onClose }: Documen
                 {explanation}
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>AI explanation generated</span>
               <span>{new Date().toLocaleTimeString()}</span>
             </div>
-            
+
             {onClose && (
               <Button variant="outline" size="sm" onClick={onClose}>
                 Close

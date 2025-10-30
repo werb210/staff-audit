@@ -139,10 +139,10 @@ export async function saveDocumentToDiskAndDB(
     const { pool } = await import('../db.js');
     const insertQuery = `
       INSERT INTO documents (
-        id, application_id, file_name, file_path, file_size, 
-        document_type, uploaded_by, checksum, storage_key, file_exists, created_at
+        id, applicationId, name, file_path, size, 
+        document_type, uploaded_by, checksum, storage_key, file_exists, createdAt
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-      RETURNING id, file_name, storage_key
+      RETURNING id, name, storage_key
     `;
     
     const insertResult = await pool.query(insertQuery, [
@@ -266,7 +266,7 @@ export async function checkUploadFailureAlert(): Promise<{ shouldAlert: boolean;
     const result = await pool.query(`
       SELECT COUNT(*) as failure_count 
       FROM uploads_log 
-      WHERE created_at > NOW() - INTERVAL '5 minutes'
+      WHERE createdAt > NOW() - INTERVAL '5 minutes'
     `);
     
     const failureCount = parseInt(result.rows[0]?.failure_count || '0');

@@ -5,14 +5,14 @@
 }
 
 /* CSS guard to ensure overlays never steal clicks from dialer FAB */
-[data-testid="dialer-fab"] { 
-  pointer-events: auto !important; 
+[data-testid="dialer-fab"] {
+  pointer-events: auto !important;
 }
 
 .drawer-overlay,
 .modal-overlay,
-.sheet-overlay { 
-  pointer-events: auto; 
+.sheet-overlay {
+  pointer-events: auto;
 }
 
 .dialer-btn {
@@ -20,7 +20,7 @@
 }
 
 /* keypad button focus ring */
-[data-testid="keypad"] .dialer-btn:focus { 
-  outline: 2px solid rgba(255,255,255,0.25); 
-  outline-offset: 2px; 
+[data-testid="keypad"] .dialer-btn:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.25);
+  outline-offset: 2px;
 }

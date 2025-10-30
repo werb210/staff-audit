@@ -41,11 +41,11 @@ router.get('/application/:applicationId/documents', async (req: any, res: any) =
     
     // Get documents
     const documentsQuery = `
-      SELECT id, application_id, file_name, file_path, file_size, file_type, 
-             document_type, created_at, updated_at, checksum, storage_key
+      SELECT id, applicationId, name, file_path, size, file_type, 
+             document_type, createdAt, updatedAt, checksum, storage_key
       FROM documents 
-      WHERE application_id = $1
-      ORDER BY created_at DESC
+      WHERE applicationId = $1
+      ORDER BY createdAt DESC
     `;
     
     const docsResult = await sql(documentsQuery, [applicationId]);
@@ -74,31 +74,31 @@ router.get('/application/:applicationId/documents', async (req: any, res: any) =
         try {
           await fs.access(document.file_path);
           physicalFileExists = true;
-          console.log(`✅ [RECOVERY-UI] File exists: ${document.file_name}`);
+          console.log(`✅ [RECOVERY-UI] File exists: ${document.name}`);
         } catch {
           needsRecovery = true;
-          console.log(`❌ [RECOVERY-UI] File missing: ${document.file_name} at ${document.file_path}`);
+          console.log(`❌ [RECOVERY-UI] File missing: ${document.name} at ${document.file_path}`);
         }
       } else {
         needsRecovery = true;
-        console.log(`❌ [RECOVERY-UI] No file path for: ${document.file_name}`);
+        console.log(`❌ [RECOVERY-UI] No file path for: ${document.name}`);
       }
       
       documentsWithStatus.push({
         id: document.id,
-        fileName: document.file_name,
+        fileName: document.name,
         filePath: document.file_path,
-        fileSize: document.file_size,
+        fileSize: document.size,
         fileType: document.file_type,
         documentType: document.document_type,
-        createdAt: document.created_at,
-        updatedAt: document.updated_at,
+        createdAt: document.createdAt,
+        updatedAt: document.updatedAt,
         checksum: document.checksum,
         storageKey: document.storage_key,
         businessName,
         physicalFileExists,
         needsRecovery,
-        isPlaceholder: !physicalFileExists && document.file_name?.includes('placeholder')
+        isPlaceholder: !physicalFileExists && document.name?.includes('placeholder')
       });
     }
     

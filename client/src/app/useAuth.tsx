@@ -2,15 +2,34 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { api } from "../lib/queryClient";
 import { tokenStore } from "@/lib/tokenStore";
 
-type User = { id:string; email:string; name?:string; role?:string; totp_enrolled?:boolean };
-type Ctx = { user?:User|null; loading:boolean; refresh:()=>Promise<void>; login:()=>void; devLogin:(email?:string)=>Promise<void>; logout:()=>Promise<void> };
-const AuthCtx = createContext<Ctx>({ loading:true, refresh:async()=>{}, login:()=>{}, devLogin:async()=>{}, logout:async()=>{} });
+type User = {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+  totp_enrolled?: boolean;
+};
+type Ctx = {
+  user?: User | null;
+  loading: boolean;
+  refresh: () => Promise<void>;
+  login: () => void;
+  devLogin: (email?: string) => Promise<void>;
+  logout: () => Promise<void>;
+};
+const AuthCtx = createContext<Ctx>({
+  loading: true,
+  refresh: async () => {},
+  login: () => {},
+  devLogin: async () => {},
+  logout: async () => {},
+});
 
-export function AuthProvider({ children }:{ children:any }){
-  const [user,setUser] = useState<User|null>(null);
-  const [loading,setLoading] = useState<boolean>(true);
+export function AuthProvider({ children }: { children: any }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  async function refresh(){
+  async function refresh() {
     setLoading(true);
     try {
       if (!tokenStore.access) {
@@ -33,22 +52,34 @@ export function AuthProvider({ children }:{ children:any }){
     }
     setLoading(false);
   }
-  useEffect(()=>{ refresh(); }, []);
+  useEffect(() => {
+    refresh();
+  }, []);
 
-  function login(){ location.href = "/login"; }
-  async function devLogin(email?:string){
+  function login() {
+    location.href = "/login";
+  }
+  async function devLogin(email?: string) {
     // Disabled in simple auth mode
     location.href = "/login";
   }
-  async function logout(){ 
-    try { 
-      await api("/auth/logout",{method:"POST"}); 
-    } catch {} 
-    tokenStore.clear(); 
-    setUser(null); 
-    location.href="/login"; 
+  async function logout() {
+    try {
+      await api("/auth/logout", { method: "POST" });
+    } catch {}
+    tokenStore.clear();
+    setUser(null);
+    location.href = "/login";
   }
 
-  return <AuthCtx.Provider value={{ user, loading, refresh, login, devLogin, logout }}>{children}</AuthCtx.Provider>;
+  return (
+    <AuthCtx.Provider
+      value={{ user, loading, refresh, login, devLogin, logout }}
+    >
+      {children}
+    </AuthCtx.Provider>
+  );
 }
-export function useAuth(){ return useContext(AuthCtx); }
+export function useAuth() {
+  return useContext(AuthCtx);
+}

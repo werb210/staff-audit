@@ -44,7 +44,7 @@ router.get('/:applicationId', async (req: any, res: any) => {
         COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected_docs,
         COUNT(CASE WHEN status = 'pending' OR status IS NULL THEN 1 END) as pending_docs
       FROM documents 
-      WHERE application_id = $1`;
+      WHERE applicationId = $1`;
     
     const docsResult = await pool.query(documentsQuery, [applicationId]);
     const { total_docs, accepted_docs, rejected_docs, pending_docs } = docsResult.rows[0];
@@ -59,7 +59,7 @@ router.get('/:applicationId', async (req: any, res: any) => {
         b.business_type,
         b.years_in_business
       FROM applications a
-      LEFT JOIN businesses b ON a.business_id = b.id
+      LEFT JOIN businesses b ON a.businessId = b.id
       WHERE a.id = $1`;
     
     const appResult = await pool.query(appQuery, [applicationId]);
@@ -79,7 +79,7 @@ router.get('/:applicationId', async (req: any, res: any) => {
       FROM lender_products lp
       JOIN lenders l ON lp.lender_id = l.id
       WHERE lp.is_active = true
-      ORDER BY lp.created_at DESC`;
+      ORDER BY lp.createdAt DESC`;
     
     const lendersResult = await pool.query(lendersQuery);
     
@@ -243,7 +243,7 @@ router.post('/transmit/:applicationId/:productId', async (req: any, res: any) =>
       SELECT COUNT(*) as total_docs,
              COUNT(CASE WHEN status = 'accepted' THEN 1 END) as accepted_docs
       FROM documents 
-      WHERE application_id = $1`;
+      WHERE applicationId = $1`;
     
     const docsResult = await pool.query(documentsQuery, [applicationId]);
     const { total_docs, accepted_docs } = docsResult.rows[0];
@@ -264,15 +264,15 @@ router.post('/transmit/:applicationId/:productId', async (req: any, res: any) =>
           json_build_object(
             'id', d.id,
             'documentType', d.document_type,
-            'fileName', d.file_name,
+            'fileName', d.name,
             'filePath', d.file_path,
             'status', d.status,
             'verifiedAt', d.verified_at
           )
         ) as documents
       FROM applications a
-      LEFT JOIN businesses b ON a.business_id = b.id
-      LEFT JOIN documents d ON a.id = d.application_id AND d.status = 'accepted'
+      LEFT JOIN businesses b ON a.businessId = b.id
+      LEFT JOIN documents d ON a.id = d.applicationId AND d.status = 'accepted'
       WHERE a.id = $1
       GROUP BY a.id, b.id`;
     
@@ -301,14 +301,14 @@ router.post('/transmit/:applicationId/:productId', async (req: any, res: any) =>
     // 4. Create transmission record
     const transmissionQuery = `
       INSERT INTO transmissions (
-        application_id, 
+        applicationId, 
         lender_product_id, 
         transmitted_by, 
         status, 
         transmission_data,
-        created_at
+        createdAt
       ) VALUES ($1, $2, $3, $4, $5, NOW())
-      RETURNING id, created_at`;
+      RETURNING id, createdAt`;
     
     const transmissionData = {
       application: application,
@@ -331,7 +331,7 @@ router.post('/transmit/:applicationId/:productId', async (req: any, res: any) =>
 
     // 5. Update application status to indicate it's been sent to lenders
     await pool.query(
-      `UPDATE applications SET status = 'submitted_to_lenders', updated_at = NOW() WHERE id = $1`,
+      `UPDATE applications SET status = 'submitted_to_lenders', updatedAt = NOW() WHERE id = $1`,
       [applicationId]
     );
 
@@ -343,7 +343,7 @@ router.post('/transmit/:applicationId/:productId', async (req: any, res: any) =>
       lenderName: product.lender_name,
       productName: product.product_name,
       documentsIncluded: application.documents?.length || 0,
-      transmittedAt: transmissionResult.rows[0].created_at,
+      transmittedAt: transmissionResult.rows[0].createdAt,
       message: `Application successfully sent to ${product.lender_name}`
     });
 

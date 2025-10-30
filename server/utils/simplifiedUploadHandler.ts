@@ -90,8 +90,8 @@ export async function simplifiedUploadHandler(options: SimplifiedUploadOptions):
     
     const insertQuery = `
       INSERT INTO documents (
-        id, application_id, file_name, file_path, file_size, 
-        file_type, document_type, checksum, created_at, updated_at
+        id, applicationId, name, file_path, size, 
+        file_type, document_type, checksum, createdAt, updatedAt
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()
       )

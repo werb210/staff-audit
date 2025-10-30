@@ -74,12 +74,12 @@ r.post('/send', async (req: any, res) => {
     try {
       const { pool } = require("../db");
       await pool.query(`
-        UPDATE applications SET stage = 'sent_to_lender', updated_at = NOW() WHERE id = $1
+        UPDATE applications SET stage = 'sent_to_lender', updatedAt = NOW() WHERE id = $1
       `, [applicationId]);
 
       // Log the activity
       await pool.query(`
-        INSERT INTO pipeline_activity (application_id, from_stage, to_stage, actor, note)
+        INSERT INTO pipeline_activity (applicationId, from_stage, to_stage, actor, note)
         VALUES ($1, 'approved', 'sent_to_lender', 'staff', $2)
       `, [applicationId, `Sent to lender ${lenderProductId}`]);
     } catch (dbErr) {

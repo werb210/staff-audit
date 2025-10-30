@@ -18,7 +18,7 @@ router.get("/", async (req: any, res: any) => {
 router.get("/:templateId/versions", async (req: any, res: any) => {
   const { templateId } = req.params;
   const versions = await q(`
-    SELECT id, version, locale, status, subject, body, changelog, created_at, approved_at
+    SELECT id, version, locale, status, subject, body, changelog, createdAt, approved_at
     FROM comm_template_versions
     WHERE template_id = $1
     ORDER BY locale, version DESC

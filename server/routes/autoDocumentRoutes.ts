@@ -22,7 +22,7 @@ router.post('/process/:documentId', async (req: any, res: any) => {
     
     // Get document details
     const documentResult = await db.execute(sql`
-      SELECT id, file_name, document_type, application_id
+      SELECT id, name, document_type, applicationId
       FROM documents 
       WHERE id = ${documentId}
       LIMIT 1
@@ -40,8 +40,8 @@ router.post('/process/:documentId', async (req: any, res: any) => {
     // Process the document
     const result = await processDocument(
       document.id,
-      document.application_id,
-      document.file_name,
+      document.applicationId,
+      document.name,
       document.document_type
     );
     
@@ -107,21 +107,21 @@ router.get('/status/:applicationId', async (req: any, res: any) => {
       SELECT COUNT(*) as total_docs,
              COUNT(CASE WHEN document_type = 'bank_statements' THEN 1 END) as bank_statements
       FROM documents
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     // Get OCR processing status
     const ocrStatusResult = await db.execute(sql`
       SELECT COUNT(*) as processed_docs
       FROM ocr_results
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     // Get banking analysis status
     const bankingStatusResult = await db.execute(sql`
       SELECT COUNT(*) as analyzed_docs
       FROM banking_analysis
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
     `);
     
     const status = {
@@ -166,11 +166,11 @@ router.get('/monitor', async (req: any, res: any) => {
              COUNT(ocr.id) as ocr_completed,
              COUNT(ba.id) as banking_completed
       FROM applications a
-      LEFT JOIN documents d ON a.id = d.application_id
-      LEFT JOIN ocr_results ocr ON a.id = ocr.application_id
-      LEFT JOIN banking_analysis ba ON a.id = ba.application_id
+      LEFT JOIN documents d ON a.id = d.applicationId
+      LEFT JOIN ocr_results ocr ON a.id = ocr.applicationId
+      LEFT JOIN banking_analysis ba ON a.id = ba.applicationId
       GROUP BY a.id, a.stage
-      ORDER BY a.created_at DESC
+      ORDER BY a.createdAt DESC
     `);
     
     const monitorData = {

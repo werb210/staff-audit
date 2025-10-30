@@ -93,7 +93,7 @@ router.post('/events', (req: any, res: any) => {
     attendees: attendees || [],
     location: location || '',
     status: 'confirmed',
-    created_at: new Date().toISOString()
+    createdAt: new Date().toISOString()
   };
 
   res.json({
@@ -111,7 +111,7 @@ router.put('/events/:id', (req: any, res: any) => {
   res.json({
     ok: true,
     message: `Event ${id} updated successfully`,
-    event: { id, ...updates, updated_at: new Date().toISOString() }
+    event: { id, ...updates, updatedAt: new Date().toISOString() }
   });
 });
 

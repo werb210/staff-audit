@@ -114,13 +114,13 @@ router.post("/applications", async (req: Request, res: Response) => {
 
     // Create or update user
     const userResult = await client.query(`
-      INSERT INTO users (email, phone, first_name, last_name, role, password_hash, created_at, updated_at)
+      INSERT INTO users (email, phone, first_name, last_name, role, password_hash, createdAt, updatedAt)
       VALUES ($1, $2, $3, $4, 'client', NULL, now(), now())
       ON CONFLICT (email) DO UPDATE SET 
         phone = EXCLUDED.phone,
         first_name = EXCLUDED.first_name,
         last_name = EXCLUDED.last_name,
-        updated_at = now()
+        updatedAt = now()
       RETURNING id
     `, [finalData.email, finalData.phone, finalData.first_name, finalData.last_name]);
     
@@ -132,13 +132,13 @@ router.post("/applications", async (req: Request, res: Response) => {
     
     const appResult = await client.query(`
       INSERT INTO applications (
-        id, user_id, business_id, tenant_id, requested_amount, use_of_funds, 
+        id, user_id, businessId, tenant_id, requested_amount, use_of_funds, 
         status, form_data, business_name, contact_email, contact_phone,
         submission_country, annual_revenue, years_in_business,
-        created_at, updated_at
+        createdAt, updatedAt
       )
       VALUES ($1, $2, NULL, $3, $4, $5, 'draft', $6, $7, $8, $9, $10, $11, $12, now(), now())
-      RETURNING id, status, created_at
+      RETURNING id, status, createdAt
     `, [
       appId, userId, bfTenantId,
       finalData.requested_amount, finalData.use_of_funds,
@@ -158,7 +158,7 @@ router.post("/applications", async (req: Request, res: Response) => {
       application: {
         id: application.id,
         status: application.status,
-        created_at: application.created_at
+        createdAt: application.createdAt
       }
     });
 
@@ -190,10 +190,10 @@ router.get("/applications/list", async (req: Request, res: Response) => {
         a.status,
         a.contact_email,
         a.contact_phone,
-        a.created_at,
-        a.updated_at
+        a.createdAt,
+        a.updatedAt
       FROM applications a
-      ORDER BY a.created_at DESC
+      ORDER BY a.createdAt DESC
       LIMIT $1 OFFSET $2
     `, [limit, offset]);
     
@@ -267,8 +267,8 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
         a.contact_email,
         a.contact_phone,
         a.submission_country,
-        a.created_at,
-        a.updated_at,
+        a.createdAt,
+        a.updatedAt,
         u.email,
         u.first_name,
         u.last_name
@@ -294,8 +294,8 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
         contact_email: app.contact_email,
         contact_phone: app.contact_phone,
         country: app.submission_country,
-        created_at: app.created_at,
-        updated_at: app.updated_at,
+        createdAt: app.createdAt,
+        updatedAt: app.updatedAt,
         applicant: {
           email: app.email,
           first_name: app.first_name,
@@ -368,15 +368,15 @@ router.post("/applications/:id/documents/upload", upload.single("file"), async (
     const docResult = await client.query(`
       INSERT INTO documents (
         id, 
-        application_id, 
-        file_name, 
+        applicationId, 
+        name, 
         document_type, 
-        file_size,
+        size,
         mime_type,
         s3_key,
         status,
-        created_at, 
-        updated_at
+        createdAt, 
+        updatedAt
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, 'uploaded', now(), now())
       RETURNING id, status

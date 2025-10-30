@@ -8,11 +8,11 @@ const r = Router();
 r.get("/applications/:id/documents.zip", async (req: Request, res: Response) => {
   const appId = String(req.params.id);
   const { rows } = await pool.query(
-    `SELECT id, file_name as filename, storage_key as object_key, file_type as content_type, sha256, status
+    `SELECT id, name as filename, storage_key as object_key, file_type as content_type, sha256, status
        FROM documents
-      WHERE application_id = $1
+      WHERE applicationId = $1
         AND status IN ('pending','accepted')
-      ORDER BY created_at ASC, id ASC`,
+      ORDER BY createdAt ASC, id ASC`,
     [appId]
   );
 

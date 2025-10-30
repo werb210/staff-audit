@@ -42,7 +42,7 @@ router.get("/", async (req: any, res: any) => {
         COALESCE(phone, form_data->>'phone', '') AS phone,
         COALESCE(status, 'Active') AS status
       FROM contacts
-      ORDER BY updated_at DESC
+      ORDER BY updatedAt DESC
       LIMIT 500
     `);
 

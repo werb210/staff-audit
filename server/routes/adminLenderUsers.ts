@@ -9,7 +9,7 @@ const router = Router();
 router.get('/lenders', async (req: any, res: any) => {
   try {
     const result = await db.query(`
-      SELECT id, name, contact_email, phone, address, city, state, zip, country, status, created_at, updated_at
+      SELECT id, name, contact_email, phone, address, city, state, zip, country, status, createdAt, updatedAt
       FROM lenders 
       ORDER BY name
     `);
@@ -42,7 +42,7 @@ router.post('/lenders', async (req: any, res: any) => {
     const lenderId = uuidv4();
     
     await db.query(`
-      INSERT INTO lenders (id, name, contact_email, phone, address, city, state, zip, country, status, created_at, updated_at)
+      INSERT INTO lenders (id, name, contact_email, phone, address, city, state, zip, country, status, createdAt, updatedAt)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
     `, [
       lenderId,
@@ -82,11 +82,11 @@ router.get('/lender-users', async (req: any, res: any) => {
         lu.last_name,
         lu.status,
         lu.role,
-        lu.created_at,
+        lu.createdAt,
         l.name as lender_name
       FROM lender_users lu
       JOIN lenders l ON lu.lender_id = l.id
-      ORDER BY lu.created_at DESC
+      ORDER BY lu.createdAt DESC
     `);
     
     res.json({
@@ -100,7 +100,7 @@ router.get('/lender-users', async (req: any, res: any) => {
         status: row.status,
         role: row.role,
         lenderName: row.lender_name,
-        createdAt: row.created_at
+        createdAt: row.createdAt
       }))
     });
   } catch (error: unknown) {
@@ -146,7 +146,7 @@ router.post('/lender-users', async (req: any, res: any) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     await db.query(`
-      INSERT INTO lender_users (id, lender_id, email, first_name, last_name, password_hash, status, role, permissions, created_at, updated_at)
+      INSERT INTO lender_users (id, lender_id, email, first_name, last_name, password_hash, status, role, permissions, createdAt, updatedAt)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
     `, [
       userId,
@@ -195,7 +195,7 @@ router.patch('/lender-users/:id', async (req: any, res: any) => {
     
     await db.query(`
       UPDATE lender_users 
-      SET status = $1, updated_at = NOW()
+      SET status = $1, updatedAt = NOW()
       WHERE id = $2
     `, [status, id]);
     

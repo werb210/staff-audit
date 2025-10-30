@@ -26,7 +26,7 @@ async function getIpVerdict(req:Request){
 
   // db rules
   try {
-    const r = await db.execute(sql`SELECT action, value FROM ip_rules ORDER BY created_at DESC`);
+    const r = await db.execute(sql`SELECT action, value FROM ip_rules ORDER BY createdAt DESC`);
     for (const row of (r.rows||[])){
       const val = String(row.value);
       const hit = val.includes("/") ? inCidr(ip, val) : (val===ip);

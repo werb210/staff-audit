@@ -27,22 +27,20 @@ export default function DialerDrawer() {
   if (!open) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-y-0 right-0 w-96 bg-gray-800 text-white p-4 shadow-xl z-50"
       style={{ zIndex: 1000 }}
     >
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Dialer</h2>
-        <button 
+        <button
           onClick={() => setOpen(false)}
           className="text-gray-400 hover:text-white"
         >
           ✕
         </button>
       </div>
-      <div className="text-gray-300">
-        Dialer interface would go here
-      </div>
+      <div className="text-gray-300">Dialer interface would go here</div>
     </div>
   );
 }

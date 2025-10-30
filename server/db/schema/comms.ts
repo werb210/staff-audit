@@ -6,8 +6,8 @@ export const commThreads = pgTable("comm_threads", {
   contactId: uuid("contact_id").notNull(), // FK to your contacts table
   channel: varchar("channel", { length: 16 }).notNull(), // 'sms' | 'email' | 'call'
   subject: text("subject"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const commMessages = pgTable("comm_messages", {
@@ -18,7 +18,7 @@ export const commMessages = pgTable("comm_messages", {
   body: text("body").notNull(),
   meta: text("meta"), // JSON string (twilio sid, subject, etc.)
   createdByUserId: uuid("created_by_user_id"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const commCalls = pgTable("comm_calls", {
@@ -33,7 +33,7 @@ export const commCalls = pgTable("comm_calls", {
   recordingUrl: text("recording_url"),
   transcript: text("transcript"),
   createdByUserId: uuid("created_by_user_id"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const commTemplates = pgTable("comm_templates", {
@@ -43,8 +43,8 @@ export const commTemplates = pgTable("comm_templates", {
   subject: varchar("subject", { length: 256 }),
   body: text("body").notNull(),
   isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const commRelations = relations(commThreads, ({ many }) => ({

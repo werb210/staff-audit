@@ -103,7 +103,7 @@ router.post('/upload', upload.single('file'), async (req: any, res: any) => {
 
     // Store document metadata in database
     const result = await db.execute(sql`
-      INSERT INTO ai_training_documents (title, file_name, file_path, file_size, mime_type, extracted_text, uploaded_by, created_at, updated_at)
+      INSERT INTO ai_training_documents (title, name, file_path, size, mime_type, extracted_text, uploaded_by, createdAt, updatedAt)
       VALUES (${originalname}, ${originalname}, ${filePath}, ${size}, ${mimetype}, ${contentPreview}, ${userId}, NOW(), NOW())
       RETURNING id
     `);
@@ -123,7 +123,7 @@ router.post('/upload', upload.single('file'), async (req: any, res: any) => {
     // Update indexed status
     await db.execute(sql`
       UPDATE ai_training_documents 
-      SET status = 'indexed', updated_at = NOW()
+      SET status = 'indexed', updatedAt = NOW()
       WHERE id = ${docId}
     `);
 
@@ -157,24 +157,24 @@ router.get('/docs', async (req: any, res: any) => {
     if (status && status !== 'all') {
       // Use parameterized query with safe status filtering
       result = await db.execute(sql`
-        SELECT id, title, description, category, file_name as "fileName", 
-               file_path as "filePath", file_size as "fileSize", mime_type as "mimeType",
+        SELECT id, title, description, category, name as "fileName", 
+               file_path as "filePath", size as "fileSize", mime_type as "mimeType",
                extracted_text as "extractedText", status, uploaded_by as "uploadedBy",
-               created_at as "createdAt", updated_at as "updatedAt"
+               createdAt as "createdAt", updatedAt as "updatedAt"
         FROM ai_training_documents
         WHERE status = ${status as string}
-        ORDER BY created_at DESC 
+        ORDER BY createdAt DESC 
         LIMIT ${limitInt}
       `);
     } else {
       // Query all documents
       result = await db.execute(sql`
-        SELECT id, title, description, category, file_name as "fileName", 
-               file_path as "filePath", file_size as "fileSize", mime_type as "mimeType", 
+        SELECT id, title, description, category, name as "fileName", 
+               file_path as "filePath", size as "fileSize", mime_type as "mimeType", 
                extracted_text as "extractedText", status, uploaded_by as "uploadedBy",
-               created_at as "createdAt", updated_at as "updatedAt"
+               createdAt as "createdAt", updatedAt as "updatedAt"
         FROM ai_training_documents
-        ORDER BY created_at DESC 
+        ORDER BY createdAt DESC 
         LIMIT ${limitInt}
       `);
     }
@@ -196,10 +196,10 @@ router.get('/docs/:id', async (req: any, res: any) => {
     const { id } = req.params;
 
     const result = await db.execute(sql`
-      SELECT id, title, description, category, file_name as "fileName", 
-             file_path as "filePath", file_size as "fileSize", mime_type as "mimeType",
+      SELECT id, title, description, category, name as "fileName", 
+             file_path as "filePath", size as "fileSize", mime_type as "mimeType",
              extracted_text as "extractedText", status, uploaded_by as "uploadedBy",
-             created_at as "createdAt", updated_at as "updatedAt"
+             createdAt as "createdAt", updatedAt as "updatedAt"
       FROM ai_training_documents 
       WHERE id = ${id}
       LIMIT 1
@@ -276,7 +276,7 @@ router.get('/stats', async (req: any, res: any) => {
         COUNT(*) as total_docs,
         COUNT(CASE WHEN status = 'indexed' THEN 1 END) as indexed_docs,
         COUNT(CASE WHEN status = 'uploaded' THEN 1 END) as pending_docs,
-        SUM(file_size) as total_size,
+        SUM(size) as total_size,
         COUNT(DISTINCT uploaded_by) as uploaders
       FROM ai_training_documents
     `);

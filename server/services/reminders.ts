@@ -19,13 +19,13 @@ export async function scanAndQueueReminders() {
 
   // 1) Applicants with missing docs for >= 24h since last request, not opted-out
   const applicants = await q<any>(`
-    SELECT c.id as contact_id, a.id as application_id
+    SELECT c.id as contact_id, a.id as applicationId
     FROM applications a
     JOIN contacts c ON c.id=a.contact_id
     WHERE EXISTS (
-      SELECT 1 FROM documents d WHERE d.application_id=a.id AND d.status IN ('pending','rejected')
+      SELECT 1 FROM documents d WHERE d.applicationId=a.id AND d.status IN ('pending','rejected')
     ) AND c.sms_opt_out=false
-      AND (a.updated_at < now() - interval '24 hours')
+      AND (a.updatedAt < now() - interval '24 hours')
     LIMIT 200
   `);
   for (const r of applicants) {
@@ -44,8 +44,8 @@ export async function scanAndQueueReminders() {
     const lenders = await q<any>(`
       SELECT DISTINCT laa.org_id
       FROM lender_app_access laa
-      JOIN applications a ON a.id=laa.application_id
-      LEFT JOIN lender_matches m ON m.application_id=a.id
+      JOIN applications a ON a.id=laa.applicationId
+      LEFT JOIN lender_matches m ON m.applicationId=a.id
       WHERE a.sent_to_lender_at < now() - interval '48 hours'
         AND (m.decision IS NULL OR m.decision='')
       LIMIT 200
@@ -88,7 +88,7 @@ export async function sendDueReminders() {
       } else {
         // lender org email: resolve primary email (may fail if tables don't exist)
         try {
-          const [lender] = await q<any>(`SELECT email FROM lender_users WHERE org_id=$1 AND is_admin=true ORDER BY created_at LIMIT 1`, [reminder.target_id]);
+          const [lender] = await q<any>(`SELECT email FROM lender_users WHERE org_id=$1 AND is_admin=true ORDER BY createdAt LIMIT 1`, [reminder.target_id]);
           const email = lender?.email;
           if (!email) {
             await q(`UPDATE reminders_queue SET status='skipped', last_error='no lender admin email' WHERE id=$1`, [reminder.id]);

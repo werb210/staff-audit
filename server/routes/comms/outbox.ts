@@ -8,10 +8,10 @@ const router = Router();
 // Reviewer list
 router.get("/", async (_req, res) => {
   const items = await q(`
-    SELECT id, channel, to_address, subject, locale, status, created_at
+    SELECT id, channel, to_address, subject, locale, status, createdAt
     FROM comm_outbox
     WHERE status='pending'
-    ORDER BY created_at
+    ORDER BY createdAt
     LIMIT 200
   `);
   res.json(items);

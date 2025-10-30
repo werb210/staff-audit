@@ -1,22 +1,31 @@
 import { ProductWithRules } from "@/types/lenderProduct";
 
-export async function getProductWithRules(productId: string): Promise<ProductWithRules> {
+export async function getProductWithRules(
+  productId: string,
+): Promise<ProductWithRules> {
   // Prefer a combined endpoint if present; fall back to two calls
   try {
-    const res = await fetch(`${API_BASE}/lender-products/${productId}?expand=rules`, {});
+    const res = await fetch(
+      `${API_BASE}/lender-products/${productId}?expand=rules`,
+      {},
+    );
     if (res.ok) return res.json();
   } catch (e) {
-    console.warn('Combined endpoint not available, falling back to separate calls');
+    console.warn(
+      "Combined endpoint not available, falling back to separate calls",
+    );
   }
 
   const [prodRes, rulesRes] = await Promise.all([
     fetch(`${API_BASE}/lender-products/${productId}`, {}),
-    fetch(`${API_BASE}/lender-products/${productId}/rules`, {}).catch(() => ({ ok: false }))
+    fetch(`${API_BASE}/lender-products/${productId}/rules`, {}).catch(() => ({
+      ok: false,
+    })),
   ]);
 
   const prod = await prodRes.json();
   const rules = rulesRes.ok ? await rulesRes.json() : {};
-  
+
   // Normalize legacy field names
   return {
     id: prod.id,
@@ -32,7 +41,7 @@ export async function getProductWithRules(productId: string): Promise<ProductWit
     maxTermMonths: prod.maxTermMonths || prod.termMaximum || prod.term_max,
     active: prod.active ?? prod.isActive ?? true,
     description: prod.description,
-    rules: rules || {}
+    rules: rules || {},
   };
 }
 
@@ -45,22 +54,24 @@ export async function upsertProductWithRules(payload: ProductWithRules) {
 
   try {
     const res = await fetch(url, {
-      method, 
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
     if (res.ok) return res.json();
   } catch (e) {
-    console.warn('Combined endpoint not available, falling back to separate calls');
+    console.warn(
+      "Combined endpoint not available, falling back to separate calls",
+    );
   }
 
   // Fallback: call old endpoints in sequence so nothing breaks
   const legacyPayload = {
     lenderId: payload.lenderId,
     productName: payload.name,
-    productCategory: payload.category || 'business_loan',
-    countryOffered: payload.countryOffered || 'CA',
+    productCategory: payload.category || "business_loan",
+    countryOffered: payload.countryOffered || "CA",
     minimumLendingAmount: payload.minAmount || 0,
     maximumLendingAmount: payload.maxAmount || 0,
     interestRateMinimum: payload.minRate || 0,
@@ -68,47 +79,47 @@ export async function upsertProductWithRules(payload: ProductWithRules) {
     termMinimum: payload.minTermMonths || 0,
     termMaximum: payload.maxTermMonths || 0,
     isActive: payload.active ?? true,
-    description: payload.description || '',
-    documentsRequired: payload.rules?.requiredDocs || []
+    description: payload.description || "",
+    documentsRequired: payload.rules?.requiredDocs || [],
   };
 
   if (!payload.id) {
     const created = await fetch(`${API_BASE}/v1/lenders/products`, {
-      method: "POST",  
-      headers:{ "Content-Type":"application/json" },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(legacyPayload),
-    }).then(r=>r.json());
-    
+    }).then((r) => r.json());
+
     // Try to save rules if endpoint exists
     try {
       await fetch(`${API_BASE}/lender-products/${created.id}/rules`, {
-        method:"PUT",  
-        headers:{ "Content-Type":"application/json" },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload.rules || {}),
       });
     } catch (e) {
-      console.warn('Rules endpoint not available');
+      console.warn("Rules endpoint not available");
     }
-    
+
     return created;
   } else {
     await fetch(`${API_BASE}/v1/lenders/products/${payload.id}`, {
-      method:"PUT",  
-      headers:{ "Content-Type":"application/json" },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(legacyPayload),
     });
-    
+
     // Try to save rules if endpoint exists
     try {
       await fetch(`${API_BASE}/lender-products/${payload.id}/rules`, {
-        method:"PUT",  
-        headers:{ "Content-Type":"application/json" },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload.rules || {}),
       });
     } catch (e) {
-      console.warn('Rules endpoint not available');
+      console.warn("Rules endpoint not available");
     }
-    
+
     return { id: payload.id };
   }
 }

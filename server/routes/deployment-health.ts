@@ -84,7 +84,7 @@ router.post("/bootstrap", async (req: any, res: any) => {
       if (count === 0) {
         // Insert demo applications
         await client.query(`
-          INSERT INTO applications (id, user_id, requested_amount, status, use_of_funds, created_at)
+          INSERT INTO applications (id, user_id, requested_amount, status, use_of_funds, createdAt)
           VALUES 
           ('demo-1', 'Demo User 1', 50000, 'draft', 'Equipment purchase', NOW()),
           ('demo-2', 'Demo User 2', 75000, 'pending', 'Working capital', NOW()),

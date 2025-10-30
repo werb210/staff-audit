@@ -166,13 +166,13 @@ router.get('/documents', async (req: any, res: any) => {
       title: doc.title,
       description: doc.description,
       category: doc.category,
-      fileName: doc.file_name,
-      fileSize: doc.file_size,
+      fileName: doc.name,
+      fileSize: doc.size,
       mimeType: doc.mime_type,
       status: doc.status,
       uploadedBy: doc.uploaded_by,
-      createdAt: doc.created_at,
-      updatedAt: doc.updated_at,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
       textLength: doc.extracted_text ? doc.extracted_text.length : 0
     }));
 

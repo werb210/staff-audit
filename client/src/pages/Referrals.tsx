@@ -1,1 +1,6 @@
-export default () => <div><h2>Referrals</h2><p>✅ Referrals ready</p></div>;
+export default () => (
+  <div>
+    <h2>Referrals</h2>
+    <p>✅ Referrals ready</p>
+  </div>
+);

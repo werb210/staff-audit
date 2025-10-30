@@ -93,7 +93,7 @@ export async function autoCreateContactsFromApplication(appData: ApplicationData
         const existingContact = await db.execute(sql`
           SELECT id FROM contacts 
           WHERE email = ${contact.email} 
-          AND application_id = ${contact.applicationId}
+          AND applicationId = ${contact.applicationId}
           LIMIT 1
         `);
         
@@ -106,8 +106,8 @@ export async function autoCreateContactsFromApplication(appData: ApplicationData
               phone, 
               role, 
               company_name, 
-              application_id,
-              created_at
+              applicationId,
+              createdAt
             ) VALUES (
               ${contact.fullName},
               ${contact.email},
@@ -156,8 +156,8 @@ export async function getAllContacts(): Promise<any[]> {
           END
         ) as business_name
       FROM contacts c
-      LEFT JOIN applications a ON c.application_id = a.id
-      ORDER BY c.created_at DESC
+      LEFT JOIN applications a ON c.applicationId = a.id
+      ORDER BY c.createdAt DESC
     `);
     
     return contactsQuery.rows || [];
@@ -180,12 +180,12 @@ export async function ensureContactsTable(): Promise<void> {
         phone VARCHAR(50),
         role VARCHAR(50) NOT NULL DEFAULT 'Applicant',
         company_name VARCHAR(255),
-        application_id UUID,
+        applicationId UUID,
         source VARCHAR(50) DEFAULT 'application',
         status VARCHAR(50) DEFAULT 'active',
         job_title VARCHAR(255),
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
+        createdAt TIMESTAMP DEFAULT NOW(),
+        updatedAt TIMESTAMP DEFAULT NOW()
       )
     `);
     
@@ -238,7 +238,7 @@ export async function autoCreateContactsFromChatEscalation(chatData: {
         phone, 
         role, 
         company_name,
-        created_at
+        createdAt
       ) VALUES (
         ${`${chatData.firstName} ${chatData.lastName}`.trim()},
         ${chatData.email},

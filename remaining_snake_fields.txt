@@ -1,0 +1,1284 @@
+server/banking/analysis.service.ts:238:      SET banking_analysis = $1, updated_at = NOW() 
+server/banking/database-setup.sql:7:    application_id UUID NOT NULL REFERENCES applications(id),
+server/banking/database-setup.sql:16:    created_at TIMESTAMP DEFAULT NOW(),
+server/banking/database-setup.sql:17:    updated_at TIMESTAMP DEFAULT NOW()
+server/banking/database-setup.sql:23:    application_id UUID NOT NULL REFERENCES applications(id),
+server/banking/database-setup.sql:27:    created_at TIMESTAMP DEFAULT NOW()
+server/banking/database-setup.sql:31:CREATE INDEX IF NOT EXISTS idx_bank_transactions_app_date ON bank_transactions(application_id, tx_date);
+server/banking/database-setup.sql:34:CREATE INDEX IF NOT EXISTS idx_bank_statement_headers_app ON bank_statement_headers(application_id);
+server/banking/sql/banking_analysis.sql:2:--    Assumes transactions table columns: application_id, tx_date, amount, description, type ('debit'|'credit')
+server/banking/sql/banking_analysis.sql:5:  SELECT application_id, tx_date::date, amount, type, description, lower(coalesce(normalized_description, description)) AS nd
+server/banking/sql/banking_analysis.sql:9:  application_id,
+server/banking/sql/banking_analysis.sql:18:GROUP BY application_id, date_trunc('month', tx_date)
+server/banking/sql/banking_analysis.sql:19:ORDER BY application_id, month;
+server/banking/sql/banking_analysis.sql:25:    application_id,
+server/banking/sql/banking_analysis.sql:34:    application_id,
+server/banking/sql/banking_analysis.sql:42:  GROUP BY application_id, key
+server/banking/sql/banking_analysis.sql:47:  application_id,
+server/banking/sql/banking_analysis.sql:59:  application_id,
+server/schemas/product.ts:13:  updated_at: z.string().datetime(),
+server/schemas/application.ts:54:  created_at: z.string(),
+server/schemas/application.ts:55:  updated_at: z.string().optional(),
+server/utils/simplifiedUploadHandler.ts:93:        id, application_id, file_name, file_path, file_size, 
+server/utils/simplifiedUploadHandler.ts:94:        file_type, document_type, checksum, created_at, updated_at
+server/utils/security-monitoring.ts:30:      INSERT INTO security_logs (event_type, severity, ip_address, user_agent, endpoint, details, created_at)
+server/utils/security-monitoring.ts:88:      AND created_at > NOW() - INTERVAL '1 minute'
+server/utils/security-monitoring.ts:157:        INSERT INTO request_logs (ip_address, user_agent, endpoint, method, created_at)
+server/utils/regenerateStorageKey.ts:23:      SET storage_key = $1, backup_status = 'completed', updated_at = NOW()
+server/utils/regenerateStorageKey.ts:24:      WHERE application_id = $2 AND file_name = $3 AND storage_key IS NULL
+server/utils/regenerateStorageKey.ts:25:      RETURNING id, file_name, storage_key
+server/utils/regenerateStorageKey.ts:53:      SELECT id, file_name FROM documents 
+server/utils/regenerateStorageKey.ts:54:      WHERE application_id = $1 AND storage_key IS NULL
+server/utils/fileVerificationService.ts:70:        // Note: Many old documents may not have file_size recorded, so we only validate if it exists
+server/utils/autoRecoveryTrigger.ts:42:    const query = 'SELECT id, file_name, file_path, application_id, file_size, created_at FROM documents';
+server/utils/autoRecoveryTrigger.ts:107:    const query = 'SELECT id, file_name, file_path, application_id, created_at FROM documents WHERE application_id = $1';
+server/utils/hardenedDocumentStorage.ts:71:        document_id, application_id, file_name, upload_attempted_at,
+server/utils/permanentUploadMonitoring.ts:24:      SELECT a.id as application_id, 
+server/utils/recoveryLogger.ts:84:          document_id, file_name, application_id, legal_business_name, 
+server/utils/recoveryLogger.ts:85:          event_type, status, original_path, new_path, file_size, 
+server/utils/recoveryLogger.ts:86:          uploaded_by, error_message, created_at
+server/utils/bulletproofDocumentStorage.ts:90:      application_id: applicationId,
+server/utils/bulletproofDocumentStorage.ts:92:      file_name: fileName,
+server/utils/bulletproofDocumentStorage.ts:94:      file_size: fileSize,
+server/utils/bulletproofDocumentStorage.ts:102:      created_at: new Date(),
+server/utils/bulletproofDocumentStorage.ts:103:      updated_at: new Date()
+server/utils/fileRecoveryService.ts:67:            SET file_path = $1, file_name = $2 
+server/utils/storage.ts:24:  created_at: string;
+server/utils/storage.ts:25:  updated_at: string;
+server/utils/storage.ts:32:export async function saveApplication(data: Omit<Application,"id"|"status"|"created_at"|"updated_at"|"files">) {
+server/utils/storage.ts:35:  DB.set(id, { id, ...data, status: "QUEUED", created_at: now, updated_at: now, files: [] });
+server/utils/storage.ts:47:  app.updated_at = new Date().toISOString();
+server/utils/storage.ts:54:    DB.set(id, { ...existing, ...updates, updated_at: new Date().toISOString() });
+server/utils/documentStorage.ts:142:        id, application_id, file_name, file_path, file_size, 
+server/utils/documentStorage.ts:143:        document_type, uploaded_by, checksum, storage_key, file_exists, created_at
+server/utils/documentStorage.ts:145:      RETURNING id, file_name, storage_key
+server/utils/documentStorage.ts:269:      WHERE created_at > NOW() - INTERVAL '5 minutes'
+server/utils/documentIntegrity.ts:40:      SELECT id, file_name, file_path, application_id, created_at 
+server/utils/documentIntegrity.ts:42:      ORDER BY created_at DESC
+server/utils/documentIntegrity.ts:145:      SELECT id, file_name, file_path, application_id, created_at 
+server/utils/documentIntegrity.ts:147:      WHERE application_id = $1
+server/utils/documentIntegrity.ts:148:      ORDER BY created_at DESC
+server/schema-lock.json:10:      "created_at",
+server/schema-lock.json:46:      "updated_at",
+server/schema-lock.json:71:      "business_id",
+server/schema-lock.json:80:      "created_at",
+server/schema-lock.json:116:      "updated_at",
+server/src/routes/pipeline.ts:14:  }).from(applications).orderBy(desc(applications.created_at));
+server/src/schema.ts:8:  created_at: timestamp('created_at').defaultNow().notNull(),
+server/src/schema.ts:16:  created_at: timestamp('created_at').defaultNow().notNull(),
+server/lib/aiObservability.ts:24:        action, user_id, tenant_id, application_id, contact_id,
+server/lib/aiObservability.ts:103:      AND created_at BETWEEN ${startDate} AND ${endDate}
+server/lib/aiObservability.ts:114:      AND created_at BETWEEN ${startDate} AND ${endDate}
+server/lib/aiObservability.ts:123:        DATE(created_at) as date,
+server/lib/aiObservability.ts:128:      AND created_at BETWEEN ${startDate} AND ${endDate}
+server/lib/aiObservability.ts:129:      GROUP BY DATE(created_at)
+server/lib/findAppByAnyId.ts:14:        created_at,
+server/lib/findAppByAnyId.ts:43:        file_name,
+server/lib/findAppByAnyId.ts:46:        created_at
+server/lib/findAppByAnyId.ts:48:      WHERE application_id = $1
+server/lib/findAppByAnyId.ts:80:      createdAt: application.created_at,
+server/lib/aiQueue.ts:88:      application_id, contact_id, user_id, tenant_id
+server/lib/aiQueue.ts:106:    SELECT status, result_data, error_message, created_at, started_at, completed_at
+server/lib/aiQueue.ts:162:      updated_at = NOW()
+server/lib/aiQueue.ts:236:    WHERE created_at < ${cutoffDate} 
+server/middleware/autoDocumentProcessor.ts:55:            application_id,
+server/middleware/autoDocumentProcessor.ts:122:      SELECT id, file_name, document_type
+server/middleware/autoDocumentProcessor.ts:124:      WHERE application_id = ${applicationId}
+server/middleware/autoDocumentProcessor.ts:126:      ORDER BY created_at
+server/middleware/autoDocumentProcessor.ts:140:      const result = await processDocument(doc.id, applicationId, doc.file_name, doc.document_type);
+server/middleware/documentUploadStageUpdater.ts:18:      if (body && body.success && body.document && body.document.application_id) {
+server/middleware/documentUploadStageUpdater.ts:19:        const applicationId = body.document.application_id;
+server/middleware/securityControls.ts:29:    const r = await db.execute(sql`SELECT action, value FROM ip_rules ORDER BY created_at DESC`);
+server/middleware/pipelineTriggers.ts:45:                         req.body.application_id;
+server/middleware/staffAuth.ts:14:      SELECT s.id, s.user_id, s.created_at, s.last_seen_at, s.expires_at, s.revoked_at,
+server/middleware/staffAuth.ts:25:    const absExpired  = now.getTime() - new Date(row.created_at).getTime() > ABS*60*1000;
+server/middleware/deletionLogger.ts:13:  application_id: string;
+server/middleware/deletionLogger.ts:30:          application_id, user_id, user_email, source, deletion_reason,
+server/middleware/deletionLogger.ts:33:          ${entry.application_id}, ${entry.user_id || null}, ${entry.user_email || null}, 
+server/middleware/deletionLogger.ts:39:      console.log(`🗑️ [DELETION LOG] Application ${entry.application_id} deleted by ${entry.user_email || 'system'} via ${entry.source}`);
+server/middleware/deletionLogger.ts:55:      WHERE application_id = ${applicationId} AND storage_status = 'fallback'
+server/middleware/deletionLogger.ts:80:          application_id: applicationId,
+server/middleware/lender.ts:11:  const r = await db.execute(sql`SELECT id, application_id, partner_id, perms, expires_at, revoked_at, disabled FROM app_lender_shares WHERE token=${token} LIMIT 1`);
+server/middleware/lender.ts:17:  req.lender = { shareId: share.id, applicationId: share.application_id, partnerId: share.partner_id, perms: share.perms, token };
+server/middleware/lender.ts:27:      INSERT INTO lender_activity(share_id, partner_id, application_id, event, meta, ip, ua)
+server/services/engine/v11.ts:68:  const products = (await db.execute(sql`SELECT * FROM lender_products ORDER BY created_at`)).rows || [];
+server/services/engine/v11.ts:127:    INSERT INTO decision_traces(application_id, variant, results, rules_applied, inputs)
+server/services/telephonyRouter.ts:53:        created_at: new Date().toISOString(),
+server/services/telephonyRouter.ts:102:          created_at: new Date().toISOString()
+server/services/telephonyRouter.ts:149:        created_at: new Date().toISOString(),
+server/services/ocr.ts:249:            application_id: applicationId,
+server/services/ocr.ts:256:            target: bankingAnalysis.application_id,
+server/services/ocr.ts:263:              updated_at: new Date()
+server/services/rtbf/purge.ts:35:        await db.execute(sql`DELETE FROM documents WHERE application_id = ANY(${appIds})`);
+server/services/rtbf/purge.ts:36:        await db.execute(sql`DELETE FROM lender_activity WHERE application_id = ANY(${appIds})`);
+server/services/rtbf/purge.ts:37:        await db.execute(sql`DELETE FROM decision_traces WHERE application_id = ANY(${appIds})`);
+server/services/rtbf/purge.ts:52:            updated_at = now()
+server/services/rtbf/purge.ts:99:        DELETE FROM documents WHERE application_id = ${applicationId}
+server/services/rtbf/purge.ts:109:        DELETE FROM comm_messages WHERE application_id = ${applicationId}
+server/services/rtbf/purge.ts:119:        DELETE FROM lender_activity WHERE application_id = ${applicationId}
+server/services/rtbf/purge.ts:129:        DELETE FROM decision_traces WHERE application_id = ${applicationId}
+server/services/rtbf/purge.ts:150:          updated_at = now()
+server/services/microsoftGraphService.ts:100:        updated_at = NOW()
+server/services/billing/core.ts:83:       SET value = value + ${qty}::bigint, updated_at = now()
+server/services/activityLog.ts:11:  const [row] = await q<{ id: string; created_at: string }>(`
+server/services/activityLog.ts:14:    RETURNING id, created_at
+server/services/activityLog.ts:26:    createdAt: row.created_at 
+server/services/smsNotificationService.ts:65:      WHERE application_id = ${data.applicationId} 
+server/services/smsNotificationService.ts:214:        application_id,
+server/services/smsNotificationService.ts:219:        created_at,
+server/services/smsNotificationService.ts:220:        updated_at
+server/services/smsNotificationService.ts:255:      WHERE application_id = ${applicationId} 
+server/services/smsNotificationService.ts:281:      WHERE application_id = ${applicationId}
+server/services/smsNotificationService.ts:288:      WHERE application_id = ${applicationId}
+server/services/_canonFields.ts:27:    submittedAt:  preferCanon(canon, legacy, 'system.submittedAt', 'created_at'),
+server/services/documentAuditService.ts:56:      const filePath = path.join("uploads", "documents", `${doc.id}.${doc.file_name.split('.').pop() || 'txt'}`);
+server/services/documentAuditService.ts:72:      console.log(`✅ [STARTUP AUDIT] SHA256 added for ${doc.file_name}: ${sha256.substring(0, 16)}...`);
+server/services/documentAuditService.ts:86:      const filePath = path.join("uploads", "documents", `${doc.id}.${doc.file_name.split('.').pop() || 'txt'}`);
+server/services/documentAuditService.ts:100:        const storageKey = await s3Storage.set(buffer, doc.file_name, doc.application_id);
+server/services/documentAuditService.ts:108:        console.log(`☁️ [STARTUP AUDIT] S3 storage key added for ${doc.file_name}: ${storageKey}`);
+server/services/lenderProductsService.ts:34:          updated_at
+server/services/lenderProductsService.ts:52:        updatedAt: product.updated_at ? new Date(product.updated_at).toISOString() : new Date().toISOString()
+server/services/lenderProductsService.ts:74:          updated_at
+server/services/lenderProductsService.ts:96:        updatedAt: product.updated_at ? new Date(product.updated_at).toISOString() : new Date().toISOString()
+server/services/generateSignedApplicationPdf.ts:16:       LEFT JOIN businesses b ON a.business_id = b.id
+server/services/generateSignedApplicationPdf.ts:145:    page.drawText(`Submission Date: ${new Date(application.created_at).toLocaleDateString()}`, {
+server/services/generateSignedApplicationPdf.ts:206:        id, application_id, file_name, document_type, status, 
+server/services/generateSignedApplicationPdf.ts:207:        source, uploaded_by, storage_key, uploaded_at, file_size, checksum
+server/services/mergeFieldsV2.ts:31:    SELECT a.id, a.created_at, a.stage
+server/services/mergeFieldsV2.ts:34:    ORDER BY a.created_at DESC
+server/services/mergeFieldsV2.ts:42:      SELECT id, document_type, status, file_name
+server/services/mergeFieldsV2.ts:44:      WHERE application_id=$1
+server/services/mergeFieldsV2.ts:61:    MissingDocs: missingDocs.map((x:any)=>({ Id:x.id, Category:x.document_type, Filename:x.file_name })),
+server/services/mergeFieldsV2.ts:63:    RejectedDocs: rejectedDocs.map((x:any)=>({ Id:x.id, Category:x.document_type, Filename:x.file_name })),
+server/services/applications.adapter.ts:33:  const id = r.id || r.appId || r.application_id || String(r.uuid || r._id);
+server/services/applications.adapter.ts:34:  const createdAt = r.createdAt || r.created_at || r.inserted_at || r.created || r.created_time || null;
+server/services/applications.adapter.ts:35:  const updatedAt = r.updatedAt || r.updated_at || r.modified || r.modified_time || createdAt || null;
+server/services/pipelineService.ts:85:        WHERE application_id = ${applicationId}
+server/services/pipelineService.ts:181:            updated_at = NOW()
+server/services/pipelineService.ts:265:      await db.execute(sql`UPDATE applications SET stage = ${evaluation.suggestedStage}, updated_at = CURRENT_TIMESTAMP WHERE id = ${applicationId}`);
+server/services/pipelineService.ts:270:          application_id, previous_stage, new_stage, reason, changed_at
+server/services/pipelineAutomation.ts:15:        SELECT id, file_name, document_type, is_verified, is_required
+server/services/pipelineAutomation.ts:17:        WHERE application_id = $1
+server/services/pipelineAutomation.ts:79:            updated_at = NOW()
+server/services/s3OcrService.ts:85:          id, document_id, application_id, extracted_data, confidence, 
+server/services/reminders.ts:22:    SELECT c.id as contact_id, a.id as application_id
+server/services/reminders.ts:26:      SELECT 1 FROM documents d WHERE d.application_id=a.id AND d.status IN ('pending','rejected')
+server/services/reminders.ts:28:      AND (a.updated_at < now() - interval '24 hours')
+server/services/reminders.ts:47:      JOIN applications a ON a.id=laa.application_id
+server/services/reminders.ts:48:      LEFT JOIN lender_matches m ON m.application_id=a.id
+server/services/reminders.ts:91:          const [lender] = await q<any>(`SELECT email FROM lender_users WHERE org_id=$1 AND is_admin=true ORDER BY created_at LIMIT 1`, [reminder.target_id]);
+server/services/crmService.ts:96:          AND application_id = ${contact.applicationId}
+server/services/crmService.ts:109:              application_id,
+server/services/crmService.ts:110:              created_at
+server/services/crmService.ts:159:      LEFT JOIN applications a ON c.application_id = a.id
+server/services/crmService.ts:160:      ORDER BY c.created_at DESC
+server/services/crmService.ts:183:        application_id UUID,
+server/services/crmService.ts:187:        created_at TIMESTAMP DEFAULT NOW(),
+server/services/crmService.ts:188:        updated_at TIMESTAMP DEFAULT NOW()
+server/services/crmService.ts:241:        created_at
+server/services/applicationService.ts:18:        created_at
+server/services/applicationService.ts:38:      WHERE application_id = ${applicationId}
+server/services/applicationService.ts:39:      ORDER BY created_at DESC
+server/services/applicationService.ts:48:      WHERE application_id = ${applicationId}
+server/services/applicationService.ts:58:      WHERE application_id = ${applicationId} 
+server/services/documentNotificationService.ts:71:          d.application_id,
+server/services/documentNotificationService.ts:72:          d.file_name,
+server/services/documentNotificationService.ts:74:          d.file_size,
+server/services/documentNotificationService.ts:75:          d.created_at,
+server/services/documentNotificationService.ts:79:        JOIN applications a ON d.application_id = a.id
+server/services/documentNotificationService.ts:80:        WHERE d.created_at > $1
+server/services/documentNotificationService.ts:81:        ORDER BY d.created_at DESC
+server/services/documentNotificationService.ts:89:        applicationId: row.application_id,
+server/services/documentNotificationService.ts:91:        fileName: row.file_name,
+server/services/documentNotificationService.ts:93:        fileSize: row.file_size,
+server/services/documentNotificationService.ts:94:        uploadedAt: row.created_at
+server/services/reminders-fixed.ts:8:      SELECT id, applicant_name, email, stage, created_at 
+server/services/reminders-fixed.ts:11:      AND created_at < NOW() - INTERVAL '24 hours'
+server/services/analytics.ts:7:      (SELECT COUNT(*) FROM contacts WHERE DATE(created_at)=${dayISO}) AS leads_new,
+server/services/analytics.ts:8:      (SELECT COUNT(*) FROM applications WHERE DATE(created_at)=${dayISO}) AS apps_created,
+server/services/analytics.ts:11:      (SELECT COUNT(*) FROM documents WHERE DATE(created_at)=${dayISO}) AS docs_uploaded,
+server/services/analytics.ts:12:      (SELECT COUNT(*) FROM comm_messages WHERE direction='in'  AND DATE(created_at)=${dayISO}) AS messages_in,
+server/services/analytics.ts:13:      (SELECT COUNT(*) FROM comm_messages WHERE direction='out' AND DATE(created_at)=${dayISO}) AS messages_out
+server/services/analytics.ts:18:    INSERT INTO analytics_daily(day, leads_new, apps_created, apps_funded, funded_amount, messages_in, messages_out, updated_at)
+server/services/analytics.ts:27:      updated_at=now()
+server/services/analytics.ts:56:      (SELECT COUNT(*) FROM documents WHERE created_at::date = ${today}) AS docs_today,
+server/services/analytics.ts:57:      (SELECT COUNT(*) FROM comm_messages WHERE created_at::date = ${today}) AS messages_today,
+server/services/office365Service.ts:39:  created_at?: string | null;
+server/services/office365Service.ts:40:  updated_at?: string | null;
+server/services/office365Service.ts:73:        sql`insert into o365_tokens (user_id, access_token, refresh_token, expires_at, scope, tenant, created_at, updated_at)
+server/services/office365Service.ts:81:              updated_at=now()`
+server/services/mergeFields.ts:33:    SELECT a.id, a.created_at, a.stage
+server/services/mergeFields.ts:36:    ORDER BY a.created_at DESC
+server/services/mergeFields.ts:46:      WHERE application_id = $1
+server/ocrService.ts:124:        document_id, application_id, extracted_data, confidence, 
+server/ocrService.ts:127:      RETURNING id, document_id, application_id, processing_status
+server/ocrService.ts:230:        document_id, application_id, extracted_data, confidence, 
+server/ocrService.ts:497:  const result = await client.query('SELECT * FROM ocr_results WHERE application_id = $1 ORDER BY processed_at DESC', [applicationId]);
+server/ocrService.ts:693:          document_id, application_id, extracted_data, confidence, 
+server/ocrService.ts:696:        RETURNING id, document_id, application_id, processing_status
+server/ocrService.ts:788:        document_id, application_id, extracted_data, confidence, 
+server/ocrService.ts:791:      RETURNING id, document_id, application_id, processing_status
+server/ocrService.ts:828:        document_id, application_id, extracted_data, confidence, 
+server/routes/documentRestoration.ts:16:      SELECT id, file_name, file_path, file_type 
+server/routes/documentRestoration.ts:18:      WHERE application_id = $1 
+server/routes/documentRestoration.ts:50:        console.log(`🔄 [DOCUMENT RESTORATION] Processing: ${placeholder.file_name} (${placeholder.id})`);
+server/routes/documentRestoration.ts:53:        let originalFileName = placeholder.file_name;
+server/routes/documentRestoration.ts:89:                file_size = $3,
+server/routes/documentRestoration.ts:90:                file_name = $4,
+server/routes/documentRestoration.ts:91:                updated_at = NOW()
+server/routes/documentRestoration.ts:117:            originalName: placeholder.file_name,
+server/routes/documentRestoration.ts:129:          console.log(`⚠️ [DOCUMENT RESTORATION] No matching file found for: ${placeholder.file_name}`);
+server/routes/documentRestoration.ts:132:            originalName: placeholder.file_name,
+server/routes/documentRestoration.ts:139:        console.error(`❌ [DOCUMENT RESTORATION] Error processing ${placeholder.file_name}:`, error);
+server/routes/documentRestoration.ts:142:          originalName: placeholder.file_name,
+server/routes/documentRestoration.ts:188:      WHERE application_id = $1
+server/routes/marketing.costs.ts:153:      WHERE r.created_at >= NOW() - INTERVAL '${days} days'
+server/routes/ai.ocr.ui.ts:17:      WHERE application_id=${appId}
+server/routes/ai.ocr.ui.ts:36:      WHERE f.application_id=${appId}
+server/routes/ai.ocr.ui.ts:43:      WHERE application_id=${appId}
+server/routes/aiTraining.ts:169:      fileName: doc.file_name,
+server/routes/aiTraining.ts:170:      fileSize: doc.file_size,
+server/routes/aiTraining.ts:174:      createdAt: doc.created_at,
+server/routes/aiTraining.ts:175:      updatedAt: doc.updated_at,
+server/routes/applications/signatureStatus.ts:27:      application_id: app.id,
+server/routes/applications/overrideSigning.ts:46:        updated_at = NOW()
+server/routes/admin/users.ts:61:        created_at,
+server/routes/admin/users.ts:62:        updated_at,
+server/routes/admin/users.ts:65:      ORDER BY created_at DESC
+server/routes/admin/users.ts:75:      createdAt: user.created_at,
+server/routes/admin/users.ts:76:      updatedAt: user.updated_at,
+server/routes/admin/users.ts:123:        id, email, name, role, phone, twofa_enabled, created_at, updated_at
+server/routes/admin/users.ts:234:    updateFields.push('updated_at = NOW()');
+server/routes/admin/users.ts:236:    if (updateFields.length === 1) { // Only updated_at
+server/routes/admin/users.ts:329:        created_at
+server/routes/admin/users.ts:331:      ORDER BY created_at DESC 
+server/routes/admin/users.ts:351:        id, user_id, action, target_user_id, details, created_at
+server/routes/admin/seed_admin.ts:30:      "INSERT INTO staff_users(email, role, password_hash, created_at) VALUES ($1, 'admin', $2, NOW()) RETURNING id",
+server/routes/admin/lists.ts:16:  const { from, to } = daterange(req.query, "c.created_at");
+server/routes/admin/lists.ts:20:  const r = await db.execute(sql`SELECT contacts.id, contacts.full_name, contacts.email, contacts.created_at FROM contacts WHERE ${where} ORDER BY contacts.created_at DESC OFFSET ${offset} LIMIT ${limit}`);
+server/routes/admin/lists.ts:31:  const { from, to } = daterange(req.query, "a.created_at");
+server/routes/admin/lists.ts:35:  const r = await db.execute(sql`SELECT a.id, a.contact_id, a.status, a.created_at FROM applications a WHERE ${where} ORDER BY a.created_at DESC OFFSET ${offset} LIMIT ${limit}`);
+server/routes/admin/lists.ts:52:  const contacts = await db.execute(sql`SELECT id, full_name, email FROM contacts WHERE lower(email) LIKE ${"%"+q+"%"} OR lower(full_name) LIKE ${"%"+q+"%"} ORDER BY created_at DESC LIMIT 10`);
+server/routes/admin/lists.ts:53:  const applications = await db.execute(sql`SELECT id, status FROM applications WHERE id::text LIKE ${"%"+q+"%"} OR lower(status) LIKE ${"%"+q+"%"} ORDER BY created_at DESC LIMIT 10`);
+server/routes/admin/lists.ts:54:  const documents = await db.execute(sql`SELECT id, type FROM documents WHERE id::text LIKE ${"%"+q+"%"} OR lower(type) LIKE ${"%"+q+"%"} ORDER BY created_at DESC LIMIT 10`);
+server/routes/views.ts:11:  const { rows } = await db.execute(sql`select * from saved_views where scope=${scope} and (user_id is null or user_id=${req.user.sub}) order by is_default desc, created_at desc`);
+server/routes/googleAds.ts:30:      INSERT INTO google_ads_integrations (id, refresh_token, access_token, token_expiry, login_customer_id, developer_token, updated_at)
+server/routes/googleAds.ts:38:        updated_at = now()
+server/routes/industry-benchmarking.ts:72:      WHERE application_id = $1
+server/routes/industry-benchmarking.ts:73:      ORDER BY created_at DESC 
+server/routes/industry-benchmarking.ts:101:        application_id, industry, applicant_monthly_revenue, applicant_monthly_expenses,
+server/routes/industry-benchmarking.ts:118:      ) ON CONFLICT (application_id) DO UPDATE SET
+server/routes/industry-benchmarking.ts:124:        updated_at = NOW()
+server/routes/industry-benchmarking.ts:195:      WHERE application_id = $1
+server/routes/industry-benchmarking.ts:196:      ORDER BY created_at DESC 
+server/routes/industry-benchmarking.ts:263:      analysisDate: comparison.created_at,
+server/routes/industry-benchmarking.ts:436:          DATE(created_at) as date,
+server/routes/industry-benchmarking.ts:439:        WHERE created_at > NOW() - INTERVAL '7 days'
+server/routes/industry-benchmarking.ts:440:        GROUP BY DATE(created_at)
+server/routes/marketing-integration.ts:215:        created_at
+server/routes/marketing-integration.ts:218:      ORDER BY created_at ASC
+server/routes/marketing-integration.ts:325:        created_at
+server/routes/lenderEngine/v11.ts:15:  const r = await db.execute(sql`SELECT id, scope, rule, created_at FROM engine_policies ORDER BY created_at DESC`);
+server/routes/lenderEngine/v11.ts:37:    SELECT id, variant, results, rules_applied, inputs, created_at
+server/routes/lenderEngine/v11.ts:38:    FROM decision_traces WHERE application_id=${req.params.applicationId}
+server/routes/lenderEngine/v11.ts:39:    ORDER BY created_at DESC LIMIT 1
+server/routes/lenderEngine/v11.ts:45:  const r = await db.execute(sql`SELECT key, weights, created_at FROM engine_variants ORDER BY created_at`);
+server/routes/documentRecoveryUI.ts:44:      SELECT id, application_id, file_name, file_path, file_size, file_type, 
+server/routes/documentRecoveryUI.ts:45:             document_type, created_at, updated_at, checksum, storage_key
+server/routes/documentRecoveryUI.ts:47:      WHERE application_id = $1
+server/routes/documentRecoveryUI.ts:48:      ORDER BY created_at DESC
+server/routes/documentRecoveryUI.ts:77:          console.log(`✅ [RECOVERY-UI] File exists: ${document.file_name}`);
+server/routes/documentRecoveryUI.ts:80:          console.log(`❌ [RECOVERY-UI] File missing: ${document.file_name} at ${document.file_path}`);
+server/routes/documentRecoveryUI.ts:84:        console.log(`❌ [RECOVERY-UI] No file path for: ${document.file_name}`);
+server/routes/documentRecoveryUI.ts:89:        fileName: document.file_name,
+server/routes/documentRecoveryUI.ts:91:        fileSize: document.file_size,
+server/routes/documentRecoveryUI.ts:94:        createdAt: document.created_at,
+server/routes/documentRecoveryUI.ts:95:        updatedAt: document.updated_at,
+server/routes/documentRecoveryUI.ts:101:        isPlaceholder: !physicalFileExists && document.file_name?.includes('placeholder')
+server/routes/ocrManualTrigger.ts:24:      SELECT id, file_name, document_type, file_path
+server/routes/ocrManualTrigger.ts:26:      WHERE application_id = ${applicationId}
+server/routes/ocrManualTrigger.ts:28:      ORDER BY created_at
+server/routes/ocrManualTrigger.ts:47:        console.log(`🔍 [OCR-TRIGGER] Processing document: ${doc.file_name} (${doc.id})`);
+server/routes/ocrManualTrigger.ts:53:          extractedText: `OCR processed text from ${doc.file_name}`,
+server/routes/ocrManualTrigger.ts:64:            application_id,
+server/routes/ocrManualTrigger.ts:83:          fileName: doc.file_name,
+server/routes/ocrManualTrigger.ts:87:        console.log(`✅ [OCR-TRIGGER] Successfully processed: ${doc.file_name}`);
+server/routes/ocrManualTrigger.ts:93:          fileName: doc.file_name,
+server/routes/ocrManualTrigger.ts:98:        console.error(`❌ [OCR-TRIGGER] Error processing ${doc.file_name}:`, error);
+server/routes/ocrManualTrigger.ts:159:      WHERE application_id = ${applicationId}
+server/routes/ocrManualTrigger.ts:211:      WHERE application_id = ${applicationId}
+server/routes/ocrManualTrigger.ts:218:      WHERE application_id = ${applicationId}
+server/routes/ocrManualTrigger.ts:226:      WHERE application_id = ${applicationId}
+server/routes/retention/index.ts:34:    ORDER BY created_at DESC
+server/routes/retention/index.ts:40:  const { scope, contact_id, application_id, reason, expires_at } = req.body || {};
+server/routes/retention/index.ts:41:  if (!scope || (!contact_id && !application_id)) {
+server/routes/retention/index.ts:46:    INSERT INTO legal_holds(scope, contact_id, application_id, reason, expires_at, created_by_user_id)
+server/routes/retention/index.ts:47:    VALUES (${scope}, ${contact_id || null}, ${application_id || null}, ${reason || null}, 
+server/routes/retention/index.ts:63:    ORDER BY created_at DESC
+server/routes/retention/index.ts:69:  const { scope, contact_id, application_id, reason } = req.body || {};
+server/routes/retention/index.ts:70:  if (!scope || (!contact_id && !application_id)) {
+server/routes/retention/index.ts:78:      AND (contact_id = ${contact_id || null} OR application_id = ${application_id || null})
+server/routes/retention/index.ts:87:    INSERT INTO erasure_requests(scope, contact_id, application_id, reason, created_by_user_id)
+server/routes/retention/index.ts:88:    VALUES (${scope}, ${contact_id || null}, ${application_id || null}, ${reason || null}, ${req.user?.id || null})
+server/routes/retention/index.ts:132:    apps = [{ id: 'app-1', created_at: new Date() }, { id: 'app-2', created_at: new Date() }];
+server/routes/retention/index.ts:134:    const appId = request.application_id;
+server/routes/retention/index.ts:141:    apps = [{ id: appId, created_at: new Date() }];
+server/routes/retention/index.ts:186:      result = await purgeApplicationData(request.application_id);
+server/routes/retention/index.ts:224:        query = sql`DELETE FROM comm_messages WHERE created_at < ${cutoffDate.toISOString()}`;
+server/routes/retention/index.ts:226:        query = sql`DELETE FROM audit_log WHERE created_at < ${cutoffDate.toISOString()}`;
+server/routes/retention/index.ts:228:        query = sql`DELETE FROM lender_activity WHERE created_at < ${cutoffDate.toISOString()}`;
+server/routes/retention/index.ts:230:        query = sql`DELETE FROM decision_traces WHERE created_at < ${cutoffDate.toISOString()}`;
+server/routes/retention/index.ts:232:        query = sql`DELETE FROM integration_events WHERE created_at < ${cutoffDate.toISOString()}`;
+server/routes/documentDashboard.ts:17:      totalSize: sql<number>`COALESCE(SUM(file_size), 0)`,
+server/routes/documentDashboard.ts:18:      avgSize: sql<number>`COALESCE(AVG(file_size), 0)`,
+server/routes/documentDashboard.ts:19:      recentUploads: sql<number>`COUNT(CASE WHEN created_at > NOW() - INTERVAL '24 hours' THEN 1 END)`
+server/routes/documentDashboard.ts:27:      avgSize: sql<number>`COALESCE(AVG(file_size), 0)`,
+server/routes/documentDashboard.ts:28:      totalSize: sql<number>`COALESCE(SUM(file_size), 0)`
+server/routes/documentResync.ts:27:        a.created_at,
+server/routes/documentResync.ts:31:        (SELECT COUNT(*) FROM documents d WHERE d.application_id = a.id) as doc_count
+server/routes/documentResync.ts:33:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/documentResync.ts:34:      ORDER BY a.created_at DESC
+server/routes/documentResync.ts:51:      LEFT JOIN applications a ON d.application_id = a.id
+server/routes/documentResync.ts:52:      ORDER BY d.created_at DESC
+server/routes/documentResync.ts:72:        new Date(doc.created_at).getTime() >= new Date(app.created_at).getTime() - (24 * 60 * 60 * 1000) // Within 24 hours
+server/routes/documentResync.ts:80:          SET application_id = $1 
+server/routes/documentResync.ts:101:        COUNT(CASE WHEN application_id IS NOT NULL THEN 1 END) as linked_docs,
+server/routes/documentResync.ts:102:        COUNT(CASE WHEN application_id IS NULL THEN 1 END) as orphaned_docs
+server/routes/documentResync.ts:124:        createdAt: app.created_at
+server/routes/documentResync.ts:150:        a.created_at,
+server/routes/documentResync.ts:156:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/documentResync.ts:157:      LEFT JOIN documents d ON d.application_id = a.id
+server/routes/documentResync.ts:158:      GROUP BY a.id, a.created_at, b.business_name, a.status, a.stage
+server/routes/documentResync.ts:159:      ORDER BY a.created_at DESC
+server/routes/documentResync.ts:169:      LEFT JOIN applications a ON d.application_id = a.id
+server/routes/documentResync.ts:190:        createdAt: app.created_at,
+server/routes/slf/contacts.ts:80:          createdAt: item.createdAt || item.created_at || item.date_created || new Date().toISOString(),
+server/routes/slf/contacts.ts:81:          updatedAt: item.updatedAt || item.updated_at || item.date_modified || new Date().toISOString(),
+server/routes/v1-applications-docs.ts:89:        id, application_id, document_type, file_name, file_path, 
+server/routes/v1-applications-docs.ts:90:        file_size, mime_type, status, uploaded_by, created_at
+server/routes/v1-applications-docs.ts:104:        application_id: applicationId,
+server/routes/v1-applications-docs.ts:106:        file_name: file.originalname,
+server/routes/v1-applications-docs.ts:107:        file_size: file.size,
+server/routes/v1-applications-docs.ts:110:        created_at: new Date().toISOString()
+server/routes/v1-applications-docs.ts:133:      SELECT id, document_type, file_name, file_size, status, created_at as uploaded_at 
+server/routes/v1-applications-docs.ts:135:      WHERE application_id = $1 
+server/routes/v1-applications-docs.ts:136:      ORDER BY created_at DESC
+server/routes/lenders.ts:168:      SET is_active = false, updated_at = NOW()
+server/routes/perf/vitals.ts:21:    SELECT name, rating, round(COALESCE(value,0)::numeric, 2) as value, page, path, ua, created_at
+server/routes/perf/vitals.ts:23:    ORDER BY created_at DESC
+server/routes/communications.ts:25:    // - group by contact_id with MAX(created_at) as lastActivity
+server/routes/communications.ts:62:    // - order by created_at ASC
+server/routes/diag.apps.ts:14:      a.created_at, a.updated_at, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
+server/routes/diag.apps.ts:17:    LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/diag.apps.ts:18:    ORDER BY a.created_at DESC
+server/routes/diag.apps.ts:31:    createdAt: row.created_at,
+server/routes/diag.apps.ts:32:    updatedAt: row.updated_at,
+server/routes/client-integration-test.ts:59:        created_at, 
+server/routes/client-integration-test.ts:60:        updated_at
+server/routes/client-integration-test.ts:63:      RETURNING id, status, requested_amount, created_at
+server/routes/client-integration-test.ts:94:        created_at: app.created_at
+server/routes/releases/admin.ts:11:  const r = await db.execute(sql`SELECT * FROM releases ORDER BY created_at DESC`);
+server/routes/releases/admin.ts:21:    ON CONFLICT (version) DO UPDATE SET codename=EXCLUDED.codename, notes_md=EXCLUDED.notes_md, rollout_flag_key=EXCLUDED.rollout_flag_key, updated_at=now()
+server/routes/releases/admin.ts:29:  await db.execute(sql`UPDATE releases SET status='staged', staged_at=now(), updated_at=now() WHERE id=${req.params.id}`);
+server/routes/releases/admin.ts:38:    await db.execute(sql`UPDATE releases SET status='live', live_at=now(), updated_at=now() WHERE id=${id}`);
+server/routes/releases/admin.ts:47:  await db.execute(sql`UPDATE releases SET status='archived', archived_at=now(), updated_at=now() WHERE id=${req.params.id}`);
+server/routes/releases/admin.ts:53:  const r = await db.execute(sql`SELECT * FROM release_tasks WHERE release_id=${req.params.id} ORDER BY created_at`);
+server/routes/ai-jobs.ts:19:      created_at: job.created_at,
+server/routes/smsStageNotifications.ts:88:        application_id,
+server/routes/smsStageNotifications.ts:92:        created_at
+server/routes/flags/admin.ts:10:  const r = await db.execute(sql`SELECT key, description, enabled, rollout_pct, tags, created_at, updated_at FROM feature_flags ORDER BY key`);
+server/routes/flags/admin.ts:18:    ON CONFLICT (key) DO UPDATE SET description=EXCLUDED.description, enabled=EXCLUDED.enabled, rollout_pct=EXCLUDED.rollout_pct, tags=EXCLUDED.tags, updated_at=now()
+server/routes/flags/admin.ts:39:  const e = await db.execute(sql`SELECT key, description, status, allocation_pct, exposure_flag_key, created_at, updated_at FROM experiments ORDER BY created_at DESC`);
+server/routes/flags/admin.ts:50:    ON CONFLICT (key) DO UPDATE SET description=EXCLUDED.description, allocation_pct=EXCLUDED.allocation_pct, exposure_flag_key=EXCLUDED.exposure_flag_key, updated_at=now()
+server/routes/client-api.ts:59:      INSERT INTO users (email, phone, first_name, last_name, role, password_hash, created_at, updated_at)
+server/routes/client-api.ts:65:        updated_at = now()
+server/routes/client-api.ts:76:        user_id, business_id, tenant_id, requested_amount, use_of_funds, 
+server/routes/client-api.ts:77:        status, form_data, created_at, updated_at
+server/routes/client-api.ts:80:      RETURNING id, status, created_at
+server/routes/client-api.ts:106:        created_at: application.created_at
+server/routes/client-api.ts:128:        a.created_at,
+server/routes/client-api.ts:129:        a.updated_at,
+server/routes/client-api.ts:187:        id, application_id, file_name, file_type, file_size, mime_type,
+server/routes/client-api.ts:188:        status, created_at, updated_at
+server/routes/client-api.ts:240:        id, application_id, user_email, user_name, initial_message,
+server/routes/client-api.ts:241:        priority, category, status, created_at, updated_at
+server/routes/client-api.ts:296:        id, application_id, reporter_email, reporter_name, issue_type,
+server/routes/client-api.ts:298:        status, created_at, updated_at
+server/routes/contacts.deals.ts:12:    select id, full_name as name, stage, amount, created_at
+server/routes/contacts.deals.ts:15:    order by created_at desc
+server/routes/applications.ts:396:      application_id: `app_${Date.now()}`,
+server/routes/autoRecovery.ts:306:    const logsQuery = 'SELECT COUNT(*) as count FROM recovery_logs WHERE created_at > NOW() - INTERVAL \'24 hours\'';
+server/routes/autoRecovery.ts:425:    const docsQuery = 'SELECT id, file_name, application_id FROM documents WHERE application_id = $1';
+server/routes/autoRecovery.ts:449:          fileName: doc.file_name,
+server/routes/autoRecovery.ts:458:          console.log(`✅ [AUTO-RECOVERY APP] Recovered: ${doc.file_name}`);
+server/routes/autoRecovery.ts:461:          console.log(`❌ [AUTO-RECOVERY APP] Failed: ${doc.file_name} - ${result.error}`);
+server/routes/autoRecovery.ts:467:          fileName: doc.file_name,
+server/routes/autoRecovery.ts:471:        console.log(`❌ [AUTO-RECOVERY APP] Error recovering ${doc.file_name}:`, error);
+server/routes/applications-basic.ts:17:      SELECT id, user_id, requested_amount, status, use_of_funds, created_at, updated_at
+server/routes/applications-basic.ts:19:      ORDER BY created_at DESC 
+server/routes/applications-basic.ts:30:      createdAt: row.created_at,
+server/routes/applications-basic.ts:31:      updatedAt: row.updated_at
+server/routes/applications-basic.ts:87:      SET updated_at = NOW(), 
+server/routes/applications.normalized.ts:24:    createdAt:     raw.createdAt || raw.created_at || raw.submitted_at || null,
+server/routes/applications.normalized.ts:25:    updatedAt:     raw.updatedAt || raw.updated_at || raw.last_activity_at || raw.createdAt || null,
+server/routes/applications.normalized.ts:40:        a.created_at, a.updated_at, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
+server/routes/applications.normalized.ts:43:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/applications.normalized.ts:44:      ORDER BY a.created_at DESC
+server/routes/applications.normalized.ts:77:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/applications.normalized.ts:100:        a.created_at, a.updated_at, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
+server/routes/applications.normalized.ts:103:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/applications.normalized.ts:104:      ORDER BY a.created_at DESC
+server/routes/bulletproofHealthV2.ts:17:        id, file_name, file_path, file_exists, checksum, file_size,
+server/routes/bulletproofHealthV2.ts:18:        application_id, document_type, created_at, updated_at
+server/routes/bulletproofHealthV2.ts:20:      ORDER BY created_at DESC
+server/routes/bulletproofHealthV2.ts:43:          file_name: doc.file_name,
+server/routes/bulletproofHealthV2.ts:45:          application_id: doc.application_id
+server/routes/bulletproofHealthV2.ts:71:                file_name: doc.file_name,
+server/routes/bulletproofHealthV2.ts:75:                file_size: stats.size
+server/routes/bulletproofHealthV2.ts:84:            file_name: doc.file_name,
+server/routes/bulletproofHealthV2.ts:94:          file_name: doc.file_name,
+server/routes/bulletproofHealthV2.ts:96:          application_id: doc.application_id,
+server/routes/bulletproofHealthV2.ts:202:        d.file_name, 
+server/routes/bulletproofHealthV2.ts:203:        d.application_id,
+server/routes/simple-test.ts:39:      created_at: new Date().toISOString()
+server/routes/public-applications.ts:208:        file_name: doc.file_name,
+server/routes/public-applications.ts:209:        file_size: doc.file_size,
+server/routes/public-applications.ts:255:      created_at: application.created_at,
+server/routes/public-applications.ts:256:      updated_at: application.updated_at,
+server/routes/campaigns.ts:21:    const campaign = { id, ...data, created_at: new Date().toISOString() };
+server/routes/campaigns.ts:32:      campaign.updated_at = new Date().toISOString();
+server/routes/campaigns.ts:56:    const event = { id, ...data, created_at: new Date().toISOString() };
+server/routes/contactsTaxonomy.ts:43:             created_at, updated_at
+server/routes/contactsTaxonomy.ts:75:    query = sql`${query} ORDER BY updated_at DESC`;
+server/routes/contactsTaxonomy.ts:102:        createdAt: row.created_at,
+server/routes/contactsTaxonomy.ts:103:        updatedAt: row.updated_at
+server/routes/contactsTaxonomy.ts:152:      updates.push(sql`updated_at = NOW()`);
+server/routes/clientCompat.ts:94:        p.created_at, p.updated_at
+server/routes/clientCompat.ts:223:        INSERT INTO "${contactTable}" (id, tenant, first_name, last_name, full_name, email, phone, company_name, created_at, updated_at)
+server/routes/clientCompat.ts:238:      INSERT INTO "${appTable}" (id, tenant_id, contact_id, user_id, requested_amount, use_of_funds, stage, created_at, updated_at)
+server/routes/ai-reports.disabled.ts:286:        created_at,
+server/routes/ai-reports.disabled.ts:287:        updated_at
+server/routes/ai-reports.disabled.ts:289:      ORDER BY created_at DESC
+server/routes/calendar-events.ts:96:    created_at: new Date().toISOString()
+server/routes/calendar-events.ts:114:    event: { id, ...updates, updated_at: new Date().toISOString() }
+server/routes/feedback.ts:60:      INSERT INTO feedback (user_id, text, conversation, metadata, status, created_at, updated_at)
+server/routes/feedback.ts:136:             created_at as "createdAt", updated_at as "updatedAt", resolved_at as "resolvedAt"
+server/routes/documentAPI.ts:11:      SELECT id, file_name, file_key, file_size, document_type, status, uploaded_at, uploaded_by
+server/routes/documentAPI.ts:13:      WHERE application_id = $1 
+server/routes/documentAPI.ts:21:      file_size: Number(d.file_size) || 0,
+server/routes/documentAPI.ts:43:      INSERT INTO documents (application_id, file_name, file_key, file_size, document_type, status, uploaded_by)
+server/routes/documentAPI.ts:58:      SELECT file_name, file_key, document_type 
+server/routes/documentAPI.ts:71:      file_name: rows[0].file_name,
+server/routes/documentAPI.ts:91:      SET status = $1, updated_at = NOW()
+server/routes/s3UploadRoutes.ts:86:        id, application_id, document_type, file_name, file_path, file_size, 
+server/routes/s3UploadRoutes.ts:88:        is_required, is_verified, uploaded_by, created_at, updated_at
+server/routes/s3UploadRoutes.ts:90:      RETURNING id, file_name, storage_key, file_size, checksum
+server/routes/billing/index.ts:19:    ON CONFLICT (key) DO UPDATE SET name=EXCLUDED.name, monthly_price_cents=EXCLUDED.monthly_price_cents, limits=EXCLUDED.limits, updated_at=now()
+server/routes/dataIntegrity.ts:60:        LEFT JOIN applications a ON d.application_id = a.id
+server/routes/dataIntegrity.ts:148:          WHERE application_id NOT IN (SELECT id FROM applications)
+server/routes/linkedin.ts:19:    mockLinkedInDb.settings.set(userId, { ...settings, updated_at: new Date().toISOString() });
+server/routes/linkedin.ts:28:    const post = { id, ...data, created_at: new Date().toISOString(), status: 'draft' };
+server/routes/linkedin.ts:39:    const ad = { id, ...data, created_at: new Date().toISOString(), status: 'draft' };
+server/routes/pipeline/bulk-operations.ts:70:          updated_at = NOW()
+server/routes/pipeline/bulk-operations.ts:108:        WHERE application_id = ${applicationId}
+server/routes/staffLenderProducts.ts:23:             is_active, created_at, updated_at
+server/routes/staffLenderProducts.ts:142:    updates.push(sql`updated_at = NOW()`);
+server/routes/staffLenderProducts.ts:155:    updateQuery = sql`${updateQuery} WHERE id = ${productId} RETURNING id, product_name, lender_id, category, amount_min, amount_max, updated_at`;
+server/routes/lenderProducts.ts:78:      created_at: p.createdAt,
+server/routes/lenderProducts.ts:79:      updated_at: p.updatedAt
+server/routes/crmContactCard.ts:40:        c.application_id,
+server/routes/crmContactCard.ts:42:        c.created_at,
+server/routes/crmContactCard.ts:43:        c.updated_at,
+server/routes/crmContactCard.ts:51:      LEFT JOIN applications a ON c.application_id = a.id
+server/routes/crmContactCard.ts:74:      applicationId: contactRow.application_id,
+server/routes/crmContactCard.ts:78:      createdAt: contactRow.created_at,
+server/routes/crmContactCard.ts:79:      updatedAt: contactRow.updated_at
+server/routes/crmContactCard.ts:364:      .where(eq(applications.id, sql`(SELECT application_id FROM contacts WHERE id = ${id})`))
+server/routes/audit.export.ts:17:      SELECT id, name, s3_key, mime_type, av_status, created_at, updated_at 
+server/routes/audit.export.ts:19:      WHERE application_id=${appId} 
+server/routes/audit.export.ts:20:      ORDER BY created_at
+server/routes/audit.export.ts:24:      SELECT id, kind, direction, body, meta, created_at 
+server/routes/audit.export.ts:26:      WHERE application_id=${appId} 
+server/routes/audit.export.ts:27:      ORDER BY created_at
+server/routes/audit.export.ts:32:      WHERE application_id=${appId} 
+server/routes/audit.export.ts:33:      ORDER BY created_at
+server/routes/ops.fullAudit.ts:99:        { key:"applications table schema", check: tableHas(["id","stage","created_at"], "applications") }
+server/routes/diag.dupes.ts:15:        a.created_at, a.updated_at, a.requested_amount, a.use_of_funds, a.form_data, a.legal_business_name,
+server/routes/diag.dupes.ts:18:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/diag.dupes.ts:19:      ORDER BY a.created_at DESC
+server/routes/diag.dupes.ts:32:      createdAt: row.created_at,
+server/routes/diag.dupes.ts:33:      updatedAt: row.updated_at,
+server/routes/marketing.sequences.ts:11:  const { rows } = await db.execute(sql`select * from marketing_sequences order by created_at desc`); 
+server/routes/marketing.sequences.ts:53:    order by e.created_at desc
+server/routes/marketing.sequences.ts:60:  const { rows } = await db.execute(sql`select * from audiences order by created_at desc`);
+server/routes/marketing.sequences.ts:72:  const { rows } = await db.execute(sql`select * from experiments order by created_at desc`);
+server/routes/sequences.ts:10:    const result = await pool.query("SELECT * FROM sequences ORDER BY created_at DESC");
+server/routes/s3Diagnostics.ts:46:        file_name: doc.fileName,
+server/routes/s3Diagnostics.ts:50:        file_size: doc.fileSize,
+server/routes/s3Diagnostics.ts:114:      application_id: applicationId,
+server/routes/s3Diagnostics.ts:156:        file_name: document.fileName
+server/routes/s3Diagnostics.ts:169:      file_name: document.fileName,
+server/routes/marketing.csv.ts:63:            created_at
+server/routes/marketing.csv.ts:120:        MIN(created_at) as first_import,
+server/routes/marketing.csv.ts:121:        MAX(created_at) as last_import
+server/routes/analytics.roi.map.ts:20:        insert into roi_mappings(application_id, contact_id, source, campaign_id, day, cost_micros, conversions)
+server/routes/analytics.roi.map.ts:31:    const apps = (await db.execute(sql`select id, contact_id from applications where gclid is not null and created_at between ${g.day}::date - 30 and ${g.day}::date + 30`)).rows;
+server/routes/analytics.roi.map.ts:34:        insert into roi_mappings(application_id, contact_id, source, event_name, day, revenue_cents)
+server/routes/analytics.roi.map.ts:53:    left join applications a on a.id = m.application_id
+server/routes/communicationCenter.ts:36:        MAX(created_at) as last_message_time,
+server/routes/communicationCenter.ts:37:        (SELECT body FROM sms_messages s2 WHERE s2.phone_number = s1.phone_number ORDER BY created_at DESC LIMIT 1) as last_message,
+server/routes/communicationCenter.ts:38:        (SELECT direction FROM sms_messages s2 WHERE s2.phone_number = s1.phone_number ORDER BY created_at DESC LIMIT 1) as direction,
+server/routes/communicationCenter.ts:95:      ORDER BY created_at ASC
+server/routes/communicationCenter.ts:151:          created_at: new Date().toISOString(),
+server/routes/communicationCenter.ts:152:          updated_at: new Date().toISOString()
+server/routes/communicationCenter.ts:204:        created_at,
+server/routes/communicationCenter.ts:205:        updated_at
+server/routes/communicationCenter.ts:207:      ORDER BY created_at DESC 
+server/routes/communicationCenter.ts:259:        created_at,
+server/routes/communicationCenter.ts:260:        updated_at
+server/routes/communicationCenter.ts:262:      ORDER BY created_at DESC 
+server/routes/communicationCenter.ts:334:          created_at: new Date().toISOString(),
+server/routes/communicationCenter.ts:335:          updated_at: new Date().toISOString()
+server/routes/communicationCenter.ts:389:        created_at,
+server/routes/communicationCenter.ts:390:        updated_at
+server/routes/communicationCenter.ts:392:      ORDER BY created_at DESC 
+server/routes/communicationCenter.ts:445:            updated_at = NOW()
+server/routes/communicationCenter.ts:487:        created_at: new Date().toISOString(),
+server/routes/communicationCenter.ts:488:        updated_at: new Date().toISOString()
+server/routes/communicationCenter.ts:530:        created_at: new Date().toISOString(),
+server/routes/communicationCenter.ts:531:        updated_at: new Date().toISOString()
+server/routes/communicationCenter.ts:568:      SET status = ${MessageStatus}, updated_at = NOW()
+server/routes/communicationCenter.ts:592:          updated_at = NOW()
+server/routes/rbacSimple.ts:37://              is_active, description, created_at, updated_at
+server/routes/rbacSimple.ts:162:    updates.push(sql`updated_at = NOW()`);
+server/routes/rbacSimple.ts:175:    updateQuery = sql`${updateQuery} WHERE id = ${productId} RETURNING id, product_name, lender_name, product_type, geography, amount_min, amount_max, description, updated_at`;
+server/routes/templates/library.ts:21:    SELECT id, version, locale, status, subject, body, changelog, created_at, approved_at
+server/routes/templates/governance.ts:15:    GROUP BY s.id, s.set_key, s.description, s.created_at
+server/routes/templates/governance.ts:16:    ORDER BY s.created_at DESC
+server/routes/templates/governance.ts:41:    ORDER BY v.created_at DESC
+server/routes/comms/threads.ts:30:      ORDER BY t.last_inbound_at DESC NULLS LAST, t.created_at DESC
+server/routes/comms/email.ts:91:             MAX(m.created_at) as last_message_at
+server/routes/comms/automations.ts:94:            WHERE d.application_id = a.id AND d.status IN ('uploaded', 'rejected')
+server/routes/comms/templates.ts:87:    fields.push(`updated_at = NOW()`);
+server/routes/comms/templates.ts:110:      SET is_active = false, updated_at = NOW()
+server/routes/comms/outbox.ts:11:    SELECT id, channel, to_address, subject, locale, status, created_at
+server/routes/comms/outbox.ts:14:    ORDER BY created_at
+server/routes/deployment-health.ts:87:          INSERT INTO applications (id, user_id, requested_amount, status, use_of_funds, created_at)
+server/routes/chatRoutes-secure.ts:101:      INSERT INTO chat_sessions (session_id, user_name, user_email, user_phone, status, priority, started_at, last_activity, updated_at)
+server/routes/chatRoutes-secure.ts:386:      INSERT INTO contacts (full_name, first_name, last_name, email, phone, role, source, created_at, updated_at)
+server/routes/chatRoutes-secure.ts:888:        created_at: escalationRecord.createdAt
+server/routes/lender/public.ts:14:  const docs = (await db.execute(sql`SELECT id, filename, category, created_at FROM documents WHERE application_id=${appId} ORDER BY created_at DESC`)).rows || [];
+server/routes/lender/public.ts:29:    INSERT INTO documents(application_id, filename, s3_key, category, source, partner_id)
+server/routes/lender/public.ts:40:  const doc = (await db.execute(sql`SELECT id, filename, s3_key FROM documents WHERE id=${documentId} AND application_id=${req.lender.applicationId} LIMIT 1`)).rows?.[0];
+server/routes/lender/public.ts:53:  const r = await db.execute(sql`SELECT id, body, created_at, role FROM comm_messages WHERE application_id=${appId} AND channel='portal' ORDER BY created_at DESC LIMIT 100`);
+server/routes/lender/public.ts:61:    INSERT INTO comm_messages(application_id, partner_id, direction, channel, role, body, created_at)
+server/routes/contacts-db.ts:45:      ORDER BY updated_at DESC
+server/routes/documents.ts:160:          application_id, storage_key, object_storage_key, mime_type, file_size, 
+server/routes/documents.ts:161:          sha256, file_name, status, document_type, created_at
+server/routes/search/global.ts:32:               a.status, a.created_at, 'application' as type
+server/routes/search/global.ts:39:        ORDER BY a.created_at DESC
+server/routes/search/global.ts:49:               c.created_at, 'contact' as type
+server/routes/search/global.ts:56:        ORDER BY c.created_at DESC
+server/routes/search/global.ts:65:        SELECT d.id, d.filename, d.category, d.application_id, d.created_at,
+server/routes/search/global.ts:68:        LEFT JOIN applications a ON a.id = d.application_id
+server/routes/search/global.ts:71:        ORDER BY d.created_at DESC
+server/routes/search/global.ts:80:        SELECT l.id, l.name, l.email, l.created_at, 'lender' as type
+server/routes/search/global.ts:84:        ORDER BY l.created_at DESC
+server/routes/search/global.ts:94:          SELECT c.id, c.body, c.channel, c.created_at, c.application_id,
+server/routes/search/global.ts:97:          LEFT JOIN applications a ON a.id = c.application_id
+server/routes/search/global.ts:99:          ORDER BY c.created_at DESC
+server/routes/search/global.ts:214:      whereConditions.push(`a.created_at BETWEEN $${++paramIndex} AND $${++paramIndex}`);
+server/routes/search/global.ts:229:             a.business_phone as phone, a.status, a.created_at, 'application' as type
+server/routes/search/global.ts:232:      ORDER BY a.created_at DESC
+server/routes/googleAdsUpload.ts:60:      SELECT gclid, gbraid, wbraid, COALESCE(ad_click_time, created_at) AS click_ts
+server/routes/security/compliance.ts:159:      whereClause += ` AND created_at >= $${++paramIndex}`;
+server/routes/security/compliance.ts:164:      whereClause += ` AND created_at <= $${++paramIndex}`;
+server/routes/security/compliance.ts:180:      ORDER BY al.created_at DESC
+server/routes/security/compliance.ts:203:        log.created_at
+server/routes/security/controls.ts:11:  const r = await db.execute(sql`SELECT id, name, prefix, scopes, revoked_at, last_used_at, created_at FROM api_keys ORDER BY created_at DESC`);
+server/routes/security/controls.ts:38:  const r = await db.execute(sql`SELECT id, action, value, note, created_at FROM ip_rules ORDER BY created_at DESC`);
+server/routes/security/controls.ts:61:    INSERT INTO app_settings(key, value, updated_at)
+server/routes/security/controls.ts:63:    ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=now()
+server/routes/marketing.programmatic.ts:81:             MAX(created_at) as last_operation
+server/routes/marketing.programmatic.ts:83:      WHERE created_at > NOW() - INTERVAL '7 days'
+server/routes/contacts-timeline.ts:20:        created_at,
+server/routes/contacts-timeline.ts:24:      ORDER BY created_at DESC
+server/routes/contacts-timeline.ts:42:      INSERT INTO comms(contact_id, kind, direction, subject, body, meta, created_at)
+server/routes/staff/applications.ts:10:    SELECT a.id, a.status, a.requested_amount, a.business_name, a.created_at, a.updated_at,
+server/routes/staff/applications.ts:22:    `SELECT COUNT(*)::int AS count FROM documents WHERE application_id = $1 AND status IN ('pending','accepted')`,
+server/routes/staff/applications.ts:26:    `SELECT id, application_id, from_stage, to_stage, actor, note, created_at
+server/routes/staff/applications.ts:28:      WHERE application_id = $1
+server/routes/staff/applications.ts:29:      ORDER BY created_at DESC, id DESC
+server/routes/staff/applications.ts:38:    createdAt: app.created_at,
+server/routes/staff/applications.ts:39:    updatedAt: app.updated_at,
+server/routes/staff/contacts.ts:39:    ORDER BY u.updated_at DESC NULLS LAST, u.id DESC
+server/routes/staff/pipeline.ts:12:      application_id VARCHAR(64) NOT NULL,
+server/routes/staff/pipeline.ts:17:      created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+server/routes/staff/pipeline.ts:39:    ORDER BY a.updated_at DESC NULLS LAST, a.id DESC
+server/routes/staff/pipeline.ts:63:    `INSERT INTO pipeline_activity (application_id, from_stage, to_stage, note) VALUES ($1,$2,$3,$4)`,
+server/routes/staff/pipeline.ts:93:    `SELECT id, application_id, from_stage, to_stage, actor, note, created_at
+server/routes/staff/pipeline.ts:95:      WHERE application_id = $1
+server/routes/staff/pipeline.ts:96:      ORDER BY created_at DESC, id DESC
+server/routes/sms-notifications.ts:57:        INSERT INTO sms_logs (application_id, phone, message, stage, status, sent_at)
+server/routes/documentUploadFixed.ts:97:        application_id, 
+server/routes/documentUploadFixed.ts:98:        file_name, 
+server/routes/documentUploadFixed.ts:102:        file_size, 
+server/routes/documentUploadFixed.ts:105:        created_at
+server/routes/documentUploadFixed.ts:160:        file_name as fileName,
+server/routes/documentUploadFixed.ts:164:        file_size as fileSize,
+server/routes/documentUploadFixed.ts:166:        created_at as uploadedAt
+server/routes/documentUploadFixed.ts:168:      WHERE application_id = ${applicationId}
+server/routes/documentUploadFixed.ts:170:      ORDER BY created_at DESC
+server/routes/ocr/mapping.ts:39:        rules = ${JSON.stringify(rules)}, updated_at = now()
+server/routes/ocr/mapping.ts:135:    updateValues.push(document.application_id);
+server/routes/ocr/mapping.ts:155:    LEFT JOIN applications a ON a.id = d.application_id
+server/routes/ocr/mapping.ts:156:    ORDER BY e.created_at DESC
+server/routes/contacts.diag.ts:19:        a.created_at, a.updated_at, a.form_data, b.business_name
+server/routes/contacts.diag.ts:21:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/contacts.diag.ts:23:      ORDER BY a.created_at DESC
+server/routes/contacts.diag.ts:45:        updatedAt: row.updated_at,
+server/routes/ai-train.ts:106:      INSERT INTO ai_training_documents (title, file_name, file_path, file_size, mime_type, extracted_text, uploaded_by, created_at, updated_at)
+server/routes/ai-train.ts:126:      SET status = 'indexed', updated_at = NOW()
+server/routes/ai-train.ts:160:        SELECT id, title, description, category, file_name as "fileName", 
+server/routes/ai-train.ts:161:               file_path as "filePath", file_size as "fileSize", mime_type as "mimeType",
+server/routes/ai-train.ts:163:               created_at as "createdAt", updated_at as "updatedAt"
+server/routes/ai-train.ts:166:        ORDER BY created_at DESC 
+server/routes/ai-train.ts:172:        SELECT id, title, description, category, file_name as "fileName", 
+server/routes/ai-train.ts:173:               file_path as "filePath", file_size as "fileSize", mime_type as "mimeType", 
+server/routes/ai-train.ts:175:               created_at as "createdAt", updated_at as "updatedAt"
+server/routes/ai-train.ts:177:        ORDER BY created_at DESC 
+server/routes/ai-train.ts:199:      SELECT id, title, description, category, file_name as "fileName", 
+server/routes/ai-train.ts:200:             file_path as "filePath", file_size as "fileSize", mime_type as "mimeType",
+server/routes/ai-train.ts:202:             created_at as "createdAt", updated_at as "updatedAt"
+server/routes/ai-train.ts:279:        SUM(file_size) as total_size,
+server/routes/contacts.actions.ts:30:    await maybe("insert into contact_files(contact_id, file_name, file_size) values($1,$2,$3) returning id", [req.params.id, req.body.filename||"file", req.body.size||0]);
+server/routes/contacts.actions.ts:37:      `insert into applications (contact_id, requested_amount, status, created_at)
+server/routes/contact-details.ts:19:        company_name, job_title, status, notes, created_at, updated_at, silo
+server/routes/contact-details.ts:43:      createdAt: contact.created_at,
+server/routes/contact-details.ts:44:      updatedAt: contact.updated_at,
+server/routes/contact-details.ts:48:      lastContactAt: contact.updated_at
+server/routes/contact-details.ts:67:        id, kind, direction, subject, body, created_at, meta
+server/routes/contact-details.ts:70:      ORDER BY created_at DESC
+server/routes/contact-details.ts:80:      timestamp: event.created_at,
+server/routes/contact-details.ts:111:        id, status, stage, requested_amount, created_at, legal_business_name
+server/routes/contact-details.ts:114:      ORDER BY created_at DESC
+server/routes/contact-details.ts:121:        id, name, type, size, created_at
+server/routes/contact-details.ts:124:      ORDER BY created_at DESC
+server/routes/contact-details.ts:137:        createdAt: app.created_at
+server/routes/contact-details.ts:144:        createdAt: doc.created_at
+server/routes/contact-details.ts:164:        id, subject, body, direction, created_at, meta
+server/routes/contact-details.ts:167:      ORDER BY created_at DESC
+server/routes/contact-details.ts:176:      timestamp: email.created_at,
+server/routes/contact-details.ts:196:        id, body, direction, created_at, meta
+server/routes/contact-details.ts:199:      ORDER BY created_at DESC
+server/routes/contact-details.ts:207:      timestamp: sms.created_at,
+server/routes/adminLenderUsers.ts:12:      SELECT id, name, contact_email, phone, address, city, state, zip, country, status, created_at, updated_at
+server/routes/adminLenderUsers.ts:45:      INSERT INTO lenders (id, name, contact_email, phone, address, city, state, zip, country, status, created_at, updated_at)
+server/routes/adminLenderUsers.ts:85:        lu.created_at,
+server/routes/adminLenderUsers.ts:89:      ORDER BY lu.created_at DESC
+server/routes/adminLenderUsers.ts:103:        createdAt: row.created_at
+server/routes/adminLenderUsers.ts:149:      INSERT INTO lender_users (id, lender_id, email, first_name, last_name, password_hash, status, role, permissions, created_at, updated_at)
+server/routes/adminLenderUsers.ts:198:      SET status = $1, updated_at = NOW()
+server/routes/autoDocumentRoutes.ts:25:      SELECT id, file_name, document_type, application_id
+server/routes/autoDocumentRoutes.ts:43:      document.application_id,
+server/routes/autoDocumentRoutes.ts:44:      document.file_name,
+server/routes/autoDocumentRoutes.ts:110:      WHERE application_id = ${applicationId}
+server/routes/autoDocumentRoutes.ts:117:      WHERE application_id = ${applicationId}
+server/routes/autoDocumentRoutes.ts:124:      WHERE application_id = ${applicationId}
+server/routes/autoDocumentRoutes.ts:169:      LEFT JOIN documents d ON a.id = d.application_id
+server/routes/autoDocumentRoutes.ts:170:      LEFT JOIN ocr_results ocr ON a.id = ocr.application_id
+server/routes/autoDocumentRoutes.ts:171:      LEFT JOIN banking_analysis ba ON a.id = ba.application_id
+server/routes/autoDocumentRoutes.ts:173:      ORDER BY a.created_at DESC
+server/routes/auth.password-reset.ts:39:      ORDER BY pr.created_at DESC
+server/routes/auth.password-reset.ts:133:      ORDER BY pr.created_at DESC
+server/routes/slf-contacts.ts:50:    created_at: raw.createdAt || null,
+server/routes/slf-contacts.ts:51:    updated_at: null,
+server/routes/slf-contacts.ts:122:          created_at: prefer(prev.created_at, c.created_at),
+server/routes/slf-contacts.ts:123:          updated_at: prefer(prev.updated_at, c.updated_at),
+server/routes/testAcceptDocuments.ts:18:      WHERE application_id = $1 
+server/routes/testAcceptDocuments.ts:21:      RETURNING id, file_name, status
+server/routes/marketing/email.ts:23:      GROUP BY et.id, et.name, et.subject, et.body_html, et.body_text, et.funnel_stage, et.trigger_event, et.send_delay_hours, et.status, et.created_at, et.updated_at
+server/routes/marketing/email.ts:24:      ORDER BY et.created_at DESC
+server/routes/marketing/email.ts:49:      createdAt: template.created_at,
+server/routes/marketing/email.ts:50:      updatedAt: template.updated_at
+server/routes/marketing/email.ts:197:      INSERT INTO email_templates (id, name, subject, body_html, body_text, funnel_stage, trigger_event, send_delay_hours, status, created_at, updated_at)
+server/routes/marketing/messaging.ts:22:      GROUP BY ls.id, ls.name, ls.status, ls.target_filters, ls.created_at, ls.updated_at
+server/routes/marketing/messaging.ts:23:      ORDER BY ls.created_at DESC
+server/routes/marketing/messaging.ts:37:      createdAt: seq.created_at,
+server/routes/marketing/messaging.ts:38:      updatedAt: seq.updated_at
+server/routes/marketing/messaging.ts:121:      createdAt: step.created_at
+server/routes/marketing/messaging.ts:170:      INSERT INTO linkedin_sequences (id, name, target_filters, status, created_at, updated_at)
+server/routes/marketing/messaging.ts:179:          INSERT INTO linkedin_sequence_steps (id, sequence_id, step_number, message_template, delay_days, delay_hours, action, created_at)
+server/routes/marketing/ads.ts:25:      GROUP BY mc.id, mc.name, mc.platform, mc.status, mc.start_date, mc.end_date, mc.budget, mc.created_at
+server/routes/marketing/ads.ts:26:      ORDER BY mc.created_at DESC
+server/routes/marketing/ads.ts:48:      createdAt: campaign.created_at
+server/routes/marketing/ads.ts:147:      INSERT INTO marketing_campaigns (id, name, platform, budget, start_date, end_date, status, created_at, updated_at)
+server/routes/marketing/ads.ts:171:      SET status = ${status}, updated_at = NOW()
+server/routes/verify-only.ts:19:      created_at TIMESTAMPTZ DEFAULT now(),
+server/routes/verify-only.ts:20:      updated_at TIMESTAMPTZ DEFAULT now()
+server/routes/users.ts:25:             created_at,
+server/routes/users.ts:29:      order by created_at desc nulls last
+server/routes/users.ts:47:      insert into users (id, first_name, email, phone, role, password_hash, created_at, updated_at) 
+server/routes/users.ts:53:      select id, COALESCE(first_name || ' ' || last_name, email) as name, email, phone, role, created_at
+server/routes/users.ts:81:    await pool.query(`update users set ${updateSets.join(",")}, updated_at=now() where id=$${updateVals.length}`, updateVals);
+server/routes/users.ts:85:      select id, COALESCE(first_name || ' ' || last_name, email) as name, email, phone, role, updated_at
+server/routes/communications/callHistory.ts:29:        call_sid, staff_id, action, reason, timestamp, created_at
+server/routes/communications/callHistory.ts:39:        updated_at = NOW()
+server/routes/communications/callHistory.ts:50:          call_sid, from_number, to_number, reason, staff_id, created_at
+server/routes/communications/callHistory.ts:103:          timeCondition = "DATE(created_at) = CURRENT_DATE";
+server/routes/communications/callHistory.ts:106:          timeCondition = "DATE(created_at) = CURRENT_DATE - INTERVAL '1 day'";
+server/routes/communications/callHistory.ts:109:          timeCondition = "created_at >= CURRENT_DATE - INTERVAL '7 days'";
+server/routes/communications/callHistory.ts:112:          timeCondition = "created_at >= CURRENT_DATE - INTERVAL '30 days'";
+server/routes/communications/callHistory.ts:130:        cl.created_at as timestamp,
+server/routes/communications/callHistory.ts:135:      ORDER BY cl.created_at DESC
+server/routes/communications/callHistory.ts:147:      WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+server/routes/communications/callHistory.ts:195:        mc.created_at,
+server/routes/communications/callHistory.ts:201:      ORDER BY mc.created_at DESC
+server/routes/communications/callHistory.ts:272:      AND created_at >= NOW() - INTERVAL '1 hour'
+server/routes/communications/callHistory.ts:280:      AND created_at >= CURRENT_DATE
+server/routes/comm.status.ts:14:  const items = (await req.app.locals.db?.all?.("select * from comm_events order by created_at desc limit 50").catch(()=>[])) || [];
+server/routes/comm.status.ts:18:    error: e.error || null, at: e.created_at || Date.now()
+server/routes/e2eRouter.ts:72:      `insert into applications (id, user_id, status, requested_amount, use_of_funds, created_at, updated_at)
+server/routes/e2eRouter.ts:85:    const docs = await q<any>(`select id, application_id, document_type as category, file_type as mime_type, file_size as size_bytes, file_path as s3_key, status from documents where application_id=$1 order by created_at asc`, [req.params.id]);
+server/routes/e2eRouter.ts:99:      `insert into documents (id, application_id, file_name, file_type, file_size, document_type, file_path)
+server/routes/e2eRouter.ts:110:    const [doc] = await q<any>(`update documents set status='accepted', updated_at=now(), verified_at=now() where id=$1 returning id, application_id`, [req.params.id]);
+server/routes/e2eRouter.ts:113:    const pending = await q<any>(`select 1 from documents where application_id=$1 and status <> 'accepted' limit 1`, [doc.application_id]);
+server/routes/e2eRouter.ts:115:      await q(`update applications set status='under_review' where id=$1`, [doc.application_id]);
+server/routes/ai.banking.ts:18:    where application_id=${appId} and posted_at>=${since}
+server/routes/bulletproofHealth.ts:39:              fileName: doc.file_name,
+server/routes/bulletproofHealth.ts:53:              fileName: doc.file_name,
+server/routes/templates.ts:14:      ORDER BY created_at DESC
+server/routes/bootstrap/seed.ts:24:      must_change_password boolean NOT NULL DEFAULT false, created_at timestamptz NOT NULL DEFAULT now())`);
+server/routes/bootstrap/seed.ts:28:    INSERT INTO ${sql.raw(tb)}(email, role, password_hash, is_active, must_change_password, created_at)
+server/routes/crm.ts:153:      FULL OUTER JOIN contacts c ON a.id = c.application_id
+server/routes/applicationReprocessing.ts:55:        updated_at: new Date()
+server/routes/documents-versioning.ts:63:      application_id: (old as any).application_id,
+server/routes/documents-versioning.ts:76:      INSERT INTO documents (application_id, category, name, s3_key, content_type, size_bytes, version, status, uploaded_by, group_id)
+server/routes/documents-versioning.ts:77:      VALUES (${newDoc.application_id}, ${newDoc.category}, ${newDoc.name}, ${newDoc.s3_key}, ${newDoc.content_type}, ${newDoc.size_bytes}, ${newDoc.version}, ${newDoc.status}, ${newDoc.uploaded_by}, ${newDoc.group_id})
+server/routes/documents-versioning.ts:95:      ORDER BY created_at DESC
+server/routes/training.ts:9:  const { rows } = await db.execute(sql`insert into training_docs(title, body, created_by, tsv) values(${title}, ${body}, ${req.user.sub}, to_tsvector('english', ${title}||' '||${body})) returning id,title,created_at`);
+server/routes/systemMaintenance.ts:84:            file_name = ${document.file_name.replace('.pdf', '.txt')}
+server/routes/ai.insights.ts:10:  const { rows: docs } = await db.execute(sql`select id, category, status, name, version from documents where application_id=${appId}`);
+server/routes/ai.insights.ts:11:  const { rows: tx } = await db.execute(sql`select posted_at, amount_cents, type from bank_tx where application_id=${appId} order by posted_at desc limit 500`);
+server/routes/_int_pipeline_diagnose.ts:28:    left join businesses b on b.id = a.business_id
+server/routes/_int_pipeline_diagnose.ts:29:    order by a.created_at desc nulls last, a.id desc
+server/routes/marketing.audience.ts:59:      ORDER BY created_at DESC 
+server/routes/communicationCalls.ts:34:        id, twilio_sid, direction, phone_number, status, created_at
+server/routes/contactsDedup.ts:26:      SELECT id, email, phone, full_name as fullName, status, updated_at as updatedAt
+server/routes/contactsDedup.ts:75:      SELECT id, email, phone, full_name as fullName, status, updated_at as updatedAt
+server/routes/contactImport.ts:36:      created_at: new Date().toISOString(),
+server/routes/contactImport.ts:37:      updated_at: new Date().toISOString()
+server/routes/contactImport.ts:45:      created_at: new Date().toISOString(),
+server/routes/contactImport.ts:46:      updated_at: new Date().toISOString()
+server/routes/contactImport.ts:89:      created_at: new Date().toISOString(),
+server/routes/contactImport.ts:90:      updated_at: new Date().toISOString()
+server/routes/reports.ts:389:    WHERE a.created_at >= $1 AND a.created_at < $2
+server/routes/reports.ts:408:    SELECT date_trunc('month', a.created_at) AS month,
+server/routes/reports.ts:412:    WHERE a.created_at >= $1 AND a.created_at < $2
+server/routes/reports.ts:434:    WHERE a.created_at >= $1 AND a.created_at < $2
+server/routes/reports.ts:459:        AVG(EXTRACT(EPOCH FROM (a.updated_at - a.created_at)) / 86400)::float AS avg_time_to_approval
+server/routes/reports.ts:461:      WHERE a.created_at >= $1 AND a.created_at < $2
+server/routes/reports.ts:516:        LEFT JOIN applications a ON d.application_id = a.id
+server/routes/reports.ts:517:        WHERE d.created_at >= $1 AND d.created_at < $2
+server/routes/reports.ts:531:          LEFT JOIN applications a ON d.application_id = a.id
+server/routes/reports.ts:532:          WHERE d.created_at >= $1 AND d.created_at < $2
+server/routes/reports.ts:533:          GROUP BY d.application_id
+server/routes/reports.ts:542:          AVG(EXTRACT(EPOCH FROM (d.updated_at - d.created_at)) / 3600)::float AS avg_processing_hours
+server/routes/reports.ts:544:        WHERE d.created_at >= $1 AND d.created_at < $2 AND d.status != 'pending';
+server/routes/reports.ts:610:          AVG(EXTRACT(EPOCH FROM (a.updated_at - a.created_at)) / 86400)::float AS avg_processing_days
+server/routes/reports.ts:612:        WHERE a.created_at >= $1 AND a.created_at < $2
+server/routes/reports.ts:624:        WHERE a.created_at >= $1 AND a.created_at < $2
+server/routes/reports.ts:635:          date_trunc('month', a.created_at) AS month,
+server/routes/reports.ts:640:        WHERE a.created_at >= $1 AND a.created_at < $2
+server/routes/reports.ts:642:        GROUP BY date_trunc('month', a.created_at)
+server/routes/reports.ts:888:      WHERE created_at >= $1 AND created_at < $2
+server/routes/reports.ts:896:      WHERE created_at >= $1 AND created_at < $2
+server/routes/reports.ts:904:      WHERE created_at >= $1 AND created_at < $2
+server/routes/chatRoutes.ts:39:      INSERT INTO chat_sessions (session_id, user_name, user_email, user_phone, status, priority, started_at, last_activity, updated_at)
+server/routes/chatRoutes.ts:245:      INSERT INTO contacts (full_name, first_name, last_name, email, phone, role, source, created_at, updated_at)
+server/routes/chatRoutes.ts:333:        created_at: escalationRecord.createdAt
+server/routes/chatRoutes.ts:651:        created_at: escalationRecord.createdAt
+server/routes/public.ts:174:          user_id, business_id, tenant_id, created_at, updated_at,
+server/routes/tasks-api.ts:25:      created_at: '2024-08-20T10:00:00Z',
+server/routes/tasks-api.ts:42:      created_at: '2024-08-19T14:00:00Z',
+server/routes/tasks-api.ts:59:      created_at: '2024-08-21T09:00:00Z',
+server/routes/tasks-api.ts:71:      created_at: '2024-08-20T16:30:00Z',
+server/routes/tasks-api.ts:83:      created_at: '2024-08-21T11:00:00Z',
+server/routes/tasks-api.ts:143:    created_at: '2024-08-20T10:00:00Z',
+server/routes/tasks-api.ts:144:    updated_at: '2024-08-21T08:30:00Z',
+server/routes/tasks-api.ts:151:        created_at: '2024-08-21T08:30:00Z'
+server/routes/tasks-api.ts:190:    created_at: new Date().toISOString(),
+server/routes/tasks-api.ts:191:    updated_at: new Date().toISOString(),
+server/routes/tasks-api.ts:216:      updated_at: new Date().toISOString() 
+server/routes/tasks-api.ts:239:      updated_at: new Date().toISOString() 
+server/routes/tasks-api.ts:260:    created_at: new Date().toISOString()
+server/routes/client/lenderProducts.ts:11:        lp.description, lp.created_at, lp.updated_at,
+server/routes/client/lenderProducts.ts:16:      ORDER BY lp.created_at DESC
+server/routes/client/docreq/index.ts:13:    SELECT r.*, a.id AS application_id
+server/routes/client/docreq/index.ts:15:    JOIN doc_requests r ON r.application_id=a.id
+server/routes/client/docreq/index.ts:17:    ORDER BY r.created_at ASC
+server/routes/client/docreq/index.ts:29:    SELECT r.id, r.application_id
+server/routes/client/docreq/index.ts:31:    JOIN applications a ON a.id=r.application_id
+server/routes/client/docreq/index.ts:36:  const key = `requests/${row.application_id}/${requestId}/${Date.now()}_${String(filename||'file').replace(/\s+/g,'_')}`;
+server/routes/client/docreq/index.ts:47:    SELECT r.id, r.application_id FROM doc_requests r
+server/routes/client/docreq/index.ts:48:    JOIN applications a ON a.id=r.application_id WHERE r.id=${requestId} AND a.contact_id=${contactId} LIMIT 1
+server/routes/client/docreq/index.ts:53:    INSERT INTO documents(application_id, filename, s3_key, category, source)
+server/routes/client/docreq/index.ts:54:    VALUES (${row.application_id}, ${filename}, ${s3_key}, 'request', 'client')
+server/routes/client/docreq/index.ts:62:  await db.execute(sql`UPDATE doc_requests SET status=CASE WHEN status='pending' THEN 'submitted' ELSE status END, updated_at=now() WHERE id=${requestId}`);
+server/routes/schedule.ts:21:r.get("/schedule/links", async (_req:any,res)=>{ const { rows } = await db.execute(sql`select * from schedule_links where active=true order by created_at desc`); res.json({ ok:true, items: rows }); });
+server/routes/integrations/credit.ts:25:    INSERT INTO credit_reports(application_id, provider, bureau_ref, score, score_band, tradelines, inquiries, public_records, raw)
+server/routes/integrations/credit.ts:39:  const r = (await db.execute(sql`SELECT * FROM credit_reports WHERE application_id=${appId} ORDER BY created_at DESC LIMIT 1`)).rows?.[0];
+server/routes/integrations/bank.ts:55:          INSERT INTO bank_accounts(link_id, acct_id, name, mask, type, subtype, currency, available, current, updated_at)
+server/routes/integrations/bank.ts:58:          SET name=EXCLUDED.name, mask=EXCLUDED.mask, type=EXCLUDED.type, subtype=EXCLUDED.subtype, currency=EXCLUDED.currency, available=EXCLUDED.available, current=EXCLUDED.current, updated_at=now()
+server/routes/data_read.ts:8:r.get('/data/users',         async (_q,res)=> res.json(await list('select * from users order by created_at desc nulls last limit 200')));
+server/routes/data_read.ts:11:r.get('/data/contacts',      async (_q,res)=> res.json(await list('select * from contacts order by created_at desc nulls last limit 200')));
+server/routes/documentUpload.ts:103:        application_id, 
+server/routes/documentUpload.ts:104:        file_name, 
+server/routes/documentUpload.ts:108:        file_size, 
+server/routes/documentUpload.ts:110:        created_at
+server/routes/documentUpload.ts:156:        file_name as "fileName",
+server/routes/documentUpload.ts:160:        file_size as "fileSize",
+server/routes/documentUpload.ts:162:        created_at as "uploadedAt"
+server/routes/documentUpload.ts:164:      WHERE application_id = '${applicationId}'
+server/routes/documentUpload.ts:166:      ORDER BY created_at DESC
+server/routes/linkedin_audiences.ts:69:    db.contacts.findMany({ where, take: 50, orderBy: { updated_at: "desc" } }),
+server/routes/docreq/staff.ts:12:  const r = await db.execute(sql`SELECT * FROM doc_requests WHERE application_id=${appId} ORDER BY created_at ASC`);
+server/routes/docreq/staff.ts:22:      INSERT INTO doc_requests(application_id, title, description, required, due_date, created_by_user_id)
+server/routes/docreq/staff.ts:36:  await db.execute(sql`UPDATE doc_requests SET status=${status}, updated_at=now() WHERE id=${req.params.requestId}`);
+server/routes/docreq/staff.ts:46:  const r = await db.execute(sql`SELECT * FROM doc_request_uploads WHERE request_id=${req.params.requestId} ORDER BY created_at DESC`);
+server/routes/docreq/staff.ts:63:    INSERT INTO documents(application_id, filename, s3_key, category, source)
+server/routes/docreq/staff.ts:73:  await db.execute(sql`UPDATE doc_requests SET status=CASE WHEN status='pending' THEN 'submitted' ELSE status END, updated_at=now() WHERE id=${requestId}`);
+server/routes/notes.ts:13:  const note = { id: 'note_'+crypto.randomUUID(), body, contact_id, created_at: new Date().toISOString() };
+server/routes/training.search.ts:31:    from documents order by created_at desc limit ${limit}
+server/routes/contacts-seed.ts:18:      created_at: new Date().toISOString()
+server/routes/contacts-seed.ts:30:      created_at: new Date().toISOString()
+server/routes/contacts-seed.ts:42:      created_at: new Date().toISOString()
+server/routes/contacts-seed.ts:65:      created_at: '2024-08-20T10:00:00Z',
+server/routes/contacts-seed.ts:79:      created_at: '2024-08-19T14:20:00Z',
+server/routes/contacts-seed.ts:93:      created_at: '2024-08-18T16:45:00Z',
+server/routes/contacts-seed.ts:126:      created_at: '2024-08-20T10:00:00Z',
+server/routes/contacts-seed.ts:169:      created_at: '2024-08-19T14:20:00Z',
+server/routes/contacts-seed.ts:203:      created_at: '2024-08-18T16:45:00Z',
+server/routes/refresh-application-data.ts:19:          COUNT(DISTINCT d.application_id) as apps_with_documents
+server/routes/refresh-application-data.ts:21:        LEFT JOIN documents d ON a.id = d.application_id AND d.file_exists = true
+server/routes/refresh-application-data.ts:78:          a.created_at,
+server/routes/refresh-application-data.ts:79:          a.updated_at,
+server/routes/refresh-application-data.ts:89:        LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/refresh-application-data.ts:92:            d.application_id,
+server/routes/refresh-application-data.ts:99:                'fileName', d.file_name,
+server/routes/refresh-application-data.ts:102:                'uploadedAt', d.created_at,
+server/routes/refresh-application-data.ts:103:                'fileSize', d.file_size,
+server/routes/refresh-application-data.ts:107:              ) ORDER BY d.created_at DESC
+server/routes/refresh-application-data.ts:115:                WHERE d2.application_id = d.application_id 
+server/routes/refresh-application-data.ts:120:          FULL OUTER JOIN expected_documents ed ON d.application_id = ed.application_id
+server/routes/refresh-application-data.ts:121:          WHERE d.file_exists = true OR ed.application_id IS NOT NULL
+server/routes/refresh-application-data.ts:122:          GROUP BY d.application_id
+server/routes/refresh-application-data.ts:123:        ) doc_stats ON a.id = doc_stats.application_id
+server/routes/refresh-application-data.ts:124:        ORDER BY a.updated_at DESC, a.created_at DESC
+server/routes/refresh-application-data.ts:135:            updated_at = NOW(),
+server/routes/refresh-application-data.ts:166:          lastUpdated: app.updated_at
+server/routes/refresh-application-data.ts:206:        LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/refresh-application-data.ts:209:            d.application_id,
+server/routes/refresh-application-data.ts:213:                'fileName', d.file_name,
+server/routes/refresh-application-data.ts:216:                'uploadedAt', d.created_at,
+server/routes/refresh-application-data.ts:217:                'fileSize', d.file_size,
+server/routes/refresh-application-data.ts:223:              ) ORDER BY d.created_at DESC
+server/routes/refresh-application-data.ts:233:                WHERE d2.application_id = d.application_id 
+server/routes/refresh-application-data.ts:238:          FULL OUTER JOIN expected_documents ed ON d.application_id = ed.application_id
+server/routes/refresh-application-data.ts:239:          WHERE (d.application_id = $1 OR ed.application_id = $1)
+server/routes/refresh-application-data.ts:241:          GROUP BY d.application_id
+server/routes/refresh-application-data.ts:242:        ) doc_data ON a.id = doc_data.application_id
+server/routes/refresh-application-data.ts:261:          updated_at = NOW(),
+server/routes/refresh-application-data.ts:299:          createdAt: app.created_at,
+server/routes/analytics-dashboard.ts:59:      WHERE created_at >= ${thirtyDaysAgo}
+server/routes/analytics-dashboard.ts:65:      WHERE created_at >= ${thirtyDaysAgo}
+server/routes/documentAudit.ts:11:  application_id: string;
+server/routes/documentAudit.ts:12:  file_name: string;
+server/routes/documentAudit.ts:15:  created_at: string;
+server/routes/documentAudit.ts:33:    const documents = await sql`SELECT * FROM documents ORDER BY created_at DESC`;
+server/routes/documentAudit.ts:53:        fileName: doc.file_name,
+server/routes/documentAudit.ts:55:        applicationId: doc.application_id,
+server/routes/documentAudit.ts:56:        createdAt: doc.created_at,
+server/routes/documentAudit.ts:67:        auditResults.summary.missingFiles.push(doc.file_name);
+server/routes/documents.upload.ts:47:      `insert into documents (application_id, file_name, file_size, document_type, status, file_key, uploaded_by)
+server/routes/contacts.adapter.ts:33:        created_at: a.createdAt || a.created_at || new Date().toISOString()
+server/routes/ai-admin.ts:27:      SELECT flag_key, enabled, config, updated_at
+server/routes/ai-admin.ts:48:      SET enabled = ${enabled}, updated_at = NOW(), updated_by = ${userId}
+server/routes/ai-admin.ts:63:      SELECT id, prompt_key, version, body, metadata, active, created_at
+server/routes/ai-admin.ts:162:      AND created_at >= ${startDate}
+server/routes/ai-admin.ts:191:      SET enabled = false, updated_at = NOW(), updated_by = ${userId}
+server/routes/application-pdf.ts:309:              <td>${doc.file_name}</td>
+server/routes/application-pdf.ts:311:              <td>${formatDate(doc.created_at)}</td>
+server/routes/application-pdf.ts:440:             contact_email, loan_amount, status, created_at, financials_ocr,
+server/routes/application-pdf.ts:446:      ORDER BY created_at DESC
+server/routes/application-pdf.ts:465:          SELECT id, file_name, document_type, status, created_at, file_size
+server/routes/application-pdf.ts:467:          WHERE application_id = $1
+server/routes/application-pdf.ts:468:          ORDER BY created_at DESC
+server/routes/application-pdf.ts:487:          INSERT INTO documents (application_id, file_name, file_type, document_type, file_size, uploaded_by, 
+server/routes/application-pdf.ts:490:          RETURNING id, file_name, storage_key
+server/routes/application-pdf.ts:507:          application_id: app.id,
+server/routes/application-pdf.ts:510:          file_name: pdfDocument.rows[0].file_name,
+server/routes/segments.ts:97:      SELECT id, email, phone, full_name as fullName, status, updated_at as updatedAt
+server/routes/slf-contacts-new.ts:53:    created_at: raw.created_at || raw.created || raw.createdAt || raw.inserted_at || null,
+server/routes/slf-contacts-new.ts:54:    updated_at: raw.updated_at || raw.updated || raw.updatedAt || null,
+server/routes/slf-contacts-new.ts:106:          created_at: prefer(prev.created_at, c.created_at),
+server/routes/slf-contacts-new.ts:107:          updated_at: prefer(prev.updated_at, c.updated_at),
+server/routes/adminUploadDashboard.ts:22:        MIN(created_at) as first_attempt,
+server/routes/adminUploadDashboard.ts:23:        MAX(created_at) as last_attempt
+server/routes/adminUploadDashboard.ts:48:        DATE_TRUNC('hour', created_at) as hour,
+server/routes/adminUploadDashboard.ts:52:      WHERE created_at >= NOW() - INTERVAL '24 hours'
+server/routes/adminUploadDashboard.ts:53:      GROUP BY DATE_TRUNC('hour', created_at), status
+server/routes/adminUploadDashboard.ts:61:        d.application_id,
+server/routes/adminUploadDashboard.ts:62:        d.file_name,
+server/routes/adminUploadDashboard.ts:63:        d.file_size,
+server/routes/adminUploadDashboard.ts:64:        d.created_at,
+server/routes/adminUploadDashboard.ts:69:      ORDER BY d.created_at DESC
+server/routes/adminUploadDashboard.ts:141:      WHERE created_at >= NOW() - INTERVAL '1 hour'
+server/routes/adminUploadDashboard.ts:191:      SELECT id, application_id, file_name, file_path, storage_status
+server/routes/adminUploadDashboard.ts:281:        (SELECT MAX(created_at) FROM document_upload_log) as last_upload
+server/routes/monitoring.ts:224:      .where(sql`created_at > NOW() - INTERVAL '24 hours'`)
+server/routes/analytics/pdf.ts:22:        (SELECT COUNT(*) FROM applications a WHERE a.created_at BETWEEN $1::date AND $2::date + INTERVAL '1 day') AS apps_this_period,
+server/routes/ai.ts:38:      SELECT id, business_name, contact_email, form_data, norm_data, status, created_at
+server/routes/ai.ts:51:      SELECT id, document_type, file_name, s3_key, pages, dpi, file_size as bytes, uploaded_at
+server/routes/ai.ts:52:      FROM documents WHERE application_id = ${appId} ORDER BY uploaded_at DESC
+server/routes/ai.ts:71:      INSERT INTO timeline_events (application_id, type, payload, created_at)
+server/routes/ai.ts:90:      INSERT INTO reported_issues (name, email, message, page, screenshot, created_at)
+server/routes/ai.ts:99:      RETURNING id, name, email, message, page, created_at
+server/routes/ai.ts:131:      INSERT INTO chat_handoff_requests (session_id, user_id, message, context, created_at, status)
+server/routes/ai.ts:140:      RETURNING id, session_id, message, created_at, status
+server/routes/ai.ts:185:      const t = (d.document_type || d.file_name || "").toLowerCase();
+server/routes/ai.ts:198:      const q = { id: d.id, file: d.file_name, dpi, pages, ok: dpi >= 150 && pages > 0 };
+server/routes/ai.ts:258:        SELECT features_json FROM bank_features WHERE application_id = ${applicationId}
+server/routes/ai.ts:360:        INSERT INTO credit_summaries (id, application_id, status, payload, created_at)
+server/routes/public/applications.ts:94:          INSERT INTO users (id, email, password_hash, phone, first_name, last_name, role, created_at, updated_at)
+server/routes/public/applications.ts:126:          id, user_id, contact_id, business_id, tenant_id, business_name, 
+server/routes/public/applications.ts:127:          requested_amount, use_of_funds, status, created_at, updated_at
+server/routes/public/applications.ts:151:      INSERT INTO users (email, phone, first_name, last_name, role, created_at, updated_at)
+server/routes/public/applications.ts:160:      INSERT INTO applications (user_id, business_name, funding_amount, purpose, country, currency, status, created_at, updated_at)
+server/routes/public/applications_documents.ts:97:      LEFT JOIN documents d ON d.application_id = a.id
+server/routes/public/applications_documents.ts:140:          application_id, 
+server/routes/public/applications_documents.ts:141:          file_name, 
+server/routes/public/applications_documents.ts:145:          file_size, 
+server/routes/public/applications_documents.ts:191:              updated_at = NOW()
+server/routes/public/documents.ts:68:        id, application_id, file_name, document_type, 
+server/routes/public/documents.ts:69:        storage_key, checksum, mime_type, created_at, updated_at
+server/routes/public/documents.ts:97:      SELECT file_name, storage_key, document_type 
+server/routes/public/documents.ts:99:      WHERE application_id = $1 
+server/routes/public/documents.ts:100:      ORDER BY created_at ASC
+server/routes/public/documents.ts:124:      const content = `Document: ${doc.file_name}\nType: ${doc.document_type}\nStorage: ${doc.storage_key}\n\n[File content would be fetched from S3 in production]`;
+server/routes/public/documents.ts:125:      archive.append(content, { name: doc.file_name });
+server/routes/public/documentsZip.ts:11:    `SELECT id, file_name as filename, storage_key as object_key, file_type as content_type, sha256, status
+server/routes/public/documentsZip.ts:13:      WHERE application_id = $1
+server/routes/public/documentsZip.ts:15:      ORDER BY created_at ASC, id ASC`,
+server/routes/public/getSignatureStatus.ts:34:      application_id: app.id
+server/routes/lender.portal.ts:282:    SELECT id, status, amount, created_at, funded
+server/routes/lender.portal.ts:285:    AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+server/routes/lender.portal.ts:286:    ORDER BY created_at DESC
+server/routes/lender.portal.ts:297:    AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+server/routes/lender.portal.ts:329:    SELECT period, sent_to, matched_count, funded_count, created_at
+server/routes/marketing.reports.ts:88:      select e.status, s.name as sequence_name, c.full_name as contact_name, e.created_at
+server/routes/marketing.reports.ts:92:      order by e.created_at desc
+server/routes/simple-application-create.ts:23:      INSERT INTO applications (id, user_id, requested_amount, use_of_funds, status, submission_country, product_id, created_at, updated_at)
+server/routes/documentReassignment.ts:71:            application_id: targetApplicationId,
+server/routes/documentAuditApi.ts:81:        application_id,
+server/routes/documentAuditApi.ts:82:        file_name,
+server/routes/documentAuditApi.ts:95:      applicationId: row.application_id,
+server/routes/documentAuditApi.ts:96:      fileName: row.file_name,
+server/routes/publicApi.ts:72:      SELECT DISTINCT application_id
+server/routes/publicApi.ts:85:    const uuid = result.rows[0].application_id;
+server/routes/publicApi.ts:840:        SELECT DISTINCT application_id
+server/routes/publicApi.ts:863:      dbId = storageResult.rows[0].application_id;
+server/routes/publicApi.ts:886:        file_name as "fileName",
+server/routes/publicApi.ts:888:        created_at as "uploadedAt",
+server/routes/publicApi.ts:889:        file_size as "fileSize",
+server/routes/publicApi.ts:892:      WHERE application_id = $1 
+server/routes/publicApi.ts:894:      ORDER BY created_at DESC
+server/routes/comms-calls.ts:16:      ORDER BY cr.created_at DESC
+server/routes/comms-calls.ts:26:      created_at: call.created_at,
+server/routes/testS3DocumentAccess.ts:26:      SELECT storage_key, file_name, id 
+server/routes/testS3DocumentAccess.ts:41:    console.log(`🔍 Testing document: ${document.file_name} with storage key: ${document.storage_key}`);
+server/routes/testS3DocumentAccess.ts:67:        fileName: document.file_name,
+server/routes/api-applications-aligned.ts:117:      INSERT INTO users (email, phone, first_name, last_name, role, password_hash, created_at, updated_at)
+server/routes/api-applications-aligned.ts:123:        updated_at = now()
+server/routes/api-applications-aligned.ts:135:        id, user_id, business_id, tenant_id, requested_amount, use_of_funds, 
+server/routes/api-applications-aligned.ts:138:        created_at, updated_at
+server/routes/api-applications-aligned.ts:141:      RETURNING id, status, created_at
+server/routes/api-applications-aligned.ts:161:        created_at: application.created_at
+server/routes/api-applications-aligned.ts:193:        a.created_at,
+server/routes/api-applications-aligned.ts:194:        a.updated_at
+server/routes/api-applications-aligned.ts:196:      ORDER BY a.created_at DESC
+server/routes/api-applications-aligned.ts:270:        a.created_at,
+server/routes/api-applications-aligned.ts:271:        a.updated_at,
+server/routes/api-applications-aligned.ts:297:        created_at: app.created_at,
+server/routes/api-applications-aligned.ts:298:        updated_at: app.updated_at,
+server/routes/api-applications-aligned.ts:371:        application_id, 
+server/routes/api-applications-aligned.ts:372:        file_name, 
+server/routes/api-applications-aligned.ts:374:        file_size,
+server/routes/api-applications-aligned.ts:378:        created_at, 
+server/routes/api-applications-aligned.ts:379:        updated_at
+server/routes/documentAnalytics.ts:63:        totalSize: sql<number>`sum(file_size)`,
+server/routes/documentAnalytics.ts:64:        avgSize: sql<number>`avg(file_size)`,
+server/routes/documentAnalytics.ts:73:        date: sql<string>`date(created_at)`,
+server/routes/documentAnalytics.ts:78:      .groupBy(sql`date(created_at)`)
+server/routes/documentAnalytics.ts:79:      .orderBy(sql`date(created_at)`);
+server/routes/appDetail.ts:48:        application_id: appId,
+server/routes/appDetail.ts:59:        application_id: appId,
+server/routes/appDetail.ts:92:      application_id: appId,
+server/routes/appDetail.ts:123:      application_id: appId,
+server/routes/appDetail.ts:147:      application_id: appId,
+server/routes/appDetail.ts:171:      application_id: appId,
+server/routes/appDetail.ts:194:      application_id: appId,
+server/routes/appDetail.ts:198:      updated_at: new Date().toISOString()
+server/routes/api/applications.ts:84:      created_at: new Date(),
+server/routes/api/lenders-settings.ts:86:        created_at as timestamp
+server/routes/api/lenders-settings.ts:89:      AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+server/routes/api/lenders-settings.ts:90:      ORDER BY created_at DESC
+server/routes/api/lenders-settings.ts:119:      INSERT INTO lender_comm_logs (lender_id, type, recipient, message, status, created_at)
+server/routes/api/lenders-reports.ts:29:        AVG(EXTRACT(EPOCH FROM (a.updated_at - a.created_at)) / 3600) AS avg_response_hours,
+server/routes/api/lenders-reports.ts:35:      WHERE a.created_at >= CURRENT_DATE - INTERVAL '30 days'
+server/routes/api/lenders-reports.ts:71:        a.created_at,
+server/routes/api/lenders-reports.ts:72:        a.updated_at,
+server/routes/api/lenders-reports.ts:76:      WHERE a.created_at >= CURRENT_DATE - INTERVAL '30 days'
+server/routes/api/lenders-reports.ts:77:      ORDER BY a.created_at DESC
+server/routes/api/lenders-reports.ts:83:        `${app.id},${app.business_name || 'N/A'},${app.amount},${app.status},${app.created_at},${app.updated_at},${app.commission}`
+server/routes/api/lenders-reports.ts:140:        a.id AS application_id,
+server/routes/api/lenders-reports.ts:149:      WHERE a.created_at >= CURRENT_DATE - INTERVAL '30 days'
+server/routes/api/lenders-reports.ts:150:      ORDER BY a.created_at DESC
+server/routes/api/documents.ts:9:    if (!req.file || !req.body.application_id || !req.body.category) {
+server/routes/api/documents.ts:16:      application_id: req.body.application_id,
+server/routes/api/documents.ts:21:      created_at: new Date(),
+server/routes/api/applications.presence.ts:36:    const rows = await db.select().from(applications).orderBy(desc(applications.created_at)).limit(1);
+server/routes/api/applications.presence.ts:49:      createdAt: app.created_at
+server/routes/autoRestore.ts:21:      WHERE application_id = ${applicationId} 
+server/routes/autoRestore.ts:37:            eq(documents.application_id, applicationId),
+server/routes/autoRestore.ts:43:          console.log(`✅ [AUTO-RESTORE] Skipping ${doc.file_name} - working replacement exists`);
+server/routes/autoRestore.ts:46:            fileName: doc.file_name,
+server/routes/autoRestore.ts:93:(Document Placeholder: ${doc.file_name}) Tj
+server/routes/autoRestore.ts:141:            file_size: placeholderContent.length,
+server/routes/autoRestore.ts:143:            updated_at: new Date()
+server/routes/autoRestore.ts:147:        console.log(`✅ [AUTO-RESTORE] Restored ${doc.file_name} with placeholder`);
+server/routes/autoRestore.ts:152:          fileName: doc.file_name,
+server/routes/autoRestore.ts:159:        console.error(`❌ [AUTO-RESTORE] Failed to restore ${doc.file_name}:`, error instanceof Error ? error.message : String(error));
+server/routes/autoRestore.ts:162:          fileName: doc.file_name,
+server/routes/lenders-match.ts:77:        UPDATE applications SET stage = 'sent_to_lender', updated_at = NOW() WHERE id = $1
+server/routes/lenders-match.ts:82:        INSERT INTO pipeline_activity (application_id, from_stage, to_stage, actor, note)
+server/routes/data.ts:10:  applications:    { model: "applications",     defaultOrder: "-created_at",  expand: { businesses: true, users: true, lender: true } },
+server/routes/client.bridge.ts:13:      INSERT INTO comms(contact_id, kind, direction, body, created_at) 
+server/routes/client.bridge.ts:30:      INSERT INTO comms(contact_id, kind, direction, body, created_at) 
+server/routes/client.bridge.ts:47:      INSERT INTO issues(contact_id, message, app_context, created_at) 
+server/routes/rbac-users.ts:21:        created_at
+server/routes/rbac-users.ts:23:      ORDER BY created_at DESC
+server/routes/rbac-users.ts:36:      created_at: row.created_at
+server/routes/training.docs.ts:30:  const { rows } = await db.execute(sql`select id,title,tags,created_at from training_docs order by created_at desc limit 200`);
+server/routes/applicationMetadata.ts:56:        created_at
+server/routes/applicationMetadata.ts:95:        createdAt: application.created_at,
+server/routes/compliance.quarantine.ts:9:  const { rows } = await db.execute(sql`select id, name, av_status, quarantine_reason, created_at from documents where av_status in ('pending','infected') order by created_at desc`);
+server/routes/push.ts:63:      SELECT id, endpoint, user_agent, created_at 
+server/routes/push.ts:66:      ORDER BY created_at DESC
+server/routes/lendersCompat.ts:56:           p.created_at, p.updated_at
+server/routes/admin.users.ts:73:      updated_at: new Date()
+server/routes/crm-dynamic.mjs:55:    sel.push(cols.has("id") ? `${a}."id"::text AS application_id` : `md5(random()::text) AS application_id`);
+server/routes/crm-dynamic.mjs:65:    sel.push(pick(cols, a, ["updated_at","modified_at","created_at"], "updated_at", "timestamptz"));
+server/routes/crm-dynamic.mjs:72:      ORDER BY updated_at DESC NULLS LAST
+server/routes/crm-dynamic.mjs:114:        application_id: a.application_id,
+server/routes/crm-dynamic.mjs:127:        updated_at: a.updated_at,
+server/routes/crm-dynamic.mjs:174:      ORDER BY ${c}."updated_at" DESC NULLS LAST, ${c}."created_at" DESC NULLS LAST
+server/routes/publicApplicationsSimple.ts:113:          requested_amount, use_of_funds, form_data, status, created_at, updated_at,
+server/routes/matchingEngine.ts:47:      WHERE application_id = $1`;
+server/routes/matchingEngine.ts:62:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/matchingEngine.ts:82:      ORDER BY lp.created_at DESC`;
+server/routes/matchingEngine.ts:246:      WHERE application_id = $1`;
+server/routes/matchingEngine.ts:267:            'fileName', d.file_name,
+server/routes/matchingEngine.ts:274:      LEFT JOIN businesses b ON a.business_id = b.id
+server/routes/matchingEngine.ts:275:      LEFT JOIN documents d ON a.id = d.application_id AND d.status = 'accepted'
+server/routes/matchingEngine.ts:304:        application_id, 
+server/routes/matchingEngine.ts:309:        created_at
+server/routes/matchingEngine.ts:311:      RETURNING id, created_at`;
+server/routes/matchingEngine.ts:334:      `UPDATE applications SET status = 'submitted_to_lenders', updated_at = NOW() WHERE id = $1`,
+server/routes/matchingEngine.ts:346:      transmittedAt: transmissionResult.rows[0].created_at,
+server/routes/documentManagement.ts:161:        id, application_id, file_name, file_path, file_type, file_size, 
+server/routes/documentManagement.ts:163:        file_exists, is_required, is_verified, created_at, updated_at
+server/routes/documentManagement.ts:165:      RETURNING id, file_name, file_size, checksum, storage_key
+server/routes/documentManagement.ts:273:      SET file_name = $1, file_path = $2, file_type = $3, file_size = $4, checksum = $5, updated_at = NOW()
+server/routes/documentManagement.ts:275:      RETURNING id, file_name, file_size, checksum
+server/routes/documentManagement.ts:317:    const docQuery = 'SELECT id, file_name, file_path, file_type, checksum, file_exists, storage_key FROM documents WHERE id = $1';
+server/routes/documentManagement.ts:346:          document.file_name
+server/routes/documentManagement.ts:358:        console.log(`✅ [S3 PREVIEW] Generated pre-signed URL for ${document.file_name}`);
+server/routes/documentManagement.ts:363:          fileName: document.file_name,
+server/routes/documentManagement.ts:391:    let actualFileName = document.file_name || 'unknown';
+server/routes/documentManagement.ts:446:          console.error(`❌ [CHECKSUM] Mismatch for ${document.file_name}: expected ${document.checksum}, got ${currentChecksum}`);
+server/routes/documentManagement.ts:456:          console.log(`✅ [CHECKSUM] Valid for ${document.file_name}`);
+server/routes/documentManagement.ts:462:        console.error(`❌ [CHECKSUM] Validation error for ${document.file_name}:`, checksumError);
+server/routes/documentManagement.ts:473:      console.log(`ℹ️ [CHECKSUM] No checksum available for ${document.file_name}`);
+server/routes/documentManagement.ts:488:    console.log(`✅ [LOCAL PREVIEW] Success for ${document.file_name} (${processingTime}ms)`);
+server/routes/documentManagement.ts:491:    res.setHeader('Content-Disposition', `inline; filename="${document.file_name}"`);
+server/routes/documentManagement.ts:523:    const docQuery = 'SELECT id, file_name, file_path, file_type, checksum, storage_key FROM documents WHERE id = $1';
+server/routes/documentManagement.ts:543:          document.file_name
+server/routes/documentManagement.ts:546:        console.log(`✅ [S3 DOWNLOAD] Generated pre-signed URL for ${document.file_name}`);
+server/routes/documentManagement.ts:551:          fileName: document.file_name,
+server/routes/documentManagement.ts:592:            res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+server/routes/documentManagement.ts:654:    res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+server/routes/documentManagement.ts:670:    const documentsQuery = 'SELECT id, file_name, file_path, checksum, created_at FROM documents ORDER BY created_at DESC';
+server/routes/documentManagement.ts:727:        fileName: doc.file_name,
+server/routes/documentManagement.ts:732:        createdAt: doc.created_at
+server/routes/documentManagement.ts:791:          updated_at = NOW()
+server/routes/documentManagement.ts:798:    const appQuery = 'SELECT application_id FROM documents WHERE id = $1';
+server/routes/documentManagement.ts:802:      const applicationId = appResult.rows[0].application_id;
+server/routes/documentManagement.ts:829:          const allDocsQuery = 'SELECT COUNT(*) as total, COUNT(CASE WHEN is_verified = true THEN 1 END) as verified FROM documents WHERE application_id = $1';
+server/routes/documentManagement.ts:936:      SELECT d.id, d.application_id, a.legal_business_name as businessname, a.contact_email as email, a.contact_phone as phone 
+server/routes/documentManagement.ts:938:      JOIN applications a ON d.application_id = a.id 
+server/routes/documentManagement.ts:947:    const applicationId = row.application_id;
+server/routes/documentManagement.ts:953:    const docInfoQuery = 'SELECT file_path, file_name FROM documents WHERE id = $1';
+server/routes/documentManagement.ts:1014:    const docsQuery = 'SELECT id, file_name, file_path, file_type FROM documents WHERE application_id = $1';
+server/routes/documentManagement.ts:1049:        archive.file(fullFilePath, { name: document.file_name });
+server/routes/documentManagement.ts:1050:        console.log(`📄 Added ${document.file_name} to ZIP`);
+server/routes/documentManagement.ts:1185:        file_name, 
+server/routes/documentManagement.ts:1188:        application_id, 
+server/routes/documentManagement.ts:1190:        created_at
+server/routes/documentManagement.ts:1192:      WHERE application_id = $1
+server/routes/documentManagement.ts:1196:      ORDER BY document_type, file_name
+server/routes/documentManagement.ts:1205:      file_name: d.file_name, 
+server/routes/documentManagement.ts:1266:        console.log(`📦 [ZIP-DOWNLOAD] Processing: ${doc.file_name} (${doc.document_type})`);
+server/routes/documentManagement.ts:1278:          const filename = doc.file_name || `document_${doc.id}.pdf`;
+server/routes/documentManagement.ts:1287:          console.log(`⚠️ [ZIP-DOWNLOAD] Empty file body for: ${doc.file_name}`);
+server/routes/documentManagement.ts:1292:        console.error(`❌ [ZIP-DOWNLOAD] Failed to add ${doc.file_name}:`, docError);
+server/routes/systemKpis.ts:109:      SELECT id, legal_business_name, created_at, status
+server/routes/systemKpis.ts:110:      FROM applications ORDER BY created_at DESC LIMIT 10
+server/routes/systemKpis.ts:118:      timestamp: app.created_at || new Date().toISOString(),
+server/communications-service.ts:134:          contact_id, application_id, category, priority, tags
+server/communications-service.ts:223:        applicationId: row.application_id,
+server/communications-service.ts:250:          contact_id, application_id, is_automated, automation_type
+server/communications-service.ts:302:        query += ` AND application_id = $${paramIndex}`;
+server/communications-service.ts:307:      query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+server/communications-service.ts:321:        applicationId: row.application_id,
+server/communications-service.ts:348:          contact_id, application_id, user_id, call_purpose
+server/communications-service.ts:400:        query += ` AND application_id = $${paramIndex}`;
+server/communications-service.ts:411:      query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+server/communications-service.ts:426:        applicationId: row.application_id,
+server/communications-service.ts:465:          phone_number, code, purpose, user_id, application_id,
+server/communications-service.ts:524:        ORDER BY created_at DESC 
+server/communications-service.ts:558:        SET attempts = attempts + 1, updated_at = NOW() 
+server/communications-service.ts:573:        SET is_verified = true, verified_at = NOW(), updated_at = NOW() 
+server/communications-service.ts:699:            COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours') as emails_today
+server/communications-service.ts:707:            COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '24 hours') as sms_today
+server/jobs/missingDocsReminder.ts:20:      SELECT id, stage, status, created_at
+server/jobs/missingDocsReminder.ts:23:        AND created_at >= NOW() - INTERVAL '30 days'
+server/jobs/missingDocsReminder.ts:24:      ORDER BY created_at DESC
+server/jobs/missingDocsReminder.ts:50:          WHERE application_id = ${app.id} 
+server/jobs/contactsGuard.ts:21:          a.created_at, a.updated_at, a.form_data, b.business_name
+server/jobs/contactsGuard.ts:23:        LEFT JOIN businesses b ON a.business_id = b.id
+server/jobs/contactsGuard.ts:25:        ORDER BY a.updated_at DESC
+server/jobs/contactsGuard.ts:47:          createdAt: row.created_at,
+server/jobs/contactsGuard.ts:48:          updatedAt: row.updated_at,
+server/jobs/contactsGuard.ts:76:          created_at: existing.created_at || primary.createdAt || new Date().toISOString(),
+server/jobs/contactsGuard.ts:77:          updated_at: new Date().toISOString(),
+server/jobs/startupFixMissingPaths.ts:12:      SELECT id, file_name, file_path, application_id, file_size, checksum 
+server/jobs/startupFixMissingPaths.ts:14:      ORDER BY created_at DESC
+server/jobs/startupFixMissingPaths.ts:25:      const { id, file_name, file_path, application_id } = doc;
+server/jobs/startupFixMissingPaths.ts:31:        `uploads/documents/${id}.${file_name?.split('.').pop() || 'pdf'}`, // UUID + original extension
+server/jobs/startupFixMissingPaths.ts:56:          console.log(`[STARTUP-FIX] Correcting path for ${file_name}: ${file_path} → ${actualPath}`);
+server/jobs/startupFixMissingPaths.ts:67:            console.log(`[STARTUP-FIX] Generated checksum for ${file_name}: ${hash.substring(0, 8)}...`);
+server/jobs/startupFixMissingPaths.ts:70:            console.warn(`[STARTUP-FIX] Could not generate checksum for ${file_name}:`, err);
+server/jobs/startupFixMissingPaths.ts:89:        console.error(`[STARTUP-FIX] ORPHANED: ${file_name} (${id}) - no file found at any expected path`);
+server/jobs/startupFixMissingPaths.ts:112:      INSERT INTO document_audit_log (operation, status, documents_processed, issues_found, details, created_at)
+server/jobs/auditS3Documents.ts:9:    const result = await pool.query('SELECT id, file_name, storage_key, object_storage_key FROM documents');
+server/jobs/auditS3Documents.ts:64:      const filePath = path.resolve(`uploads/documents/${doc.id}.${doc.file_name?.split('.').pop() || 'pdf'}`);
+server/jobs/auditS3Documents.ts:68:        console.log(`[S3-AUDIT] ✅ Local file exists: ${doc.file_name}`);
+server/jobs/auditS3Documents.ts:70:        console.error(`[S3-AUDIT] ❌ Missing local file: ${doc.file_name}`);
+server/jobs/jobs_daily_brief.ts:15:    where: { created_at: { gte: since } }, 
+server/db/types.ts:13:  created_at?: string;
+server/db/types.ts:14:  updated_at?: string;
+server/db/types.ts:25:  application_id?: string;
+server/db/types.ts:32:  created_at?: string;
+server/db/types.ts:33:  updated_at?: string;
+server/db/types.ts:48:  created_at?: string;
+server/db/types.ts:49:  updated_at?: string;
+server/db/types.ts:64:  created_at?: string;
+server/db/types.ts:65:  updated_at?: string;
+server/db/types.ts:76:  created_at?: string;
+server/db/types.ts:83:  updated_at?: string;
+server/db/types.ts:94:  created_at?: string; 
+server/db/schema/graphTokens.ts:11:  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/graphTokens.ts:12:  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/application_stage_history.sql:6:  application_id VARCHAR(255) NOT NULL,
+server/db/schema/application_stage_history.sql:13:  FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE
+server/db/schema/application_stage_history.sql:16:CREATE INDEX IF NOT EXISTS idx_stage_history_app_id ON application_stage_history(application_id);
+server/db/schema/lenderProducts.ts:17:  updatedAt: timestamp("updated_at"),
+server/db/schema/comms.ts:9:  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/comms.ts:10:  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/comms.ts:21:  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/comms.ts:36:  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/comms.ts:46:  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/comms.ts:47:  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema/contactActivity.ts:11:  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+server/db/schema.ts:9:  createdAt: timestamp('created_at').defaultNow()
+server/db/schema.ts:19:  createdAt: timestamp('created_at').defaultNow()
+server/db/schema.ts:30:  created_at: timestamp('created_at').defaultNow()
+server/db/schema.ts:35:  applicationId: uuid('application_id').references(()=>applications.id).notNull(),
+server/db/schema.ts:45:  createdAt: timestamp('created_at').defaultNow()
+server/db/schema.ts:71:  createdAt: timestamp('created_at').defaultNow()
+server/db/schema.ts:81:  createdAt: timestamp('created_at').defaultNow()
+server/db/init.sql:8:  created_at timestamp DEFAULT now()
+server/db/init.sql:18:  created_at timestamp DEFAULT now()
+server/db/init.sql:26:  created_at timestamp DEFAULT now()
+server/db/init.sql:31:  application_id uuid REFERENCES staff_applications(id) NOT NULL,
+server/db/init.sql:41:  created_at timestamp DEFAULT now()
+server/db/init.sql:67:  created_at timestamp DEFAULT now()
+server/db/init.sql:77:  created_at timestamp DEFAULT now()
+server/db/migrations/20251003_o365_tokens.sql:9:  created_at   timestamptz not null default now(),
+server/db/migrations/20251003_o365_tokens.sql:10:  updated_at   timestamptz not null default now()
+server/db/repo/lenderReports.ts:7:    return q<LenderReport>(`SELECT * FROM lender_reports ORDER BY created_at DESC`);
+server/db/repo/lenderReports.ts:10:    return q<LenderReport>(`SELECT * FROM lender_reports WHERE lender_id=$1 ORDER BY created_at DESC`, [lenderId]);
+server/db/repo/lenderReports.ts:14:      `INSERT INTO lender_reports (id, lender_id, name, type, url, embed_url, created_at)
+server/db/repo/lenderReports.ts:28:    return { lender_id: lenderId, reports, updated_at: new Date().toISOString() };
+server/db/repo/lenderProducts.ts:8:      return q<LenderProduct>(`SELECT * FROM lender_products WHERE lender_id=$1 ORDER BY updated_at DESC`, [lenderId]);
+server/db/repo/lenderProducts.ts:10:    return q<LenderProduct>(`SELECT * FROM lender_products ORDER BY updated_at DESC`);
+server/db/repo/lenderProducts.ts:18:      `INSERT INTO lender_products (id, lender_id, name, category, min_amount, max_amount, interest_rate, term_months, active, created_at, updated_at)
+server/db/repo/lenderProducts.ts:40:    const sql = `UPDATE lender_products SET ${fields.join(',')}, updated_at=NOW() WHERE id=$${paramIndex} RETURNING *`;
+server/db/repo/users.ts:21:      `INSERT INTO users (id, tenant_id, email, role, created_at, updated_at)
+server/db/repo/users.ts:31:      `SELECT * FROM users WHERE tenant_id = current_setting('app.tenant', true)::uuid ORDER BY created_at DESC`
+server/db/repo/apps.ts:12:    return q<Application>(`SELECT * FROM applications WHERE recommended_lender_id=$1 ORDER BY updated_at DESC`, [lenderId]);
+server/db/repo/apps.ts:15:    return q<Application>(`SELECT * FROM applications ORDER BY updated_at DESC`);
+server/db/repo/apps.ts:19:      `INSERT INTO applications (id, user_id, business_id, status, requested_amount, created_at, updated_at)
+server/db/repo/apps.ts:41:    const sql = `UPDATE applications SET ${fields.join(",")}, updated_at=NOW() WHERE id=$${i} RETURNING *`;
+server/db/repo/apps.ts:47:      `UPDATE applications SET stage=$1, updated_at=NOW() WHERE id=$2 RETURNING *`,
+server/db/repo/contacts.ts:11:    return q<Contact>(`SELECT * FROM contacts ORDER BY created_at DESC`);
+server/db/repo/contacts.ts:15:      `INSERT INTO contacts (id, full_name, email, phone, role, company_name, source, status, created_at, updated_at)
+server/db/repo/contacts.ts:37:    const sql = `UPDATE contacts SET ${fields.join(',')}, updated_at=NOW() WHERE id=$${paramIndex} RETURNING *`;
+server/db/repo/marketing.ts:9:      `INSERT INTO communication_logs (id, contact_id, type, direction, content, created_at)
+server/db/repo/marketing.ts:16:      return q<IntakeEvent>(`SELECT * FROM communication_logs WHERE type='marketing' AND created_at BETWEEN $1 AND $2 ORDER BY created_at DESC`, [from, to]);
+server/db/repo/marketing.ts:18:    return q<IntakeEvent>(`SELECT * FROM communication_logs WHERE type='marketing' ORDER BY created_at DESC`);
+server/scripts/sql-guardrails.sql:100:  INSERT INTO duplicate_attempt_log (table_name, attempted_data, conflict_reason, created_at)
+server/scripts/sql-guardrails.sql:112:  created_at TIMESTAMP DEFAULT NOW()
+server/scripts/seed-admin-todd.mjs:13:    created_at TIMESTAMPTZ DEFAULT now(),
+server/scripts/seed-admin-todd.mjs:14:    updated_at TIMESTAMPTZ DEFAULT now()
+server/scripts/seed-admin-todd.mjs:27:    await pool.query("UPDATE users SET roles=$2, full_name=$3, updated_at=now() WHERE phone_e164=$1",[phone,roles,name]);
+server/scripts/seed-admin-todd-compatible.mjs:49:      SET roles = $2, first_name = $3, last_name = $4, phone_e164 = $5, updated_at = now() 
+server/conflicts/collectSourcedValues.ts:20:        created_at
+server/conflicts/collectSourcedValues.ts:26:        if (value !== undefined && value !== null && column !== 'created_at') {
+server/conflicts/collectSourcedValues.ts:33:            observedAt: appData.created_at?.toISOString()
+server/conflicts/collectSourcedValues.ts:41:      SELECT financials_ocr, updated_at FROM applications WHERE id = $1 AND financials_ocr IS NOT NULL LIMIT 1;
+server/conflicts/collectSourcedValues.ts:48:        out.push({ column: 'req_business_legal_name', value: ocr.business_name, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updated_at?.toISOString() });
+server/conflicts/collectSourcedValues.ts:51:        out.push({ column: 'req_business_address', value: ocr.business_address, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updated_at?.toISOString() });
+server/conflicts/collectSourcedValues.ts:54:        out.push({ column: 'req_annual_revenue', value: ocr.annual_revenue, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Financial Document', observedAt: ocrData.updated_at?.toISOString() });
+server/conflicts/collectSourcedValues.ts:57:        out.push({ column: 'income_statement_net_income', value: ocr.net_income, sourceType: 'ocr', sourceId: 'financial_ocr', label: 'OCR Income Statement', observedAt: ocrData.updated_at?.toISOString() });
+server/conflicts/collectSourcedValues.ts:63:      SELECT banking_analysis, updated_at FROM applications WHERE id = $1 AND banking_analysis IS NOT NULL LIMIT 1;
+server/conflicts/collectSourcedValues.ts:73:        observedAt: bankData.updated_at?.toISOString()
+server/workers/transcripts.worker.mjs:70:      ORDER BY t.created_at ASC
+server/workers/transcripts.worker.mjs:86:          SET status = 'processing', updated_at = now()
+server/workers/transcripts.worker.mjs:103:          SET status = 'done', text = $1, summary = $2, updated_at = now()
+server/workers/transcripts.worker.mjs:118:          SET status = 'error', error = $1, updated_at = now()
+server/controllers/lenderProductsController.ts:26:        LEFT JOIN documents d ON a.id = d.application_id
+server/fraud-detection-service.ts:63:Document: ${document.file_name}
+server/fraud-detection-service.ts:154:        SELECT id FROM documents WHERE application_id = ${sql.placeholder('applicationId')}
+server/fraud-detection-service.ts:218:        SELECT d.id, d.file_name, d.document_type, o.extracted_data as ocr_text
+server/fraud-detection-service.ts:240:              documentName: doc.file_name,
+server/fraud-detection-service.ts:339:          application_id, overall_fraud_score, risk_level, similar_documents,
+server/fraud-detection-service.ts:404:        ORDER BY overall_fraud_score DESC, created_at DESC
+server/monitoring/permanentMonitoring.sql:6:    applications.id as application_id,
+server/monitoring/permanentMonitoring.sql:9:    applications.created_at,
+server/monitoring/permanentMonitoring.sql:16:LEFT JOIN documents ON documents.application_id = applications.id
+server/monitoring/permanentMonitoring.sql:17:WHERE applications.created_at > NOW() - INTERVAL '24 hours'
+server/monitoring/permanentMonitoring.sql:18:GROUP BY applications.id, applications.legal_business_name, applications.contact_email, applications.created_at
+server/monitoring/permanentMonitoring.sql:20:ORDER BY applications.created_at DESC;
+server/industry-benchmarking-service.ts:670:          WHERE created_at > NOW() - INTERVAL '30 days'

@@ -7,7 +7,7 @@ const router = Router();
 
 /* ----- Flags CRUD ----- */
 router.get("/flags", async (_req,res)=>{
-  const r = await db.execute(sql`SELECT key, description, enabled, rollout_pct, tags, created_at, updated_at FROM feature_flags ORDER BY key`);
+  const r = await db.execute(sql`SELECT key, description, enabled, rollout_pct, tags, createdAt, updatedAt FROM feature_flags ORDER BY key`);
   res.json(r.rows || []);
 });
 router.post("/flags", async (req:any,res)=>{
@@ -15,7 +15,7 @@ router.post("/flags", async (req:any,res)=>{
   const up = await db.execute(sql`
     INSERT INTO feature_flags(key, description, enabled, rollout_pct, tags)
     VALUES (${key}, ${description}, ${enabled}, ${rollout_pct}, ${tags})
-    ON CONFLICT (key) DO UPDATE SET description=EXCLUDED.description, enabled=EXCLUDED.enabled, rollout_pct=EXCLUDED.rollout_pct, tags=EXCLUDED.tags, updated_at=now()
+    ON CONFLICT (key) DO UPDATE SET description=EXCLUDED.description, enabled=EXCLUDED.enabled, rollout_pct=EXCLUDED.rollout_pct, tags=EXCLUDED.tags, updatedAt=now()
     RETURNING key
   `);
   res.json({ ok:true, key: up.rows?.[0]?.key });
@@ -36,7 +36,7 @@ router.get("/flags/:key/eval", async (req:any,res)=>{
 
 /* ----- Experiments ----- */
 router.get("/experiments", async (_req,res)=>{
-  const e = await db.execute(sql`SELECT key, description, status, allocation_pct, exposure_flag_key, created_at, updated_at FROM experiments ORDER BY created_at DESC`);
+  const e = await db.execute(sql`SELECT key, description, status, allocation_pct, exposure_flag_key, createdAt, updatedAt FROM experiments ORDER BY createdAt DESC`);
   const v = await db.execute(sql`SELECT experiment_key, variant_key, weight FROM experiment_variants ORDER BY experiment_key, variant_key`);
   const byExp:any = {};
   for (const r of (v.rows||[])){ (byExp[r.experiment_key] ||= []).push({ variant_key: r.variant_key, weight: r.weight }); }
@@ -47,7 +47,7 @@ router.post("/experiments", async (req:any,res)=>{
   await db.execute(sql`
     INSERT INTO experiments(key, description, allocation_pct, exposure_flag_key)
     VALUES (${key}, ${description}, ${allocation_pct}, ${exposure_flag_key})
-    ON CONFLICT (key) DO UPDATE SET description=EXCLUDED.description, allocation_pct=EXCLUDED.allocation_pct, exposure_flag_key=EXCLUDED.exposure_flag_key, updated_at=now()
+    ON CONFLICT (key) DO UPDATE SET description=EXCLUDED.description, allocation_pct=EXCLUDED.allocation_pct, exposure_flag_key=EXCLUDED.exposure_flag_key, updatedAt=now()
   `);
   // upsert variants (simple: delete + reinsert)
   await db.execute(sql`DELETE FROM experiment_variants WHERE experiment_key=${key}`);

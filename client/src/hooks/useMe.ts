@@ -11,10 +11,10 @@ interface User {
 
 export function useMe() {
   return useQuery({
-    queryKey: ['me'],
+    queryKey: ["me"],
     queryFn: async (): Promise<User | null> => {
       try {
-        return await api('/api/users/me');
+        return await api("/api/users/me");
       } catch (error) {
         return null;
       }

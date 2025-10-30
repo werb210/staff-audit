@@ -18,9 +18,9 @@ router.post("/ingest", async (req:any, res)=>{
 
 router.get("/latest", async (_req,res)=>{
   const r = await db.execute(sql`
-    SELECT name, rating, round(COALESCE(value,0)::numeric, 2) as value, page, path, ua, created_at
+    SELECT name, rating, round(COALESCE(value,0)::numeric, 2) as value, page, path, ua, createdAt
     FROM perf_vitals
-    ORDER BY created_at DESC
+    ORDER BY createdAt DESC
     LIMIT 200
   `);
   res.json(r.rows || []);

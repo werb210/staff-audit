@@ -1,4 +1,4 @@
-const k = { a: 'bf.access', r: 'bf.refresh' };
+const k = { a: "bf.access", r: "bf.refresh" };
 
 export const tokenStore = {
   set(access: string, refresh: string) {
@@ -9,10 +9,10 @@ export const tokenStore = {
     localStorage.setItem(k.a, access);
   },
   getAccess() {
-    return localStorage.getItem(k.a) || '';
+    return localStorage.getItem(k.a) || "";
   },
   getRefresh() {
-    return localStorage.getItem(k.r) || '';
+    return localStorage.getItem(k.r) || "";
   },
   clear() {
     localStorage.removeItem(k.a);

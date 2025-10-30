@@ -27,7 +27,7 @@ r.post("/training/docs", async (req:any,res)=>{
 });
 
 r.get("/training/docs", async (_req,res)=>{
-  const { rows } = await db.execute(sql`select id,title,tags,created_at from training_docs order by created_at desc limit 200`);
+  const { rows } = await db.execute(sql`select id,title,tags,createdAt from training_docs order by createdAt desc limit 200`);
   res.json({ ok:true, items: rows });
 });
 

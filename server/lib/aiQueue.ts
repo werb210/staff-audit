@@ -85,7 +85,7 @@ export async function queueAIJob(data: AIJobData): Promise<string> {
   await db.execute(sql`
     INSERT INTO ai_jobs (
       request_id, action, status, input_data, 
-      application_id, contact_id, user_id, tenant_id
+      applicationId, contact_id, user_id, tenant_id
     ) VALUES (
       ${data.requestId}, ${data.action}, 'pending', ${JSON.stringify(data.input)},
       ${data.applicationId}, ${data.contactId}, ${data.userId}, ${data.tenantId}
@@ -103,7 +103,7 @@ export async function queueAIJob(data: AIJobData): Promise<string> {
 
 export async function getJobStatus(requestId: string) {
   const [job] = await db.execute(sql`
-    SELECT status, result_data, error_message, created_at, started_at, completed_at
+    SELECT status, result_data, error_message, createdAt, started_at, completed_at
     FROM ai_jobs 
     WHERE request_id = ${requestId}
   `);
@@ -159,7 +159,7 @@ async function updateJobStatus(
       ${(status === 'completed' || status === 'failed' || status === 'cancelled') ? sql`completed_at = NOW(),` : sql``}
       ${result ? sql`result_data = ${JSON.stringify(result)},` : sql``}
       ${error ? sql`error_message = ${error},` : sql``}
-      updated_at = NOW()
+      updatedAt = NOW()
     WHERE request_id = ${requestId}
   `);
 }
@@ -233,7 +233,7 @@ export async function cleanupOldJobs() {
   
   await db.execute(sql`
     DELETE FROM ai_jobs 
-    WHERE created_at < ${cutoffDate} 
+    WHERE createdAt < ${cutoffDate} 
     AND status IN ('completed', 'failed', 'cancelled')
   `);
 }

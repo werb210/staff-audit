@@ -36,7 +36,7 @@ router.get('/health', async (req: any, res: any) => {
             falsePositives++;
             raceConditionsDetected.push({
               documentId: doc.id,
-              fileName: doc.file_name,
+              fileName: doc.name,
               issue: 'file_exists=false but file present on disk',
               type: 'false_negative'
             });
@@ -50,7 +50,7 @@ router.get('/health', async (req: any, res: any) => {
             falsePositives++;
             raceConditionsDetected.push({
               documentId: doc.id,
-              fileName: doc.file_name,
+              fileName: doc.name,
               issue: 'file_exists=true but missing on disk',
               type: 'false_positive'
             });

@@ -110,7 +110,7 @@ r.post("/applications", async (req: any, res: any) => {
       const result = await db.execute(sql`
         INSERT INTO applications (
           legal_business_name, contact_email, contact_first_name, contact_last_name,
-          requested_amount, use_of_funds, form_data, status, created_at, updated_at,
+          requested_amount, use_of_funds, form_data, status, createdAt, updatedAt,
           external_id
         ) VALUES (
           ${businessName}, ${contactEmail}, ${firstName}, ${lastName},

@@ -22,7 +22,7 @@ type SiloState = {
 };
 
 export const useSilo = create<SiloState>((set, get) => ({
-  silo: ((localStorage.getItem(KEY) as Silo) || "bf"),
+  silo: (localStorage.getItem(KEY) as Silo) || "bf",
   setSilo: (s: Silo) => {
     localStorage.setItem(KEY, s);
     set({ silo: s });
@@ -33,12 +33,13 @@ export const useSilo = create<SiloState>((set, get) => ({
     // normalize current route into the chosen silo's namespace
     const next = normalizeRoute(window.location.pathname, s);
     if (next !== window.location.pathname) {
-      window.history.replaceState({}, '', next);
+      window.history.replaceState({}, "", next);
     }
 
     // let other tabs/components know immediately
-    window.dispatchEvent(new CustomEvent("silo-change", { detail: { silo: s }}));
-    
+    window.dispatchEvent(
+      new CustomEvent("silo-change", { detail: { silo: s } }),
+    );
   },
   toggle: () => get().setSilo(get().silo === "bf" ? "slf" : "bf"),
 }));

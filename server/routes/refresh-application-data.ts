@@ -16,9 +16,9 @@ export function mountRefreshApplicationData(app: Express) {
         SELECT 
           COUNT(*) as total_applications,
           COUNT(*) FILTER (WHERE status = 'new') as new_applications,
-          COUNT(DISTINCT d.application_id) as apps_with_documents
+          COUNT(DISTINCT d.applicationId) as apps_with_documents
         FROM applications a
-        LEFT JOIN documents d ON a.id = d.application_id AND d.file_exists = true
+        LEFT JOIN documents d ON a.id = d.applicationId AND d.file_exists = true
       `;
       
       const result = await pool.query(countQuery);
@@ -75,8 +75,8 @@ export function mountRefreshApplicationData(app: Express) {
           COALESCE(a.contact_last_name, a.owner_last_name) as last_name,
           -- Additional fields
           a.use_of_funds,
-          a.created_at,
-          a.updated_at,
+          a.createdAt,
+          a.updatedAt,
           a.lender_id,
           a.product_id,
           -- Document statistics
@@ -86,25 +86,25 @@ export function mountRefreshApplicationData(app: Express) {
           doc_stats.recent_uploads,
           doc_stats.missing_required
         FROM applications a
-        LEFT JOIN businesses b ON a.business_id = b.id
+        LEFT JOIN businesses b ON a.businessId = b.id
         LEFT JOIN (
           SELECT 
-            d.application_id,
+            d.applicationId,
             COUNT(*) as total_docs,
             COUNT(*) FILTER (WHERE d.status = 'accepted' OR d.is_verified = true) as verified_docs,
             COUNT(*) FILTER (WHERE d.status = 'pending' OR d.status IS NULL) as pending_docs,
             jsonb_agg(
               jsonb_build_object(
                 'id', d.id,
-                'fileName', d.file_name,
+                'fileName', d.name,
                 'documentType', d.document_type,
                 'status', COALESCE(d.status, 'pending'),
-                'uploadedAt', d.created_at,
-                'fileSize', d.file_size,
+                'uploadedAt', d.createdAt,
+                'fileSize', d.size,
                 'isVerified', COALESCE(d.is_verified, false),
                 'filePath', d.file_path,
                 'storageKey', d.storage_key
-              ) ORDER BY d.created_at DESC
+              ) ORDER BY d.createdAt DESC
             ) FILTER (WHERE d.id IS NOT NULL) as recent_uploads,
             -- Calculate missing required documents
             array_agg(DISTINCT ed.document_type) FILTER (
@@ -112,16 +112,16 @@ export function mountRefreshApplicationData(app: Express) {
               AND ed.document_type NOT IN (
                 SELECT DISTINCT d2.document_type 
                 FROM documents d2 
-                WHERE d2.application_id = d.application_id 
+                WHERE d2.applicationId = d.applicationId 
                 AND (d2.file_exists = true OR d2.status = 'accepted')
               )
             ) as missing_required
           FROM documents d
-          FULL OUTER JOIN expected_documents ed ON d.application_id = ed.application_id
-          WHERE d.file_exists = true OR ed.application_id IS NOT NULL
-          GROUP BY d.application_id
-        ) doc_stats ON a.id = doc_stats.application_id
-        ORDER BY a.updated_at DESC, a.created_at DESC
+          FULL OUTER JOIN expected_documents ed ON d.applicationId = ed.applicationId
+          WHERE d.file_exists = true OR ed.applicationId IS NOT NULL
+          GROUP BY d.applicationId
+        ) doc_stats ON a.id = doc_stats.applicationId
+        ORDER BY a.updatedAt DESC, a.createdAt DESC
       `;
       
       const result = await pool.query(refreshQuery);
@@ -132,7 +132,7 @@ export function mountRefreshApplicationData(app: Express) {
         const updateQuery = `
           UPDATE applications 
           SET 
-            updated_at = NOW(),
+            updatedAt = NOW(),
             missing_docs = $2,
             is_ready_for_lenders = $3
           WHERE id = $1
@@ -163,7 +163,7 @@ export function mountRefreshApplicationData(app: Express) {
           verifiedCount: app.verified_count,
           pendingCount: app.pending_count,
           missingRequired: app.missing_required || [],
-          lastUpdated: app.updated_at
+          lastUpdated: app.updatedAt
         }))
       });
       
@@ -203,24 +203,24 @@ export function mountRefreshApplicationData(app: Express) {
           doc_data.pending_count,
           doc_data.missing_required
         FROM applications a
-        LEFT JOIN businesses b ON a.business_id = b.id
+        LEFT JOIN businesses b ON a.businessId = b.id
         LEFT JOIN (
           SELECT 
-            d.application_id,
+            d.applicationId,
             jsonb_agg(
               jsonb_build_object(
                 'id', d.id,
-                'fileName', d.file_name,
+                'fileName', d.name,
                 'documentType', d.document_type,
                 'status', COALESCE(d.status, 'pending'),
-                'uploadedAt', d.created_at,
-                'fileSize', d.file_size,
+                'uploadedAt', d.createdAt,
+                'fileSize', d.size,
                 'isVerified', COALESCE(d.is_verified, false),
                 'filePath', d.file_path,
                 'mimeType', d.mime_type,
                 'storageKey', d.storage_key,
                 'objectStorageKey', d.object_storage_key
-              ) ORDER BY d.created_at DESC
+              ) ORDER BY d.createdAt DESC
             ) as documents,
             COUNT(*) as document_count,
             COUNT(*) FILTER (WHERE d.status = 'verified' OR d.is_verified = true) as verified_count,
@@ -230,16 +230,16 @@ export function mountRefreshApplicationData(app: Express) {
               AND ed.document_type NOT IN (
                 SELECT DISTINCT d2.document_type 
                 FROM documents d2 
-                WHERE d2.application_id = d.application_id 
+                WHERE d2.applicationId = d.applicationId 
                 AND (d2.file_exists = true OR d2.status = 'accepted')
               )
             ) as missing_required
           FROM documents d
-          FULL OUTER JOIN expected_documents ed ON d.application_id = ed.application_id
-          WHERE (d.application_id = $1 OR ed.application_id = $1)
+          FULL OUTER JOIN expected_documents ed ON d.applicationId = ed.applicationId
+          WHERE (d.applicationId = $1 OR ed.applicationId = $1)
           AND d.file_exists = true
-          GROUP BY d.application_id
-        ) doc_data ON a.id = doc_data.application_id
+          GROUP BY d.applicationId
+        ) doc_data ON a.id = doc_data.applicationId
         WHERE a.id = $1
       `;
       
@@ -258,7 +258,7 @@ export function mountRefreshApplicationData(app: Express) {
       const updateQuery = `
         UPDATE applications 
         SET 
-          updated_at = NOW(),
+          updatedAt = NOW(),
           missing_docs = $2
         WHERE id = $1
       `;
@@ -296,7 +296,7 @@ export function mountRefreshApplicationData(app: Express) {
           pendingCount: app.pending_count || 0,
           missingRequired: app.missing_required || [],
           // Metadata
-          createdAt: app.created_at,
+          createdAt: app.createdAt,
           updatedAt: new Date().toISOString(),
           lenderId: app.lender_id,
           productId: app.product_id

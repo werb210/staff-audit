@@ -43,11 +43,11 @@ router.get('/s3-status/:applicationId', async (req: any, res: any) => {
     for (const doc of applicationDocuments) {
       const result = {
         id: doc.id,
-        file_name: doc.fileName,
+        name: doc.fileName,
         storage_key: doc.storageKey || doc.storage_key,
         object_storage_key: doc.objectStorageKey,
         file_path: doc.filePath,
-        file_size: doc.fileSize,
+        size: doc.fileSize,
         storage_type: 'unknown',
         s3_accessible: false,
         preview_url_valid: false,
@@ -111,7 +111,7 @@ router.get('/s3-status/:applicationId', async (req: any, res: any) => {
 
     res.json({
       success: true,
-      application_id: applicationId,
+      applicationId: applicationId,
       summary,
       documents: diagnosticResults,
       timestamp: new Date().toISOString()
@@ -153,7 +153,7 @@ router.get('/s3-test-single/:documentId', async (req: any, res: any) => {
         success: false,
         error: 'Document not in S3 storage',
         document_id: documentId,
-        file_name: document.fileName
+        name: document.fileName
       });
     }
 
@@ -166,7 +166,7 @@ router.get('/s3-test-single/:documentId', async (req: any, res: any) => {
     res.json({
       success: true,
       document_id: documentId,
-      file_name: document.fileName,
+      name: document.fileName,
       storage_key: s3Key,
       signed_url: signedUrl,
       http_status: response.status,

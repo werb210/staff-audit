@@ -24,7 +24,7 @@ export function buildPdfData(app: any) {
       email:     preferCanon(canon, legacy, 'applicant.email', 'applicant_email'),
       phone:     preferCanon(canon, legacy, 'applicant.phone', 'applicant_phone'),
     },
-    submittedAt:  preferCanon(canon, legacy, 'system.submittedAt', 'created_at'),
+    submittedAt:  preferCanon(canon, legacy, 'system.submittedAt', 'createdAt'),
   };
 }
 

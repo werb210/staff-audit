@@ -212,10 +212,10 @@ router.get('/api/marketing/attribution/:contactId', async (req: any, res: any) =
         type,
         summary,
         data,
-        created_at
+        createdAt
       FROM timeline_events
       WHERE contact_id = ${contactId}
-      ORDER BY created_at ASC
+      ORDER BY createdAt ASC
     `);
 
     res.json({
@@ -322,7 +322,7 @@ router.post('/api/marketing/retargeting/rules', async (req: any, res: any) => {
         action_config,
         audience_name,
         platforms,
-        created_at
+        createdAt
       ) VALUES (
         ${trigger.type},
         ${JSON.stringify(trigger.conditions)},

@@ -22,7 +22,7 @@ router.get("/threads", async (req: Request, res: Response) => {
     // Expectation:
     // - communications table OR union view of sms_messages, emails, calls
     // - join to contacts table
-    // - group by contact_id with MAX(created_at) as lastActivity
+    // - group by contact_id with MAX(createdAt) as lastActivity
     // - filter by types and optional search `q`
     const results = await (req.app.locals.db?.communications?.getThreads?.({
       types, q, limit, cursor
@@ -59,7 +59,7 @@ router.get("/", async (req: Request, res: Response) => {
     // TODO: Replace with actual ORM queries.
     // Expectation:
     // - fetch messages (union) for this contactId filtered by types
-    // - order by created_at ASC
+    // - order by createdAt ASC
     const messages = await (req.app.locals.db?.communications?.getMessages?.({
       contactId, types, limit, before, after
     }) || [

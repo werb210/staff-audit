@@ -156,12 +156,12 @@ router.post("/audit/export", async (req: any, res) => {
     let paramIndex = 0;
     
     if (startDate) {
-      whereClause += ` AND created_at >= $${++paramIndex}`;
+      whereClause += ` AND createdAt >= $${++paramIndex}`;
       params.push(startDate);
     }
     
     if (endDate) {
-      whereClause += ` AND created_at <= $${++paramIndex}`;
+      whereClause += ` AND createdAt <= $${++paramIndex}`;
       params.push(endDate);
     }
     
@@ -177,7 +177,7 @@ router.post("/audit/export", async (req: any, res) => {
       FROM audit_log al
       LEFT JOIN users u ON u.id = al.actor_user_id
       ${whereClause}
-      ORDER BY al.created_at DESC
+      ORDER BY al.createdAt DESC
       LIMIT 10000
     `, params));
     
@@ -200,7 +200,7 @@ router.post("/audit/export", async (req: any, res) => {
         log.resource_type || '',
         log.resource_id || '',
         JSON.stringify(log.meta || {}),
-        log.created_at
+        log.createdAt
       ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(',');
       csvContent += row + '\n';
     }

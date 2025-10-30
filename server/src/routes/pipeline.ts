@@ -11,7 +11,7 @@ router.get('/cards', async (_req, res) => {
     stage: applications.stage,
     businessName: applications.business_name,
     amount: applications.amount,
-  }).from(applications).orderBy(desc(applications.created_at));
+  }).from(applications).orderBy(desc(applications.createdAt));
 
   res.json(rows);
 });

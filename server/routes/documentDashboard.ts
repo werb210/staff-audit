@@ -14,9 +14,9 @@ router.get('/enhanced-status', async (req: any, res: Response) => {
       totalDocuments: count(),
       withChecksums: sql<number>`COUNT(CASE WHEN checksum IS NOT NULL AND checksum != '' THEN 1 END)`,
       withStorageKeys: sql<number>`COUNT(CASE WHEN storage_key IS NOT NULL AND storage_key != '' THEN 1 END)`,
-      totalSize: sql<number>`COALESCE(SUM(file_size), 0)`,
-      avgSize: sql<number>`COALESCE(AVG(file_size), 0)`,
-      recentUploads: sql<number>`COUNT(CASE WHEN created_at > NOW() - INTERVAL '24 hours' THEN 1 END)`
+      totalSize: sql<number>`COALESCE(SUM(size), 0)`,
+      avgSize: sql<number>`COALESCE(AVG(size), 0)`,
+      recentUploads: sql<number>`COUNT(CASE WHEN createdAt > NOW() - INTERVAL '24 hours' THEN 1 END)`
     }).from(documents);
 
     // Get documents by category with enhancement indicators
@@ -24,8 +24,8 @@ router.get('/enhanced-status', async (req: any, res: Response) => {
       documentType: documents.documentType,
       count: count(),
       withChecksums: sql<number>`COUNT(CASE WHEN checksum IS NOT NULL AND checksum != '' THEN 1 END)`,
-      avgSize: sql<number>`COALESCE(AVG(file_size), 0)`,
-      totalSize: sql<number>`COALESCE(SUM(file_size), 0)`
+      avgSize: sql<number>`COALESCE(AVG(size), 0)`,
+      totalSize: sql<number>`COALESCE(SUM(size), 0)`
     })
     .from(documents)
     .groupBy(documents.documentType)

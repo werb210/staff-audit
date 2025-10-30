@@ -12,9 +12,9 @@ export class PipelineAutomationService {
       
       // Get all documents for this application
       const documentsQuery = `
-        SELECT id, file_name, document_type, is_verified, is_required
+        SELECT id, name, document_type, is_verified, is_required
         FROM documents 
-        WHERE application_id = $1
+        WHERE applicationId = $1
       `;
       
       const documentsResult = await pool.query(documentsQuery, [applicationId]);
@@ -76,7 +76,7 @@ export class PipelineAutomationService {
         UPDATE applications 
         SET pipeline_stage = 'Off to Lender',
             status = 'lender_match',
-            updated_at = NOW()
+            updatedAt = NOW()
         WHERE id = $1
         RETURNING id, pipeline_stage, status
       `;

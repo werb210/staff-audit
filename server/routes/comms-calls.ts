@@ -13,7 +13,7 @@ r.get("/calls", async (req: any, res: any) => {
       SELECT cr.*, c.full_name, c.email, c.phone
       FROM call_records cr
       LEFT JOIN contacts c ON cr.contact_id = c.id
-      ORDER BY cr.created_at DESC
+      ORDER BY cr.createdAt DESC
       LIMIT 50
     `);
     
@@ -23,7 +23,7 @@ r.get("/calls", async (req: any, res: any) => {
       status: call.status,
       recording_url: call.recording_url,
       duration_seconds: call.duration_seconds,
-      created_at: call.created_at,
+      createdAt: call.createdAt,
       contact: call.full_name ? {
         id: call.contact_id,
         name: call.full_name,

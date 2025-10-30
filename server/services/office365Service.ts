@@ -36,8 +36,8 @@ type TokenRow = {
   expires_at: number;
   scope?: string | null;
   tenant?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 };
 
 const mem = new Map<string, TokenRow>();
@@ -70,7 +70,7 @@ async function writeToken(row: TokenRow) {
   if (db) {
     try {
       await db.execute(
-        sql`insert into o365_tokens (user_id, access_token, refresh_token, expires_at, scope, tenant, created_at, updated_at)
+        sql`insert into o365_tokens (user_id, access_token, refresh_token, expires_at, scope, tenant, createdAt, updatedAt)
             values (${row.user_id}, ${row.access_token}, ${row.refresh_token}, ${row.expires_at}, ${row.scope || null}, ${row.tenant || null}, now(), now())
             on conflict (user_id) do update set 
               access_token=excluded.access_token,
@@ -78,7 +78,7 @@ async function writeToken(row: TokenRow) {
               expires_at=excluded.expires_at,
               scope=excluded.scope,
               tenant=excluded.tenant,
-              updated_at=now()`
+              updatedAt=now()`
       );
     } catch {}
   }

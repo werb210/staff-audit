@@ -12,7 +12,7 @@ router.post("/run/:applicationId", async (req:any, res)=>{
 });
 
 router.get("/policies", async (_req,res)=>{
-  const r = await db.execute(sql`SELECT id, scope, rule, created_at FROM engine_policies ORDER BY created_at DESC`);
+  const r = await db.execute(sql`SELECT id, scope, rule, createdAt FROM engine_policies ORDER BY createdAt DESC`);
   res.json(r.rows || []);
 });
 
@@ -34,15 +34,15 @@ router.post("/products/:key/knobs", async (req:any,res)=>{
 
 router.get("/trace/:applicationId/latest", async (req:any,res)=>{
   const r = await db.execute(sql`
-    SELECT id, variant, results, rules_applied, inputs, created_at
-    FROM decision_traces WHERE application_id=${req.params.applicationId}
-    ORDER BY created_at DESC LIMIT 1
+    SELECT id, variant, results, rules_applied, inputs, createdAt
+    FROM decision_traces WHERE applicationId=${req.params.applicationId}
+    ORDER BY createdAt DESC LIMIT 1
   `);
   res.json(r.rows?.[0] || null);
 });
 
 router.get("/variants", async (_req,res)=>{
-  const r = await db.execute(sql`SELECT key, weights, created_at FROM engine_variants ORDER BY created_at`);
+  const r = await db.execute(sql`SELECT key, weights, createdAt FROM engine_variants ORDER BY createdAt`);
   res.json(r.rows || []);
 });
 

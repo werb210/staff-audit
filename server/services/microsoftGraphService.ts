@@ -97,7 +97,7 @@ class MicrosoftGraphService {
         access_token = ${newTokens.access_token},
         refresh_token = ${newTokens.refresh_token || token.refresh_token},
         expires_at = ${new Date(Date.now() + (newTokens.expires_in * 1000)).toISOString()},
-        updated_at = NOW()
+        updatedAt = NOW()
       WHERE user_id = ${userId}
     `);
     

@@ -21,7 +21,7 @@ export async function uploadToS3(applicationId: string, file: Express.Multer.Fil
     Key: storageKey,
     Body: file.buffer,
     ContentType: file.mimetype,
-    ServerSideEncryption: "AES256",
+    ServerSideEncryption: "AES256" as const,
   });
 
   try {
@@ -50,7 +50,7 @@ export async function uploadDocumentToS3(
     Key: storageKey,
     Body: buffer,
     ContentType: "application/pdf",
-    ServerSideEncryption: "AES256",
+    ServerSideEncryption: "AES256" as const,
   });
 
   try {

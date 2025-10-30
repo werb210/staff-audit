@@ -121,10 +121,10 @@ export async function processDocumentOCR(
     console.log('✅ [OCR] Inserting OCR results into database...');
     const insertQuery = `
       INSERT INTO ocr_results (
-        document_id, application_id, extracted_data, confidence, 
+        document_id, applicationId, extracted_data, confidence, 
         field_confidences, processing_status, processing_time_ms
       ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, document_id, application_id, processing_status
+      RETURNING id, document_id, applicationId, processing_status
     `;
     
     // Use direct SQL with postgres client instead of Drizzle
@@ -227,7 +227,7 @@ export async function processDocumentOCR(
     console.log('❌ [OCR] Storing failed OCR result in database...');
     const failedQuery = `
       INSERT INTO ocr_results (
-        document_id, application_id, extracted_data, confidence, 
+        document_id, applicationId, extracted_data, confidence, 
         field_confidences, processing_status, processing_time_ms, error_message
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id, processing_status
@@ -494,7 +494,7 @@ export async function getOcrResultsByDocument(documentId: string) {
 export async function getOcrResultsByApplication(applicationId: string) {
   const { pool } = await import('./db');
   const client = await pool.connect();
-  const result = await client.query('SELECT * FROM ocr_results WHERE application_id = $1 ORDER BY processed_at DESC', [applicationId]);
+  const result = await client.query('SELECT * FROM ocr_results WHERE applicationId = $1 ORDER BY processed_at DESC', [applicationId]);
   client.release();
   return result.rows;
 }
@@ -690,10 +690,10 @@ Format as detailed text extraction for banking analysis.`
       console.log('✅ [S3-OCR] Inserting PDF text extraction results into database...');
       const insertQuery = `
         INSERT INTO ocr_results (
-          document_id, application_id, extracted_data, confidence, 
+          document_id, applicationId, extracted_data, confidence, 
           field_confidences, processing_status, processing_time_ms
         ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING id, document_id, application_id, processing_status
+        RETURNING id, document_id, applicationId, processing_status
       `;
       
       // Use direct SQL with postgres client instead of Drizzle
@@ -785,10 +785,10 @@ Format as detailed text extraction for banking analysis.`
     console.log('✅ [S3-OCR] Inserting OCR results into database...');
     const insertQuery = `
       INSERT INTO ocr_results (
-        document_id, application_id, extracted_data, confidence, 
+        document_id, applicationId, extracted_data, confidence, 
         field_confidences, processing_status, processing_time_ms
       ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, document_id, application_id, processing_status
+      RETURNING id, document_id, applicationId, processing_status
     `;
     
     // Use direct SQL with postgres client instead of Drizzle
@@ -825,7 +825,7 @@ Format as detailed text extraction for banking analysis.`
     
     const failedQuery = `
       INSERT INTO ocr_results (
-        document_id, application_id, extracted_data, confidence, 
+        document_id, applicationId, extracted_data, confidence, 
         field_confidences, processing_status, processing_time_ms, error_message
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id, processing_status

@@ -45,7 +45,7 @@ appDetailRouter.get("/:appId/timeline", async (req: any, res: any) => {
     const rows = [
       {
         id: 1,
-        application_id: appId,
+        applicationId: appId,
         kind: "email_sent",
         direction: "out",
         title: "Welcome email sent",
@@ -56,7 +56,7 @@ appDetailRouter.get("/:appId/timeline", async (req: any, res: any) => {
       },
       {
         id: 2,
-        application_id: appId,
+        applicationId: appId,
         kind: "doc_uploaded",
         title: "Bank statements uploaded",
         body: "3 months of bank statements received",
@@ -89,7 +89,7 @@ appDetailRouter.post("/:appId/actions/email", async (req: any, res: any) => {
     
     const act = {
       id: Date.now(),
-      application_id: appId,
+      applicationId: appId,
       actor_staff_id: staffUserId,
       kind: "email_sent",
       direction: "out",
@@ -120,7 +120,7 @@ appDetailRouter.post("/:appId/actions/task", async (req: any, res: any) => {
     
     const act = {
       id: Date.now(),
-      application_id: appId,
+      applicationId: appId,
       actor_staff_id: staffUserId,
       kind: "task",
       title,
@@ -144,7 +144,7 @@ appDetailRouter.post("/:appId/actions/call", async (req: any, res: any) => {
     
     const act = {
       id: Date.now(),
-      application_id: appId,
+      applicationId: appId,
       actor_staff_id: staffUserId,
       kind: "call_out",
       direction: "out",
@@ -168,7 +168,7 @@ appDetailRouter.post("/:appId/actions/sms", async (req: any, res: any) => {
     
     const act = {
       id: Date.now(),
-      application_id: appId,
+      applicationId: appId,
       actor_staff_id: staffUserId,
       kind: "sms_out",
       direction: "out",
@@ -191,11 +191,11 @@ appDetailRouter.get("/:appId/deal", async (req: any, res: any) => {
     // Mock deal summary
     const row = {
       id: 1,
-      application_id: appId,
+      applicationId: appId,
       stage: "document_review",
       amount_cents: 15000000, // $150,000
       lender_name: "First National Bank",
-      updated_at: new Date().toISOString()
+      updatedAt: new Date().toISOString()
     };
     res.json({ deal: row });
   } catch (error: unknown) {

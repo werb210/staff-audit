@@ -86,8 +86,8 @@ router.post("/api/v1/applications/:id/docs", upload.single("file"), async (req: 
     
     await pool.query(`
       INSERT INTO documents (
-        id, application_id, document_type, file_name, file_path, 
-        file_size, mime_type, status, uploaded_by, created_at
+        id, applicationId, document_type, name, file_path, 
+        size, mime_type, status, uploaded_by, createdAt
       ) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', 'v1-api', NOW())
     `, [
@@ -101,13 +101,13 @@ router.post("/api/v1/applications/:id/docs", upload.single("file"), async (req: 
       success: true,
       document: {
         id: documentId,
-        application_id: applicationId,
+        applicationId: applicationId,
         document_type: documentType,
-        file_name: file.originalname,
-        file_size: file.size,
+        name: file.originalname,
+        size: file.size,
         s3_key: s3Key,
         status: 'pending',
-        created_at: new Date().toISOString()
+        createdAt: new Date().toISOString()
       }
     });
     
@@ -130,10 +130,10 @@ router.get("/api/v1/applications/:id/docs", async (req: Request, res: Response) 
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
     
     const result = await pool.query(`
-      SELECT id, document_type, file_name, file_size, status, created_at as uploaded_at 
+      SELECT id, document_type, name, size, status, createdAt as uploaded_at 
       FROM documents 
-      WHERE application_id = $1 
-      ORDER BY created_at DESC
+      WHERE applicationId = $1 
+      ORDER BY createdAt DESC
     `, [applicationId]);
     
     res.json({

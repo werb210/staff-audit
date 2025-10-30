@@ -165,7 +165,7 @@ r.delete("/:id", async (req: any, res: any) => {
     const tenant = getTenantFromRequest(req);
     const results = await db.execute(sql`
       UPDATE lenders 
-      SET is_active = false, updated_at = NOW()
+      SET is_active = false, updatedAt = NOW()
       WHERE id = ${req.params.id} 
       AND (tenant = ${tenant} OR tenant IS NULL)
       RETURNING *

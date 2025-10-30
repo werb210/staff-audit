@@ -21,22 +21,38 @@ export function useFeaturePanel(featureId: string, meta?: Record<string, any>) {
 }
 
 /** Put on any page where an action button exists for the feature. */
-export function useFeatureActionAvailable(featureId: string, meta?: Record<string, any>) {
+export function useFeatureActionAvailable(
+  featureId: string,
+  meta?: Record<string, any>,
+) {
   useEffect(() => {
-    post("/events", { featureId, kind: "action-available", meta, at: Date.now() });
+    post("/events", {
+      featureId,
+      kind: "action-available",
+      meta,
+      at: Date.now(),
+    });
   }, [featureId]);
 }
 
 /** Drop-in button that also logs action-fired. */
 export function FeatureActionButton(
-  props: PropsWithChildren<{ featureId: string; onClick?: (e: any) => void; className?: string }>
+  props: PropsWithChildren<{
+    featureId: string;
+    onClick?: (e: any) => void;
+    className?: string;
+  }>,
 ) {
   useFeatureActionAvailable(props.featureId);
   return (
     <button
       className={props.className ?? "btn btn-primary"}
       onClick={(e) => {
-        post("/events", { featureId: props.featureId, kind: "action-fired", at: Date.now() });
+        post("/events", {
+          featureId: props.featureId,
+          kind: "action-fired",
+          at: Date.now(),
+        });
         props.onClick?.(e);
       }}
       data-feature={props.featureId}

@@ -94,15 +94,15 @@ router.post('/public/applications/:applicationId/documents', upload.single('docu
     const insertResult = await db.execute(sql`
       INSERT INTO documents (
         id, 
-        application_id, 
-        file_name, 
+        applicationId, 
+        name, 
         document_type, 
         storage_key, 
         checksum, 
-        file_size, 
+        size, 
         mime_type,
         status,
-        created_at
+        createdAt
       ) VALUES (
         ${documentId},
         ${applicationId},
@@ -157,17 +157,17 @@ router.get('/public/applications/:applicationId/documents', async (req: any, res
     const docs = await db.execute(sql`
       SELECT 
         id as documentId,
-        file_name as fileName,
+        name as fileName,
         document_type as documentType, 
         storage_key as storageKey,
         checksum,
-        file_size as fileSize,
+        size as fileSize,
         mime_type as mimeType,
-        created_at as uploadedAt
+        createdAt as uploadedAt
       FROM documents 
-      WHERE application_id = ${applicationId}
+      WHERE applicationId = ${applicationId}
       AND storage_key IS NOT NULL
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `);
 
     console.log(`✅ [DOCUMENT LIST FIXED] Found ${docs.rows.length} documents`);

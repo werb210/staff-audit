@@ -6,7 +6,7 @@ const r = Router(); r.use(requireAuth);
 
 r.post("/training/docs", async (req:any,res)=>{
   const { title, body } = req.body||{};
-  const { rows } = await db.execute(sql`insert into training_docs(title, body, created_by, tsv) values(${title}, ${body}, ${req.user.sub}, to_tsvector('english', ${title}||' '||${body})) returning id,title,created_at`);
+  const { rows } = await db.execute(sql`insert into training_docs(title, body, created_by, tsv) values(${title}, ${body}, ${req.user.sub}, to_tsvector('english', ${title}||' '||${body})) returning id,title,createdAt`);
   res.json({ ok:true, item: rows[0] });
 });
 

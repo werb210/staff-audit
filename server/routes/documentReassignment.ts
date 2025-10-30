@@ -68,7 +68,7 @@ router.post('/reassign', async (req: any, res: any) => {
         const result = await db
           .update(documents)
           .set({ 
-            application_id: targetApplicationId,
+            applicationId: targetApplicationId,
             updatedAt: new Date()
           })
           .where(eq(documents.id, documentId));

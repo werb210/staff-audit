@@ -36,7 +36,7 @@ router.put("/:id", async (req: any, res) => {
   const result = await db.execute(sql`
     UPDATE ocr_mappings 
     SET doc_type = ${doc_type}, name = ${name}, description = ${description}, 
-        rules = ${JSON.stringify(rules)}, updated_at = now()
+        rules = ${JSON.stringify(rules)}, updatedAt = now()
     WHERE id = ${id}
     RETURNING *
   `);
@@ -132,7 +132,7 @@ router.post("/:id/apply/:documentId", async (req: any, res) => {
   }
   
   if (updateFields.length > 0) {
-    updateValues.push(document.application_id);
+    updateValues.push(document.applicationId);
     const query = `UPDATE applications SET ${updateFields.join(', ')} WHERE id = $${updateValues.length}`;
     await db.execute(sql.raw(query, updateValues));
   }
@@ -152,8 +152,8 @@ router.get("/exceptions", async (req: any, res) => {
     SELECT e.*, d.filename, d.category, a.business_name
     FROM ocr_exceptions e
     JOIN documents d ON d.id = e.document_id
-    LEFT JOIN applications a ON a.id = d.application_id
-    ORDER BY e.created_at DESC
+    LEFT JOIN applications a ON a.id = d.applicationId
+    ORDER BY e.createdAt DESC
     LIMIT 100
   `);
   res.json(exceptions.rows || []);

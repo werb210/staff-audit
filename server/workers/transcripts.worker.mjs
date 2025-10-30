@@ -67,7 +67,7 @@ async function processTranscripts() {
       FROM call_transcripts t
       JOIN call_recordings r ON t.recording_id = r.id
       WHERE t.status = 'queued'
-      ORDER BY t.created_at ASC
+      ORDER BY t.createdAt ASC
       LIMIT 5
     `);
 
@@ -83,7 +83,7 @@ async function processTranscripts() {
         // Mark as processing
         await db.execute(`
           UPDATE call_transcripts 
-          SET status = 'processing', updated_at = now()
+          SET status = 'processing', updatedAt = now()
           WHERE id = $1
         `, [transcript.id]);
 
@@ -100,7 +100,7 @@ async function processTranscripts() {
         // Update transcript record
         await db.execute(`
           UPDATE call_transcripts 
-          SET status = 'done', text = $1, summary = $2, updated_at = now()
+          SET status = 'done', text = $1, summary = $2, updatedAt = now()
           WHERE id = $3
         `, [text, summary, transcript.id]);
 
@@ -115,7 +115,7 @@ async function processTranscripts() {
         // Mark as error
         await db.execute(`
           UPDATE call_transcripts 
-          SET status = 'error', error = $1, updated_at = now()
+          SET status = 'error', error = $1, updatedAt = now()
           WHERE id = $2
         `, [error.message, transcript.id]);
       }

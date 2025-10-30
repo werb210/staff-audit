@@ -8,9 +8,9 @@ const router = Router();
 router.get('/applications/:id/documents', bearerAuth, async (req: any, res: any) => {
   try {
     const { rows } = await pool.query(`
-      SELECT id, file_name, file_key, file_size, document_type, status, uploaded_at, uploaded_by
+      SELECT id, name, file_key, size, document_type, status, uploaded_at, uploaded_by
       FROM documents 
-      WHERE application_id = $1 
+      WHERE applicationId = $1 
       ORDER BY uploaded_at DESC
     `, [req.params.id]);
 
@@ -18,7 +18,7 @@ router.get('/applications/:id/documents', bearerAuth, async (req: any, res: any)
     const withUrls = rows.map(d => ({
       ...d,
       url: `/api/documents/${d.id}/view`,
-      file_size: Number(d.file_size) || 0,
+      size: Number(d.size) || 0,
       uploaded_at: d.uploaded_at
     }));
 
@@ -40,7 +40,7 @@ router.post('/applications/:id/documents', bearerAuth, async (req: any, res: any
     }
 
     await pool.query(`
-      INSERT INTO documents (application_id, file_name, file_key, file_size, document_type, status, uploaded_by)
+      INSERT INTO documents (applicationId, name, file_key, size, document_type, status, uploaded_by)
       VALUES ($1, $2, $3, $4, $5, 'pending', $6)
     `, [appId, fileName, fileKey, fileSize || null, documentType || null, req.user?.email || 'system']);
 
@@ -55,7 +55,7 @@ router.post('/applications/:id/documents', bearerAuth, async (req: any, res: any
 router.get('/documents/:docId/view', bearerAuth, async (req: any, res: any) => {
   try {
     const { rows } = await pool.query(`
-      SELECT file_name, file_key, document_type 
+      SELECT name, file_key, document_type 
       FROM documents 
       WHERE id = $1
     `, [req.params.docId]);
@@ -68,7 +68,7 @@ router.get('/documents/:docId/view', bearerAuth, async (req: any, res: any) => {
     res.json({ 
       ok: true, 
       message: 'Document view requested',
-      file_name: rows[0].file_name,
+      name: rows[0].name,
       document_type: rows[0].document_type 
     });
   } catch (error: unknown) {
@@ -88,7 +88,7 @@ router.put('/documents/:docId/status', bearerAuth, async (req: any, res: any) =>
 
     await pool.query(`
       UPDATE documents 
-      SET status = $1, updated_at = NOW()
+      SET status = $1, updatedAt = NOW()
       WHERE id = $2
     `, [status, req.params.docId]);
 

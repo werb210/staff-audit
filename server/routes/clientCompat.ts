@@ -91,7 +91,7 @@ r.get("/lenders", async (req: any, res: any) => {
         p.term_max AS term_months,
         p.amount_min AS min_amount,
         p.amount_max AS max_amount,
-        p.created_at, p.updated_at
+        p.createdAt, p.updatedAt
       FROM "${Product}" p
       LEFT JOIN "${Lender}" l ON l.id = p.lender_id
       ${whereSQL}
@@ -220,7 +220,7 @@ r.post("/public/applications", async (req: any, res: any) => {
     let contactId = found.rows[0]?.id;
     if (!contactId) {
       const insC = `
-        INSERT INTO "${contactTable}" (id, tenant, first_name, last_name, full_name, email, phone, company_name, created_at, updated_at)
+        INSERT INTO "${contactTable}" (id, tenant, first_name, last_name, full_name, email, phone, company_name, createdAt, updatedAt)
         VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, now(), now())
         RETURNING id
       `;
@@ -235,7 +235,7 @@ r.post("/public/applications", async (req: any, res: any) => {
 
     // APPLICATION create - use valid stage enum value, include required user_id 
     const insA = `
-      INSERT INTO "${appTable}" (id, tenant_id, contact_id, user_id, requested_amount, use_of_funds, stage, created_at, updated_at)
+      INSERT INTO "${appTable}" (id, tenant_id, contact_id, user_id, requested_amount, use_of_funds, stage, createdAt, updatedAt)
       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, 'New', now(), now())
       RETURNING id
     `;

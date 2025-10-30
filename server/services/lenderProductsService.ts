@@ -31,7 +31,7 @@ export class LenderProductsService {
           term_months,
           required_documents,
           description,
-          updated_at
+          updatedAt
         FROM lender_products 
         WHERE is_active = true
         ORDER BY name ASC
@@ -49,7 +49,7 @@ export class LenderProductsService {
         termLength: product.term_months ? `${product.term_months} months` : "24 months",
         documentsRequired: product.required_documents || [],
         description: product.description || "",
-        updatedAt: product.updated_at ? new Date(product.updated_at).toISOString() : new Date().toISOString()
+        updatedAt: product.updatedAt ? new Date(product.updatedAt).toISOString() : new Date().toISOString()
       }));
     } catch (error) {
       console.error('Error fetching lender products:', error);
@@ -71,7 +71,7 @@ export class LenderProductsService {
           term_months,
           required_documents,
           description,
-          updated_at
+          updatedAt
         FROM lender_products 
         WHERE id = $1 AND is_active = true
       `, [id]);
@@ -93,7 +93,7 @@ export class LenderProductsService {
         termLength: product.term_months ? `${product.term_months} months` : "24 months",
         documentsRequired: product.required_documents || [],
         description: product.description || "",
-        updatedAt: product.updated_at ? new Date(product.updated_at).toISOString() : new Date().toISOString()
+        updatedAt: product.updatedAt ? new Date(product.updatedAt).toISOString() : new Date().toISOString()
       };
     } catch (error) {
       console.error('Error fetching lender product by ID:', error);

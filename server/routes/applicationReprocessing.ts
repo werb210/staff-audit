@@ -52,7 +52,7 @@ router.post('/request-resync', async (req: any, res: any) => {
     await db.update(applications)
       .set({
         status: 'reprocessing_requested',
-        updated_at: new Date()
+        updatedAt: new Date()
       })
       .where(eq(applications.id, applicationId));
 

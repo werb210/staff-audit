@@ -17,11 +17,11 @@ router.get("/:id/timeline", async (req: any, res: any) => {
         direction,
         subject,
         body,
-        created_at,
+        createdAt,
         meta
       FROM comms 
       WHERE contact_id = ${id}
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
       LIMIT 100
     `);
     
@@ -39,7 +39,7 @@ router.post("/:id/timeline", async (req: any, res: any) => {
     const { kind, direction, subject, body, meta } = req.body;
     
     await db.execute(sql`
-      INSERT INTO comms(contact_id, kind, direction, subject, body, meta, created_at)
+      INSERT INTO comms(contact_id, kind, direction, subject, body, meta, createdAt)
       VALUES(${id}, ${kind}, ${direction}, ${subject || null}, ${body}, ${JSON.stringify(meta || {})}, NOW())
     `);
     

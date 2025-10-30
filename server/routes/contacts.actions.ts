@@ -27,14 +27,14 @@ export function mountContactActions(app: Express) {
 
   // POST /api/contacts/:id/files  { filename, size }
   app.post("/api/contacts/:id/files", async (req: any, res: any) => {
-    await maybe("insert into contact_files(contact_id, file_name, file_size) values($1,$2,$3) returning id", [req.params.id, req.body.filename||"file", req.body.size||0]);
+    await maybe("insert into contact_files(contact_id, name, size) values($1,$2,$3) returning id", [req.params.id, req.body.filename||"file", req.body.size||0]);
     res.json({ ok: true });
   });
 
   // POST /api/contacts/:id/create-application  { amount }
   app.post("/api/contacts/:id/create-application", async (req: any, res: any) => {
     const row = await maybe<{id:string}>(
-      `insert into applications (contact_id, requested_amount, status, created_at)
+      `insert into applications (contact_id, requested_amount, status, createdAt)
        values($1,$2,'draft',now()) returning id`,
       [req.params.id, req.body.amount || 0]
     );

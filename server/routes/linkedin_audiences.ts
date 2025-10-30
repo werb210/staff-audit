@@ -66,7 +66,7 @@ r.post("/:id/preview", async (req: any, res: any) => {
   const where = allowIds ? { AND: [whereContacts, { id: { in: allowIds } }] } : whereContacts;
 
   const [items, total] = await Promise.all([
-    db.contacts.findMany({ where, take: 50, orderBy: { updated_at: "desc" } }),
+    db.contacts.findMany({ where, take: 50, orderBy: { updatedAt: "desc" } }),
     db.contacts.count({ where })
   ]);
 

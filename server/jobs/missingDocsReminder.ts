@@ -17,11 +17,11 @@ export async function sendMissingDocsReminders() {
     
     // Get applications that need document reminders - include all relevant stages
     const applicationsQuery = await db.execute(sql`
-      SELECT id, stage, status, created_at
+      SELECT id, stage, status, createdAt
       FROM applications 
       WHERE stage IN ('Requires Docs', 'New', 'In Review')
-        AND created_at >= NOW() - INTERVAL '30 days'
-      ORDER BY created_at DESC
+        AND createdAt >= NOW() - INTERVAL '30 days'
+      ORDER BY createdAt DESC
       LIMIT 50
     `);
 
@@ -47,7 +47,7 @@ export async function sendMissingDocsReminders() {
         const docQuery = await db.execute(sql`
           SELECT COUNT(*) as count 
           FROM documents 
-          WHERE application_id = ${app.id} 
+          WHERE applicationId = ${app.id} 
             AND status = 'accepted'
         `);
         

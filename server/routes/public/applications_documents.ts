@@ -94,7 +94,7 @@ router.post('/:id/documents', uploadMiddleware, async (req: any, res: any) => {
         a.id, a.status, a.stage,
         COUNT(d.id) as current_document_count
       FROM applications a
-      LEFT JOIN documents d ON d.application_id = a.id
+      LEFT JOIN documents d ON d.applicationId = a.id
       WHERE a.id = ${applicationId}
       GROUP BY a.id, a.status, a.stage
       LIMIT 1
@@ -137,12 +137,12 @@ router.post('/:id/documents', uploadMiddleware, async (req: any, res: any) => {
       const insertQuery = sql`
         INSERT INTO documents (
           id, 
-          application_id, 
-          file_name, 
+          applicationId, 
+          name, 
           document_type, 
           storage_key, 
           checksum, 
-          file_size, 
+          size, 
           mime_type
         ) VALUES (
           ${documentId},
@@ -188,7 +188,7 @@ router.post('/:id/documents', uploadMiddleware, async (req: any, res: any) => {
               status = 'submitted',
               stage = 'In Review',
               documents_status = 'complete',
-              updated_at = NOW()
+              updatedAt = NOW()
             WHERE id = ${applicationId}
           `);
 

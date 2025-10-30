@@ -56,13 +56,13 @@ router.post("/applications", async (req: Request, res: Response) => {
 
     // Create or update user (include password_hash as NULL for clients)
     const userResult = await pool.query(`
-      INSERT INTO users (email, phone, first_name, last_name, role, password_hash, created_at, updated_at)
+      INSERT INTO users (email, phone, first_name, last_name, role, password_hash, createdAt, updatedAt)
       VALUES ($1, $2, $3, $4, 'client', NULL, now(), now())
       ON CONFLICT (email) DO UPDATE SET 
         phone = EXCLUDED.phone,
         first_name = EXCLUDED.first_name,
         last_name = EXCLUDED.last_name,
-        updated_at = now()
+        updatedAt = now()
       RETURNING id
     `, [step4.email, step4.phone, step4.firstName, step4.lastName]);
     
@@ -73,11 +73,11 @@ router.post("/applications", async (req: Request, res: Response) => {
     const tenantId = randomUUID(); // Generate tenant ID (UUID required)
     const appResult = await pool.query(`
       INSERT INTO applications (
-        user_id, business_id, tenant_id, requested_amount, use_of_funds, 
-        status, form_data, created_at, updated_at
+        user_id, businessId, tenant_id, requested_amount, use_of_funds, 
+        status, form_data, createdAt, updatedAt
       )
       VALUES ($1, $2, $3, $4, $5, 'submitted', $6, now(), now())
-      RETURNING id, status, created_at
+      RETURNING id, status, createdAt
     `, [
       userId, 
       businessId, 
@@ -103,7 +103,7 @@ router.post("/applications", async (req: Request, res: Response) => {
       application: {
         id: application.id,
         status: application.status,
-        created_at: application.created_at
+        createdAt: application.createdAt
       }
     });
 
@@ -125,8 +125,8 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
         a.funding_amount,
         a.purpose,
         a.status,
-        a.created_at,
-        a.updated_at,
+        a.createdAt,
+        a.updatedAt,
         u.email,
         u.first_name,
         u.last_name
@@ -184,8 +184,8 @@ router.post("/documents/upload", async (req: Request, res: Response) => {
     // Create document record
     const docResult = await pool.query(`
       INSERT INTO documents (
-        id, application_id, file_name, file_type, file_size, mime_type,
-        status, created_at, updated_at
+        id, applicationId, name, file_type, size, mime_type,
+        status, createdAt, updatedAt
       )
       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, 'uploaded', now(), now())
       RETURNING id, status
@@ -237,8 +237,8 @@ router.post("/chat/start", async (req: Request, res: Response) => {
     // Create chat session
     const sessionResult = await pool.query(`
       INSERT INTO chat_sessions (
-        id, application_id, user_email, user_name, initial_message,
-        priority, category, status, created_at, updated_at
+        id, applicationId, user_email, user_name, initial_message,
+        priority, category, status, createdAt, updatedAt
       )
       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, 'open', now(), now())
       RETURNING id, status
@@ -293,9 +293,9 @@ router.post("/issues/report", async (req: Request, res: Response) => {
     // Create issue report
     const issueResult = await pool.query(`
       INSERT INTO issue_reports (
-        id, application_id, reporter_email, reporter_name, issue_type,
+        id, applicationId, reporter_email, reporter_name, issue_type,
         title, description, severity, browser_info, current_url,
-        status, created_at, updated_at
+        status, createdAt, updatedAt
       )
       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, 'open', now(), now())
       RETURNING id, status

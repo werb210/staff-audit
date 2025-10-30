@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useQuery } from '@tanstack/react-query';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   BarChart,
-  Bar
-} from 'recharts';
-import { 
-  Loader2, 
-  Users, 
-  Eye, 
-  MousePointer, 
-  TrendingUp, 
+  Bar,
+} from "recharts";
+import {
+  Loader2,
+  Users,
+  Eye,
+  MousePointer,
+  TrendingUp,
   Clock,
   RefreshCw,
   Settings,
-  Activity
-} from 'lucide-react';
+  Activity,
+} from "lucide-react";
 
 interface AnalyticsSummary {
   sessions: number;
@@ -58,29 +58,35 @@ export default function GA4Dashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState(30);
 
   // Fetch analytics summary
-  const { data: summaryData, isLoading: summaryLoading, error: summaryError } = useQuery({
-    queryKey: ['analytics-summary', selectedPeriod],
+  const {
+    data: summaryData,
+    isLoading: summaryLoading,
+    error: summaryError,
+  } = useQuery({
+    queryKey: ["analytics-summary", selectedPeriod],
     queryFn: async () => {
-      const response = await fetch(`/api/analytics/ga4/summary?days=${selectedPeriod}`);
+      const response = await fetch(
+        `/api/analytics/ga4/summary?days=${selectedPeriod}`,
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch analytics summary');
+        throw new Error("Failed to fetch analytics summary");
       }
       return response.json();
     },
-    refetchInterval: 5 * 60 * 1000 // Refresh every 5 minutes
+    refetchInterval: 5 * 60 * 1000, // Refresh every 5 minutes
   });
 
   // Fetch real-time analytics
   const { data: realTimeData, isLoading: realTimeLoading } = useQuery({
-    queryKey: ['analytics-realtime'],
+    queryKey: ["analytics-realtime"],
     queryFn: async () => {
-      const response = await fetch('/api/analytics/ga4/realtime');
+      const response = await fetch("/api/analytics/ga4/realtime");
       if (!response.ok) {
-        throw new Error('Failed to fetch real-time analytics');
+        throw new Error("Failed to fetch real-time analytics");
       }
       return response.json();
     },
-    refetchInterval: 30000 // Refresh every 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   const summary: AnalyticsSummary = summaryData?.data;
@@ -89,9 +95,9 @@ export default function GA4Dashboard() {
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
+      return (num / 1000000).toFixed(1) + "M";
     } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
+      return (num / 1000).toFixed(1) + "K";
     }
     return num.toString();
   };
@@ -99,11 +105,11 @@ export default function GA4Dashboard() {
   const formatDuration = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const formatBounceRate = (rate: number): string => {
-    return (rate * 100).toFixed(1) + '%';
+    return (rate * 100).toFixed(1) + "%";
   };
 
   if (summaryLoading) {
@@ -120,9 +126,12 @@ export default function GA4Dashboard() {
       <Card>
         <CardContent className="py-12 text-center">
           <Settings className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Analytics Configuration Required</h3>
+          <h3 className="text-lg font-semibold mb-2">
+            Analytics Configuration Required
+          </h3>
           <p className="text-muted-foreground mb-4">
-            Google Analytics 4 integration needs to be configured to display data.
+            Google Analytics 4 integration needs to be configured to display
+            data.
           </p>
           <Badge variant="outline">Contact admin to configure GA4</Badge>
         </CardContent>
@@ -140,11 +149,11 @@ export default function GA4Dashboard() {
             Google Analytics 4 insights for the last {selectedPeriod} days
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {/* Period Selector */}
           <div className="flex items-center space-x-1">
-            {[7, 30, 90].map(days => (
+            {[7, 30, 90].map((days) => (
               <Button
                 key={days}
                 variant={selectedPeriod === days ? "default" : "outline"}
@@ -155,7 +164,7 @@ export default function GA4Dashboard() {
               </Button>
             ))}
           </div>
-          
+
           {/* Configuration Status */}
           <Badge variant={isConfigured ? "default" : "secondary"}>
             {isConfigured ? "Live Data" : "Demo Data"}
@@ -176,8 +185,12 @@ export default function GA4Dashboard() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-3xl font-bold text-green-500">{realTime.activeUsers}</p>
-                <p className="text-sm text-muted-foreground">Active users right now</p>
+                <p className="text-3xl font-bold text-green-500">
+                  {realTime.activeUsers}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Active users right now
+                </p>
               </div>
               <div>
                 <p className="text-sm font-medium mb-2">Top Active Pages</p>
@@ -185,7 +198,9 @@ export default function GA4Dashboard() {
                   {realTime.topPages.slice(0, 3).map((page, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="truncate">{page.page}</span>
-                      <span className="text-muted-foreground">{page.activeUsers}</span>
+                      <span className="text-muted-foreground">
+                        {page.activeUsers}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -201,8 +216,12 @@ export default function GA4Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Sessions</p>
-                <p className="text-2xl font-bold">{formatNumber(summary?.sessions || 0)}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Sessions
+                </p>
+                <p className="text-2xl font-bold">
+                  {formatNumber(summary?.sessions || 0)}
+                </p>
               </div>
               <Users className="h-8 w-8 text-blue-500" />
             </div>
@@ -213,8 +232,12 @@ export default function GA4Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Page Views</p>
-                <p className="text-2xl font-bold">{formatNumber(summary?.pageviews || 0)}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Page Views
+                </p>
+                <p className="text-2xl font-bold">
+                  {formatNumber(summary?.pageviews || 0)}
+                </p>
               </div>
               <Eye className="h-8 w-8 text-green-500" />
             </div>
@@ -225,8 +248,12 @@ export default function GA4Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Bounce Rate</p>
-                <p className="text-2xl font-bold">{formatBounceRate(summary?.bounceRate || 0)}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Bounce Rate
+                </p>
+                <p className="text-2xl font-bold">
+                  {formatBounceRate(summary?.bounceRate || 0)}
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-orange-500" />
             </div>
@@ -237,8 +264,12 @@ export default function GA4Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Avg. Duration</p>
-                <p className="text-2xl font-bold">{formatDuration(summary?.avgSessionDuration || 0)}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Avg. Duration
+                </p>
+                <p className="text-2xl font-bold">
+                  {formatDuration(summary?.avgSessionDuration || 0)}
+                </p>
               </div>
               <Clock className="h-8 w-8 text-purple-500" />
             </div>
@@ -257,27 +288,27 @@ export default function GA4Dashboard() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={summary?.dailyStats || []}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   tickFormatter={(date) => new Date(date).toLocaleDateString()}
                 />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   labelFormatter={(date) => new Date(date).toLocaleDateString()}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="sessions" 
-                  stroke="#3b82f6" 
+                <Line
+                  type="monotone"
+                  dataKey="sessions"
+                  stroke="#3b82f6"
                   strokeWidth={2}
-                  dot={{ fill: '#3b82f6', strokeWidth: 2 }}
+                  dot={{ fill: "#3b82f6", strokeWidth: 2 }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="users" 
-                  stroke="#10b981" 
+                <Line
+                  type="monotone"
+                  dataKey="users"
+                  stroke="#10b981"
                   strokeWidth={2}
-                  dot={{ fill: '#10b981', strokeWidth: 2 }}
+                  dot={{ fill: "#10b981", strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -325,13 +356,24 @@ export default function GA4Dashboard() {
                     <td className="py-2">
                       <div className="flex items-center space-x-2">
                         <MousePointer className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium capitalize">{source.source}</span>
+                        <span className="font-medium capitalize">
+                          {source.source}
+                        </span>
                       </div>
                     </td>
-                    <td className="text-right py-2">{formatNumber(source.sessions)}</td>
-                    <td className="text-right py-2">{formatNumber(source.users)}</td>
                     <td className="text-right py-2">
-                      {summary?.sessions ? ((source.sessions / summary.sessions) * 100).toFixed(1) : 0}%
+                      {formatNumber(source.sessions)}
+                    </td>
+                    <td className="text-right py-2">
+                      {formatNumber(source.users)}
+                    </td>
+                    <td className="text-right py-2">
+                      {summary?.sessions
+                        ? ((source.sessions / summary.sessions) * 100).toFixed(
+                            1,
+                          )
+                        : 0}
+                      %
                     </td>
                   </tr>
                 )) || []}

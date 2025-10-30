@@ -28,10 +28,10 @@ export async function getContactMergeVars(contactId: string) {
 
   // Pull missing/rejected documents for the most recent application by this contact
   const [application] = await q<any>(`
-    SELECT a.id, a.created_at, a.stage
+    SELECT a.id, a.createdAt, a.stage
     FROM applications a
     WHERE a.contact_id=$1
-    ORDER BY a.created_at DESC
+    ORDER BY a.createdAt DESC
     LIMIT 1
   `, [contactId]);
 
@@ -39,9 +39,9 @@ export async function getContactMergeVars(contactId: string) {
   let rejectedDocs: any[] = [];
   if (application) {
     const docs = await q<any>(`
-      SELECT id, document_type, status, file_name
+      SELECT id, document_type, status, name
       FROM documents
-      WHERE application_id=$1
+      WHERE applicationId=$1
     `, [application.id]);
     
     missingDocs = docs.filter((x:any)=> x.status === "pending"); // pending but not accepted -> still missing
@@ -58,9 +58,9 @@ export async function getContactMergeVars(contactId: string) {
     ApplicationId: application?.id || "",
     ApplicationStage: application?.stage || "",
     MissingDocsCount: missingDocs.length,
-    MissingDocs: missingDocs.map((x:any)=>({ Id:x.id, Category:x.document_type, Filename:x.file_name })),
+    MissingDocs: missingDocs.map((x:any)=>({ Id:x.id, Category:x.document_type, Filename:x.name })),
     RejectedDocsCount: rejectedDocs.length,
-    RejectedDocs: rejectedDocs.map((x:any)=>({ Id:x.id, Category:x.document_type, Filename:x.file_name })),
+    RejectedDocs: rejectedDocs.map((x:any)=>({ Id:x.id, Category:x.document_type, Filename:x.name })),
     Now: new Date().toISOString(),
     ClientPortalUrl: `${process.env.CLIENT_PORTAL_BASE}/login`
   };

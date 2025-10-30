@@ -14,10 +14,10 @@ router.get('/health', async (req: any, res: any) => {
     // Get all documents from database
     const documentsQuery = `
       SELECT 
-        id, file_name, file_path, file_exists, checksum, file_size,
-        application_id, document_type, created_at, updated_at
+        id, name, file_path, file_exists, checksum, size,
+        applicationId, document_type, createdAt, updatedAt
       FROM documents 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `;
     const documentsResult = await pool.query(documentsQuery);
     const documents = documentsResult.rows;
@@ -40,9 +40,9 @@ router.get('/health', async (req: any, res: any) => {
         orphanedRecords++;
         orphanedFiles.push({
           id: doc.id,
-          file_name: doc.file_name,
+          name: doc.name,
           reason: 'null_file_path',
-          application_id: doc.application_id
+          applicationId: doc.applicationId
         });
         continue;
       }
@@ -68,11 +68,11 @@ router.get('/health', async (req: any, res: any) => {
               documentsWithCorruptions++;
               corruptedFiles.push({
                 id: doc.id,
-                file_name: doc.file_name,
+                name: doc.name,
                 reason: 'checksum_mismatch',
                 expected_checksum: doc.checksum,
                 actual_checksum: actualChecksum,
-                file_size: stats.size
+                size: stats.size
               });
             }
           }
@@ -81,7 +81,7 @@ router.get('/health', async (req: any, res: any) => {
           documentsWithCorruptions++;
           corruptedFiles.push({
             id: doc.id,
-            file_name: doc.file_name,
+            name: doc.name,
             reason: 'file_access_error',
             error: accessError instanceof Error ? accessError.message : String(accessError)
           });
@@ -91,9 +91,9 @@ router.get('/health', async (req: any, res: any) => {
         documentsMissingFiles++;
         missingFiles.push({
           id: doc.id,
-          file_name: doc.file_name,
+          name: doc.name,
           expected_path: filePath,
-          application_id: doc.application_id,
+          applicationId: doc.applicationId,
           db_file_exists: doc.file_exists
         });
       }
@@ -199,8 +199,8 @@ router.get('/preview-logs', async (req: any, res: any) => {
     let query = `
       SELECT 
         dpl.*, 
-        d.file_name, 
-        d.application_id,
+        d.name, 
+        d.applicationId,
         d.document_type
       FROM document_preview_log dpl
       LEFT JOIN documents d ON dpl.document_id = d.id

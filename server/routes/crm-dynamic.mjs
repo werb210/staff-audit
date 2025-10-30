@@ -52,7 +52,7 @@ router.get("/api/pipeline-cards", async (req, res) => {
 
     // Field picks (text/numeric)
     const sel = [];
-    sel.push(cols.has("id") ? `${a}."id"::text AS application_id` : `md5(random()::text) AS application_id`);
+    sel.push(cols.has("id") ? `${a}."id"::text AS applicationId` : `md5(random()::text) AS applicationId`);
     sel.push(pick(cols, a, ["borrower_name","applicant_name","contact_name","primary_contact_name","first_name || ' ' || last_name"], "borrower_name", "text"));
     sel.push(pick(cols, a, ["company_name","business_name","org_name"], "company_name", "text"));
     sel.push(pick(cols, a, ["stage","pipeline_stage","status_stage"], "stage", "text"));
@@ -62,14 +62,14 @@ router.get("/api/pipeline-cards", async (req, res) => {
     sel.push(pick(cols, a, ["lender_id"], "a_lender_id", "text"));
     sel.push(pick(cols, a, ["product_name","product","product_type"], "a_product_name", "text"));
     sel.push(pick(cols, a, ["country","country_offered"], "a_country", "text"));
-    sel.push(pick(cols, a, ["updated_at","modified_at","created_at"], "updated_at", "timestamptz"));
+    sel.push(pick(cols, a, ["updatedAt","modified_at","createdAt"], "updatedAt", "timestamptz"));
 
     // Build SQL with two-stage product match: by id OR by (lender_id+name+country)
     const baseSelect = `
       SELECT ${sel.join(", ") }
       FROM "${appTable}" ${a}
       ${tenantId ? `WHERE ${a}."tenant_id" = $1 OR ${a}."tenant"::text = $1` : ""}
-      ORDER BY updated_at DESC NULLS LAST
+      ORDER BY updatedAt DESC NULLS LAST
       LIMIT ${limit}
     `;
     const params = tenantId ? [tenantId] : [];
@@ -111,7 +111,7 @@ router.get("/api/pipeline-cards", async (req, res) => {
       }
       const lender_name = a.a_lender_id ? (lenderById.get(String(a.a_lender_id)) || null) : null;
       return {
-        application_id: a.application_id,
+        applicationId: a.applicationId,
         borrower_name: a.borrower_name,
         company_name: a.company_name,
         stage: a.stage,
@@ -124,7 +124,7 @@ router.get("/api/pipeline-cards", async (req, res) => {
         min_amount: p?.min_amount ?? null,
         max_amount: p?.max_amount ?? null,
         active: p?.active ?? null,
-        updated_at: a.updated_at,
+        updatedAt: a.updatedAt,
       };
     });
 
@@ -171,7 +171,7 @@ router.get("/api/contact-cards", async (req, res) => {
       SELECT ${idExpr}, ${nameExpr}, ${emailExpr}, ${phoneExpr}, ${compExpr}
       FROM "${contactsTable}" ${c}
       ${tenantId ? `WHERE ${c}."tenant_id" = $1 OR ${c}."tenant"::text = $1` : ""}
-      ORDER BY ${c}."updated_at" DESC NULLS LAST, ${c}."created_at" DESC NULLS LAST
+      ORDER BY ${c}."updatedAt" DESC NULLS LAST, ${c}."createdAt" DESC NULLS LAST
       LIMIT ${limit}
     `;
     const params = tenantId ? [tenantId] : [];

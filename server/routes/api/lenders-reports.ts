@@ -26,13 +26,13 @@ router.get("/lenders/:lenderId/report", allowPublicAccess, async (req: any, res:
           100.0 * COUNT(CASE WHEN a.status IN ('approved', 'funded') THEN 1 END) / NULLIF(COUNT(*), 0), 
           1
         ) AS approval_rate,
-        AVG(EXTRACT(EPOCH FROM (a.updated_at - a.created_at)) / 3600) AS avg_response_hours,
+        AVG(EXTRACT(EPOCH FROM (a.updatedAt - a.createdAt)) / 3600) AS avg_response_hours,
         SUM(CASE WHEN a.status = 'funded' THEN a.amount * 0.06 ELSE 0 END) AS total_commission,
         COUNT(DISTINCT lp.id) AS active_products
       FROM applications a
       LEFT JOIN lender_products lp ON lp.lender_id = ${lenderId}
       JOIN lenders l ON l.id = ${lenderId}
-      WHERE a.created_at >= CURRENT_DATE - INTERVAL '30 days'
+      WHERE a.createdAt >= CURRENT_DATE - INTERVAL '30 days'
       GROUP BY l.name
     `);
 
@@ -68,19 +68,19 @@ router.get("/lenders/:lenderId/report/download", allowPublicAccess, async (req: 
         a.business_name,
         a.amount,
         a.status,
-        a.created_at,
-        a.updated_at,
+        a.createdAt,
+        a.updatedAt,
         CASE WHEN a.status = 'funded' THEN a.amount * 0.06 ELSE 0 END AS commission
       FROM applications a
       LEFT JOIN lender_products lp ON lp.lender_id = ${lenderId}
-      WHERE a.created_at >= CURRENT_DATE - INTERVAL '30 days'
-      ORDER BY a.created_at DESC
+      WHERE a.createdAt >= CURRENT_DATE - INTERVAL '30 days'
+      ORDER BY a.createdAt DESC
     `);
 
     if (format === 'csv') {
       const csvHeader = 'Application ID,Business Name,Amount,Status,Created,Updated,Commission\n';
       const csvRows = applications.map(app => 
-        `${app.id},${app.business_name || 'N/A'},${app.amount},${app.status},${app.created_at},${app.updated_at},${app.commission}`
+        `${app.id},${app.business_name || 'N/A'},${app.amount},${app.status},${app.createdAt},${app.updatedAt},${app.commission}`
       ).join('\n');
       
       res.setHeader('Content-Type', 'text/csv');
@@ -137,7 +137,7 @@ router.get("/lenders/:id/matches", allowPublicAccess, async (req: any, res: any)
     
     const matches = await db.execute(sql`
       SELECT
-        a.id AS application_id,
+        a.id AS applicationId,
         a.business_name,
         a.amount,
         a.status,
@@ -146,8 +146,8 @@ router.get("/lenders/:id/matches", allowPublicAccess, async (req: any, res: any)
       FROM applications a
       LEFT JOIN lender_products lp ON lp.lender_id = ${id}
       JOIN lenders l ON l.id = ${id}
-      WHERE a.created_at >= CURRENT_DATE - INTERVAL '30 days'
-      ORDER BY a.created_at DESC
+      WHERE a.createdAt >= CURRENT_DATE - INTERVAL '30 days'
+      ORDER BY a.createdAt DESC
     `);
 
     res.json(matches);

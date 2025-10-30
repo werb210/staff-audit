@@ -58,11 +58,11 @@ router.get("/api/admin/users", requireAdmin, async (req: any, res: any) => {
         role,
         phone,
         twofa_enabled,
-        created_at,
-        updated_at,
+        createdAt,
+        updatedAt,
         last_login
       FROM users 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `);
 
     const users = usersResult.map(user => ({
@@ -72,8 +72,8 @@ router.get("/api/admin/users", requireAdmin, async (req: any, res: any) => {
       role: user.role,
       phone: user.phone,
       twofaEnabled: user.twofa_enabled,
-      createdAt: user.created_at,
-      updatedAt: user.updated_at,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
       lastLogin: user.last_login
     }));
 
@@ -120,7 +120,7 @@ router.post("/api/admin/users", requireAdmin, async (req: any, res: any) => {
 
     await db.execute(sql`
       INSERT INTO users (
-        id, email, name, role, phone, twofa_enabled, created_at, updated_at
+        id, email, name, role, phone, twofa_enabled, createdAt, updatedAt
       ) VALUES (
         ${userId}, 
         ${userData.email}, 
@@ -231,9 +231,9 @@ router.put("/api/admin/users/:id", requireAdmin, async (req: any, res: any) => {
       updateValues.push(userData.twofa_enabled);
     }
 
-    updateFields.push('updated_at = NOW()');
+    updateFields.push('updatedAt = NOW()');
 
-    if (updateFields.length === 1) { // Only updated_at
+    if (updateFields.length === 1) { // Only updatedAt
       return res.status(400).json({ error: "No fields to update" });
     }
 
@@ -326,9 +326,9 @@ router.get("/api/admin/users/audit", requireAdmin, async (req: any, res: any) =>
         action,
         target_user_id,
         details,
-        created_at
+        createdAt
       FROM user_audit_log 
-      ORDER BY created_at DESC 
+      ORDER BY createdAt DESC 
       LIMIT ${Number(limit)} OFFSET ${Number(offset)}
     `);
 
@@ -348,7 +348,7 @@ async function logUserAudit(userId: string, action: string, targetUserId: string
   try {
     await db.execute(sql`
       INSERT INTO user_audit_log (
-        id, user_id, action, target_user_id, details, created_at
+        id, user_id, action, target_user_id, details, createdAt
       ) VALUES (
         ${`audit_${Date.now()}`}, ${userId}, ${action}, ${targetUserId}, ${JSON.stringify(details)}, NOW()
       )

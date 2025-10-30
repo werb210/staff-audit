@@ -37,9 +37,9 @@ export async function checkDocumentIntegrity(): Promise<DocumentIntegrityReport>
   try {
     // Get all documents from database
     const documentsQuery = `
-      SELECT id, file_name, file_path, application_id, created_at 
+      SELECT id, name, file_path, applicationId, createdAt 
       FROM documents 
-      ORDER BY created_at DESC
+      ORDER BY createdAt DESC
     `;
     const documentsResult = await pool.query(documentsQuery);
     const documents = documentsResult.rows;
@@ -142,10 +142,10 @@ export async function getApplicationDocumentIntegrity(applicationId: string): Pr
 
   try {
     const documentsQuery = `
-      SELECT id, file_name, file_path, application_id, created_at 
+      SELECT id, name, file_path, applicationId, createdAt 
       FROM documents 
-      WHERE application_id = $1
-      ORDER BY created_at DESC
+      WHERE applicationId = $1
+      ORDER BY createdAt DESC
     `;
     const documentsResult = await pool.query(documentsQuery, [applicationId]);
     const documents = documentsResult.rows;

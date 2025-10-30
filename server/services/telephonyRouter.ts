@@ -50,7 +50,7 @@ export class TelephonyRouter {
         status: 'answered',
         summary: `Inbound call answered by ${answeredByUser}`,
         metadata: { callSid, answeredByUser },
-        created_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         actor_user_id: answeredByUser
       };
       
@@ -99,7 +99,7 @@ export class TelephonyRouter {
           status: 'received',
           summary: body,
           metadata: { messageSid, fromNumber, toNumber },
-          created_at: new Date().toISOString()
+          createdAt: new Date().toISOString()
         };
         
         // TODO: Save to database
@@ -146,7 +146,7 @@ export class TelephonyRouter {
         status: 'initiated',
         summary: `Outbound call to ${toNumber}`,
         metadata: { userId, toNumber },
-        created_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         actor_user_id: userId
       };
       

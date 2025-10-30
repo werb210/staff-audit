@@ -11,10 +11,14 @@ export default function Routes() {
       <Route path="/login" component={Login} />
       <Route path="/auth/verify" component={OtpPage} />
       <Route path="/staff/:rest*">
-        <ProtectedRoute><Shell /></ProtectedRoute>
+        <ProtectedRoute>
+          <Shell />
+        </ProtectedRoute>
       </Route>
       <Route path="/.replit.dev/staff/:rest*">
-        <ProtectedRoute><Shell /></ProtectedRoute>
+        <ProtectedRoute>
+          <Shell />
+        </ProtectedRoute>
       </Route>
       <Route path="/" component={() => <Redirect to="/login" />} />
       <Route path="*" component={() => <Redirect to="/login" />} />

@@ -20,7 +20,7 @@ router.get('/lender-products', async (req: Request, res: Response) => {
     
     const products = await db.execute(sql`
       SELECT id, product_name, lender_id, category, amount_min, amount_max, 
-             is_active, created_at, updated_at
+             is_active, createdAt, updatedAt
       FROM lender_products 
       WHERE is_active = true
       ORDER BY product_name 
@@ -139,7 +139,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
     }
     
     // Always update the timestamp
-    updates.push(sql`updated_at = NOW()`);
+    updates.push(sql`updatedAt = NOW()`);
     
     // Build and execute update query
     let updateQuery = sql`UPDATE lender_products SET `;
@@ -152,7 +152,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
       }
     }
     
-    updateQuery = sql`${updateQuery} WHERE id = ${productId} RETURNING id, product_name, lender_id, category, amount_min, amount_max, updated_at`;
+    updateQuery = sql`${updateQuery} WHERE id = ${productId} RETURNING id, product_name, lender_id, category, amount_min, amount_max, updatedAt`;
     
     const updatedProduct = await db.execute(updateQuery);
     

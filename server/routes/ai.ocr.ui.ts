@@ -14,7 +14,7 @@ r.get("/ai/ocr/:applicationId/groups", async (req: any, res: any) => {
       SELECT group_key, COUNT(*) as n,
              json_agg(json_build_object('id',id,'field',field,'value',value,'confidence',confidence) ORDER BY confidence DESC) as items
       FROM ocr_insights
-      WHERE application_id=${appId}
+      WHERE applicationId=${appId}
       GROUP BY group_key
       ORDER BY group_key
     `).catch(() => ({ rows: [] }));
@@ -33,14 +33,14 @@ r.get("/ai/ocr/:applicationId/conflicts", async (req: any, res: any) => {
     const conflicts = await db.execute(sql`
       SELECT f.field, f.value_model as model_value, f.value_doc as doc_value, f.delta, f.severity
       FROM field_conflicts f 
-      WHERE f.application_id=${appId}
+      WHERE f.applicationId=${appId}
       ORDER BY f.severity DESC, abs(f.delta) DESC
     `).catch(() => ({ rows: [] }));
     
     const risk = await db.execute(sql`
       SELECT COALESCE(sum(weight),0) as score
       FROM risk_factors 
-      WHERE application_id=${appId}
+      WHERE applicationId=${appId}
     `).catch(() => ({ rows: [{ score: 0 }] }));
     
     res.json({ 

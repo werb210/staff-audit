@@ -1,22 +1,28 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import AddLenderModal from '@/pages/staff/lenders/AddLenderModal';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import AddLenderModal from "@/pages/staff/lenders/AddLenderModal";
 
 interface CreateLenderButtonProps {
-  variant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'link' | 'destructive';
-  size?: 'default' | 'sm' | 'lg' | 'icon';
+  variant?:
+    | "default"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link"
+    | "destructive";
+  size?: "default" | "sm" | "lg" | "icon";
   className?: string;
   showIcon?: boolean;
   children?: React.ReactNode;
 }
 
-export default function CreateLenderButton({ 
-  variant = 'default',
-  size = 'default',
-  className = '',
+export default function CreateLenderButton({
+  variant = "default",
+  size = "default",
+  className = "",
   showIcon = true,
-  children
+  children,
 }: CreateLenderButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -29,7 +35,7 @@ export default function CreateLenderButton({
         onClick={() => setIsModalOpen(true)}
       >
         {showIcon && <Plus className="h-4 w-4" />}
-        {children || 'Create Lender'}
+        {children || "Create Lender"}
       </Button>
 
       <AddLenderModal

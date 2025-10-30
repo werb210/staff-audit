@@ -27,7 +27,7 @@ export async function logSecurityEvent(event: SecurityEvent): Promise<void> {
 
     // Store in database for analysis (use raw SQL if security_events table doesn't exist)
     await db.execute(sql`
-      INSERT INTO security_logs (event_type, severity, ip_address, user_agent, endpoint, details, created_at)
+      INSERT INTO security_logs (event_type, severity, ip_address, user_agent, endpoint, details, createdAt)
       VALUES (${event.type}, ${event.severity}, ${event.ip}, ${event.userAgent || null}, ${event.endpoint}, ${event.details}, NOW())
       ON CONFLICT DO NOTHING
     `).catch(() => {
@@ -85,7 +85,7 @@ export async function checkRequestAnomalies(ip: string, endpoint: string): Promi
       FROM request_logs 
       WHERE ip_address = ${ip} 
       AND endpoint = ${endpoint}
-      AND created_at > NOW() - INTERVAL '1 minute'
+      AND createdAt > NOW() - INTERVAL '1 minute'
     `).catch(() => ({ rows: [{ count: 0 }] }));
 
     const requestCount = Number(recentRequests.rows[0]?.count || 0);
@@ -154,7 +154,7 @@ export function securityMonitoringMiddleware() {
 
       // Log the request
       await db.execute(sql`
-        INSERT INTO request_logs (ip_address, user_agent, endpoint, method, created_at)
+        INSERT INTO request_logs (ip_address, user_agent, endpoint, method, createdAt)
         VALUES (${ip}, ${userAgent}, ${endpoint}, ${req.method}, NOW())
         ON CONFLICT DO NOTHING
       `).catch(() => {

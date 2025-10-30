@@ -1,0 +1,38 @@
+import { Router } from "express";
+const router = Router();
+/** POST /api/dev/impersonate  { role, email?, lenderId? }  (DEV_AUTH only) */
+router.post("/impersonate", (req, res) => {
+    if (process.env.DEV_AUTH !== "1")
+        return res.status(403).json({ error: "forbidden" });
+    const { role, email, lenderId } = req.body || {};
+    if (!role)
+        return res.status(400).json({ error: "missing_role" });
+    const payload = JSON.stringify({ role, email, lenderId });
+    res.cookie("dev_impersonate", payload, {
+        httpOnly: false, // readable by client to show current role
+        sameSite: "lax",
+        secure: false,
+        path: "/",
+        maxAge: 7 * 24 * 3600 * 1000
+    });
+    res.json({ ok: true, role, email, lenderId });
+});
+/** POST /api/dev/impersonate/clear */
+router.post("/impersonate/clear", (req, res) => {
+    if (process.env.DEV_AUTH !== "1")
+        return res.status(403).json({ error: "forbidden" });
+    res.clearCookie("dev_impersonate", { path: "/" });
+    res.json({ ok: true });
+});
+/** GET /api/dev/env-dump - Masked env dump for migration debugging */
+router.get("/env-dump", (req, res) => {
+    const mask = (val) => val ? val.slice(0, 6) + "..." : "MISSING";
+    res.json({
+        TWILIO_ACCOUNT_SID: mask(process.env.TWILIO_ACCOUNT_SID),
+        TWILIO_API_KEY_SID: mask(process.env.TWILIO_API_KEY_SID),
+        TWILIO_TWIML_APP_SID: mask(process.env.TWILIO_TWIML_APP_SID),
+        TWILIO_VERIFY_SERVICE_SID: mask(process.env.TWILIO_VERIFY_SERVICE_SID),
+        S3_BUCKET: process.env.S3_BUCKET || "MISSING",
+    });
+});
+export default router;

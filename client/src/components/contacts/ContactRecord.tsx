@@ -1,9 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Phone, Mail, MapPin, Building, Calendar, FileText, User } from 'lucide-react';
-import { lower } from '@/lib/dedupe';
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Building,
+  Calendar,
+  FileText,
+  User,
+} from "lucide-react";
+import { lower } from "@/lib/dedupe";
 
 interface Contact {
   id: string;
@@ -29,23 +37,27 @@ interface ContactRecordProps {
 }
 
 export default function ContactRecord({ contactId }: ContactRecordProps) {
-  const { data: contact, isLoading, error } = useQuery({
-    queryKey: ['contact', contactId],
+  const {
+    data: contact,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["contact", contactId],
     queryFn: async () => {
       const response = await fetch(`/api/contacts/${contactId}`);
-      if (!response.ok) throw new Error('Failed to fetch contact');
+      if (!response.ok) throw new Error("Failed to fetch contact");
       return response.json();
-    }
+    },
   });
 
   const { data: notes = [] } = useQuery({
-    queryKey: ['contact-notes', contactId],
+    queryKey: ["contact-notes", contactId],
     queryFn: async () => {
       const response = await fetch(`/api/contacts/${contactId}/notes`);
       if (!response.ok) return [];
       const result = await response.json();
       return result.items || [];
-    }
+    },
   });
 
   if (isLoading) {
@@ -69,8 +81,13 @@ export default function ContactRecord({ contactId }: ContactRecordProps) {
           <CardContent className="flex items-center justify-center py-8">
             <div className="text-center">
               <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900">Contact Not Found</h3>
-              <p className="text-gray-600">The contact you're looking for doesn't exist or has been removed.</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Contact Not Found
+              </h3>
+              <p className="text-gray-600">
+                The contact you're looking for doesn't exist or has been
+                removed.
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -80,11 +97,16 @@ export default function ContactRecord({ contactId }: ContactRecordProps) {
 
   const getStatusColor = (status: string) => {
     switch (lower(status)) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'lead': return 'bg-blue-100 text-blue-800';
-      case 'customer': return 'bg-purple-100 text-purple-800';
-      case 'inactive': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "lead":
+        return "bg-blue-100 text-blue-800";
+      case "customer":
+        return "bg-purple-100 text-purple-800";
+      case "inactive":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -190,7 +212,10 @@ export default function ContactRecord({ contactId }: ContactRecordProps) {
           {notes.length > 0 ? (
             <div className="space-y-4">
               {notes.slice(0, 5).map((note: any) => (
-                <div key={note.id} className="border-l-4 border-blue-500 pl-4 py-2">
+                <div
+                  key={note.id}
+                  className="border-l-4 border-blue-500 pl-4 py-2"
+                >
                   <div className="flex justify-between items-start">
                     <p className="text-gray-700">{note.html || note.body}</p>
                     <span className="text-xs text-gray-500">
@@ -198,7 +223,9 @@ export default function ContactRecord({ contactId }: ContactRecordProps) {
                     </span>
                   </div>
                   {note.authorId && (
-                    <p className="text-xs text-gray-500 mt-1">by {note.authorId}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      by {note.authorId}
+                    </p>
                   )}
                 </div>
               ))}
@@ -211,8 +238,12 @@ export default function ContactRecord({ contactId }: ContactRecordProps) {
           ) : (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Notes Yet</h3>
-              <p className="text-gray-600 mb-4">Start documenting your interactions with this contact.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No Notes Yet
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Start documenting your interactions with this contact.
+              </p>
               {/* Add First Note button removed per design */}
             </div>
           )}

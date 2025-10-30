@@ -28,7 +28,7 @@ r.post("/training/reindex", async (req: any, res: any) => {
   const limit = Math.min(200, Number(req.body?.limit || 50));
   const { rows: docs } = await db.execute(sql`
     select id, name, s3_key, mime_type, contact_id
-    from documents order by created_at desc limit ${limit}
+    from documents order by createdAt desc limit ${limit}
   `);
   const s3 = new S3Client({ region: process.env.S3_REGION });
   let ok = 0, fail = 0;

@@ -56,7 +56,7 @@ r.get("/marketing/audience/logs", async (req: any, res: any) => {
   try {
     const { rows } = await db.execute(sql`
       SELECT * FROM audience_sync_logs 
-      ORDER BY created_at DESC 
+      ORDER BY createdAt DESC 
       LIMIT 50
     `);
     

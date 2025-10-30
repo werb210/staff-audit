@@ -75,8 +75,8 @@ router.get("/", async (req: any, res: any) => {
       
       // System Fields
       active: p.isActive,
-      created_at: p.createdAt,
-      updated_at: p.updatedAt
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt
     }));
 
     console.log(`✅ [LENDER-PRODUCTS-API] Serving ${unifiedProducts.length} products (filters: country=${country}, category=${productCategory}, active=${isActive})`);

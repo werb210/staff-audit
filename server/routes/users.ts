@@ -22,11 +22,11 @@ r.get("/", async (_req,res)=>{
              email, 
              phone, 
              role, 
-             created_at,
+             createdAt,
              is_active
       from users 
       where is_active = true OR is_active IS NULL
-      order by created_at desc nulls last
+      order by createdAt desc nulls last
     `);
     console.log(`✅ [USERS-API] Returning ${rs.rows.length} users`);
     res.json({ ok: true, data: rs.rows });
@@ -44,13 +44,13 @@ r.post("/", async (req,res)=>{
     const passHash = password ? await bcrypt.hash(password, 10) : null;
 
     await pool.query(`
-      insert into users (id, first_name, email, phone, role, password_hash, created_at, updated_at) 
+      insert into users (id, first_name, email, phone, role, password_hash, createdAt, updatedAt) 
       values ($1, $2, $3, $4, $5, $6, now(), now())
     `, [id, name, email, phone, role, passHash]);
     
     // Return the created user
     const result = await pool.query(`
-      select id, COALESCE(first_name || ' ' || last_name, email) as name, email, phone, role, created_at
+      select id, COALESCE(first_name || ' ' || last_name, email) as name, email, phone, role, createdAt
       from users where id = $1
     `, [id]);
     
@@ -78,11 +78,11 @@ r.patch("/:id", async (req,res)=>{
     if(!updateSets.length) return res.json({ok:true});
     
     updateVals.push(id);
-    await pool.query(`update users set ${updateSets.join(",")}, updated_at=now() where id=$${updateVals.length}`, updateVals);
+    await pool.query(`update users set ${updateSets.join(",")}, updatedAt=now() where id=$${updateVals.length}`, updateVals);
     
     // Return the updated user
     const result = await pool.query(`
-      select id, COALESCE(first_name || ' ' || last_name, email) as name, email, phone, role, updated_at
+      select id, COALESCE(first_name || ' ' || last_name, email) as name, email, phone, role, updatedAt
       from users where id = $1
     `, [id]);
     

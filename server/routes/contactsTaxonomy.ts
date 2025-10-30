@@ -40,7 +40,7 @@ const contactsDb = {
     
     let query = sql`
       SELECT id, full_name, email, phone, company_name, state, audience_segments, 
-             created_at, updated_at
+             createdAt, updatedAt
       FROM contacts 
       WHERE 1=1
     `;
@@ -72,7 +72,7 @@ const contactsDb = {
       query = sql`${query} ${condition}`;
     }
     
-    query = sql`${query} ORDER BY updated_at DESC`;
+    query = sql`${query} ORDER BY updatedAt DESC`;
     
     if (params.limit) {
       query = sql`${query} LIMIT ${params.limit}`;
@@ -99,8 +99,8 @@ const contactsDb = {
         company: row.company_name,
         state: row.state || 'new',
         audienceSegments: JSON.parse(row.audience_segments || '[]'),
-        createdAt: row.created_at,
-        updatedAt: row.updated_at
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt
       })), 
       total: parseInt((countResult.rows[0] as any)?.total || '0') 
     };
@@ -149,7 +149,7 @@ const contactsDb = {
     }
     
     if (updates.length > 0) {
-      updates.push(sql`updated_at = NOW()`);
+      updates.push(sql`updatedAt = NOW()`);
       
       await db.execute(sql`
         UPDATE contacts 

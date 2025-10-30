@@ -27,7 +27,7 @@ router.get("/", async (req: any, res: any) => {
         c.phone
       FROM comm_threads t
       LEFT JOIN contacts c ON c.id = t.contact_id
-      ORDER BY t.last_inbound_at DESC NULLS LAST, t.created_at DESC
+      ORDER BY t.last_inbound_at DESC NULLS LAST, t.createdAt DESC
       LIMIT 100
     `);
     

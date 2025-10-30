@@ -67,7 +67,7 @@ export async function verifyUploadedFiles(): Promise<{
         }
         
         // Check if file size matches database record
-        // Note: Many old documents may not have file_size recorded, so we only validate if it exists
+        // Note: Many old documents may not have size recorded, so we only validate if it exists
         if (doc.fileSize !== null && doc.fileSize !== undefined && stats.size !== doc.fileSize) {
           results.corrupted++;
           results.issues.push({

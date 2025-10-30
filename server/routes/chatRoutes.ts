@@ -36,7 +36,7 @@ router.post('/start', async (req: any, res: any) => {
 
     // Use raw SQL to work around schema mismatch
     const sessionResult = await db.execute(sql`
-      INSERT INTO chat_sessions (session_id, user_name, user_email, user_phone, status, priority, started_at, last_activity, updated_at)
+      INSERT INTO chat_sessions (session_id, user_name, user_email, user_phone, status, priority, started_at, last_activity, updatedAt)
       VALUES (${sessionId}, ${sessionData.userName}, ${sessionData.userEmail}, ${sessionData.userPhone}, ${sessionData.status}, ${sessionData.priority}, ${sessionData.startedAt}, ${sessionData.lastActivity}, NOW())
       RETURNING id, session_id
     `);
@@ -242,7 +242,7 @@ router.post('/leads', async (req: any, res: any) => {
 
     // Store lead in contacts table using raw SQL
     const leadResult = await db.execute(sql`
-      INSERT INTO contacts (full_name, first_name, last_name, email, phone, role, source, created_at, updated_at)
+      INSERT INTO contacts (full_name, first_name, last_name, email, phone, role, source, createdAt, updatedAt)
       VALUES (${name}, ${firstName}, ${lastName}, ${email}, ${phone || null}, 'Lead', ${source}, NOW(), NOW())
       RETURNING id, email
     `);
@@ -330,7 +330,7 @@ router.post('/escalate', async (req: any, res: any) => {
         escalationReason,
         applicationId,
         status: 'pending',
-        created_at: escalationRecord.createdAt
+        createdAt: escalationRecord.createdAt
       });
     }
 
@@ -648,7 +648,7 @@ router.post('/request-staff', async (req: any, res: any) => {
         message,
         requestType,
         status: 'pending',
-        created_at: escalationRecord.createdAt
+        createdAt: escalationRecord.createdAt
       });
     }
 
