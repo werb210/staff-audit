@@ -30,7 +30,7 @@ jobs:
         run: npm run build
         working-directory: client
 
-      # Do not type-check the whole repo in CI
+      # Type-check server only (exclude client/tests/scripts)
       - name: Server type check only
         run: npx tsc -p tsconfig.ci.json --noEmit || true
 
