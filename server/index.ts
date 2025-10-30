@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 
 import contactsRouter from "./routes/contacts.js";
-import pipelineRouter from "./routes/pipeline.js";
+import pipelineRouter from "./routes/pipeline.mjs";
 import healthRouter from "./routes/_int/index.js";
 
 // --- Setup ---
