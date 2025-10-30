@@ -31,15 +31,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { uploadDocumentBuffer, downloadDocumentBuffer, computeChecksum, validateBufferIntegrity } from '../utils/documentBuffer.js';
 import { generateBusinessPdf, getApplicationDataForPdf } from '../utils/generateBusinessPdf.js';
 
-// Import AWS S3 for fallback streaming
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+// Import AWS Azure for fallback streaming
+import { AzureClient, GetObjectCommand } from '@aws-sdk/client-s3';
 
-// Configure S3 client for fallback streaming
-const s3Client = new S3Client({
+// Configure Azure client for fallback streaming
+const s3Client = new AzureClient({
   region: 'ca-central-1', // Fixed region for boreal-documents bucket
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AZURE_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AZURE_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -61,7 +61,6 @@ const upload = multer({
     const allowedMimeTypes = [
       'application/pdf',
       'application/x-pdf',
-      'application/octet-stream', // fallback for PDFs in Replit
       'binary/octet-stream',      // binary fallback
       'image/jpeg',
       'image/jpg', 
@@ -111,14 +110,14 @@ router.use((req: any, res: any, next: any) => {
 
 // RESTORED: Staff document upload endpoints for recovery
 
-// POST /api/documents/staff-upload/:applicationId - S3-FIRST Staff Upload
+// POST /api/documents/staff-upload/:applicationId - Azure-FIRST Staff Upload
 router.post('/staff-upload/:applicationId', async (req: any, res: any) => upload.single('file'), async (req: RBACRequest, res) => {
   try {
     const { applicationId } = req.params;
     const { documentType, uploadedBy } = req.body;
     const file = req.file;
 
-    console.log(`🚀 [S3 STAFF UPLOAD] Starting S3-first upload for application: ${applicationId}`);
+    console.log(`🚀 [Azure STAFF UPLOAD] Starting Azure-first upload for application: ${applicationId}`);
     console.log(`📄 File:`, file?.originalname, file?.size, 'bytes');
     console.log(`📋 Document Type:`, documentType);
 
@@ -130,29 +129,29 @@ router.post('/staff-upload/:applicationId', async (req: any, res: any) => upload
     const storageKey = `${applicationId}/${file.originalname}`;
     const documentId = uuidv4();
     
-    console.log(`🔒 [S3 STAFF UPLOAD] Document ID: ${documentId}`);
-    console.log(`🗂️ [S3 STAFF UPLOAD] Storage Key: ${storageKey}`);
+    console.log(`🔒 [Azure STAFF UPLOAD] Document ID: ${documentId}`);
+    console.log(`🗂️ [Azure STAFF UPLOAD] Storage Key: ${storageKey}`);
 
-    // STEP 2: Upload to S3 first
+    // STEP 2: Upload to Azure first
     let s3UploadSuccess = false;
     let checksum = null;
     
     try {
-      const { uploadToS3 } = await import('../config/s3Config.js');
+      const { uploadToAzure } = await import('../config/s3Config.js');
       const { computeChecksum } = await import('../utils/bulletproofDocumentStorage.js');
       
       // Compute checksum from buffer
       checksum = await computeChecksum(file.buffer);
-      console.log(`🔒 [S3 STAFF UPLOAD] Checksum: ${checksum}`);
+      console.log(`🔒 [Azure STAFF UPLOAD] Checksum: ${checksum}`);
       
-      // Upload to S3
-      await uploadToS3(file.buffer, storageKey, file.mimetype);
+      // Upload to Azure
+      await uploadToAzure(file.buffer, storageKey, file.mimetype);
       s3UploadSuccess = true;
-      console.log(`☁️ [S3 STAFF UPLOAD] File uploaded to S3: ${storageKey}`);
+      console.log(`☁️ [Azure STAFF UPLOAD] File uploaded to Azure: ${storageKey}`);
       
     } catch (s3Error) {
-      console.error(`❌ [S3 STAFF UPLOAD] S3 upload failed:`, s3Error);
-      return res.status(500).json({ error: 'Failed to upload to S3 storage' });
+      console.error(`❌ [Azure STAFF UPLOAD] Azure upload failed:`, s3Error);
+      return res.status(500).json({ error: 'Failed to upload to Azure storage' });
     }
 
     // STEP 3: Save to database with storage_key
@@ -169,21 +168,21 @@ router.post('/staff-upload/:applicationId', async (req: any, res: any) => upload
       documentId,
       applicationId,
       file.originalname,
-      null, // No local file_path for S3-first
+      null, // No local file_path for Azure-first
       file.mimetype,
       file.size,
       documentType,
       uploadedBy || 'staff',
       checksum,
-      storageKey, // S3 storage key
+      storageKey, // Azure storage key
       'completed', // backup_status
       true, // file_exists
       false, // is_required
       false // is_verified
     ]);
 
-    console.log(`💾 [S3 STAFF UPLOAD] Database record created with storage key: ${storageKey}`);
-    console.log(`📋 [S3 STAFF UPLOAD] Database result:`, result.rows[0]);
+    console.log(`💾 [Azure STAFF UPLOAD] Database record created with storage key: ${storageKey}`);
+    console.log(`📋 [Azure STAFF UPLOAD] Database result:`, result.rows[0]);
 
     console.log(`✅ [STAFF UPLOAD] Document saved:`, result.rows[0]);
 
@@ -310,10 +309,10 @@ router.get('/:id/preview', async (req: Request, res) => {
   try {
     const { id } = req.params;
     
-    console.log(`🔒 [S3 PREVIEW] Starting S3-first preview for document: ${id}`);
+    console.log(`🔒 [Azure PREVIEW] Starting Azure-first preview for document: ${id}`);
     console.log(`📋 [PREVIEW LOG] IP: ${ipAddress}, User-Agent: ${userAgent}`);
     
-    // Get document details including storage_key for S3 access
+    // Get document details including storage_key for Azure access
     const docQuery = 'SELECT id, name, file_path, file_type, checksum, file_exists, storage_key FROM documents WHERE id = $1';
     const docResult = await pool.query(docQuery, [id]);
     
@@ -333,12 +332,12 @@ router.get('/:id/preview', async (req: Request, res) => {
 
     const document = docResult.rows[0];
     
-    // ✅ S3-FIRST APPROACH: Check for S3 storage key
+    // ✅ Azure-FIRST APPROACH: Check for Azure storage key
     if (document.storage_key) {
       try {
-        console.log(`🔗 [S3 PREVIEW] Generating pre-signed URL for: ${document.storage_key}`);
+        console.log(`🔗 [Azure PREVIEW] Generating pre-signed URL for: ${document.storage_key}`);
         
-        // Import and use the S3 pre-signed URL generator
+        // Import and use the Azure pre-signed URL generator
         const { generatePreSignedDownloadUrl } = await import('../utils/s3PreSignedUrls.js');
         const preSignedUrl = await generatePreSignedDownloadUrl(
           document.storage_key, 
@@ -349,29 +348,29 @@ router.get('/:id/preview', async (req: Request, res) => {
         previewStatus = 200;
         fileExists = true;
         
-        // Log successful S3 access
+        // Log successful Azure access
         await pool.query(
           'INSERT INTO document_preview_log (document_id, status, error_message, file_exists, checksum_valid, user_agent, ip_address) VALUES ($1, $2, $3, $4, $5, $6, $7)',
           [id, previewStatus, null, true, true, userAgent, ipAddress]
         );
         
-        console.log(`✅ [S3 PREVIEW] Generated pre-signed URL for ${document.name}`);
+        console.log(`✅ [Azure PREVIEW] Generated pre-signed URL for ${document.name}`);
         
         return res.json({
           success: true,
           url: preSignedUrl,
           fileName: document.name,
           fileType: document.file_type,
-          source: 'S3',
+          source: 'Azure',
           expiresIn: '1 hour'
         });
         
       } catch (s3Error: any) {
-        console.error(`❌ [S3 PREVIEW] Failed to generate pre-signed URL:`, s3Error.message);
+        console.error(`❌ [Azure PREVIEW] Failed to generate pre-signed URL:`, s3Error.message);
         previewStatus = 500;
-        errorMessage = `S3 access failed: ${s3Error.message}`;
+        errorMessage = `Azure access failed: ${s3Error.message}`;
         
-        // Log S3 failure
+        // Log Azure failure
         await pool.query(
           'INSERT INTO document_preview_log (document_id, status, error_message, file_exists, user_agent, ip_address) VALUES ($1, $2, $3, $4, $5, $6)',
           [id, previewStatus, errorMessage, false, userAgent, ipAddress]
@@ -384,8 +383,8 @@ router.get('/:id/preview', async (req: Request, res) => {
       }
     }
     
-    // Legacy local file fallback (only if no S3 storage key)
-    console.log(`⚠️ [PREVIEW] No S3 storage key found for document ${id}, checking local files...`);
+    // Legacy local file fallback (only if no Azure storage key)
+    console.log(`⚠️ [PREVIEW] No Azure storage key found for document ${id}, checking local files...`);
     
     let filePath: string | null = null;
     let actualFileName = document.name || 'unknown';
@@ -414,7 +413,7 @@ router.get('/:id/preview', async (req: Request, res) => {
     
     // If no local file found either
     if (!filePath) {
-      console.log(`❌ [PREVIEW] No file found for document ${id} (neither S3 nor local)`);
+      console.log(`❌ [PREVIEW] No file found for document ${id} (neither Azure nor local)`);
       
       previewStatus = 404;
       errorMessage = "Document not found in cloud storage or local files";
@@ -517,9 +516,9 @@ router.get('/:id/download', async (req: Request, res) => {
   try {
     const { id } = req.params;
     
-    console.log(`🔒 [S3 DOWNLOAD] Starting S3-first download for document: ${id}`);
+    console.log(`🔒 [Azure DOWNLOAD] Starting Azure-first download for document: ${id}`);
     
-    // Get document details including storage_key for S3 access
+    // Get document details including storage_key for Azure access
     const docQuery = 'SELECT id, name, file_path, file_type, checksum, storage_key FROM documents WHERE id = $1';
     const docResult = await pool.query(docQuery, [id]);
     
@@ -530,12 +529,12 @@ router.get('/:id/download', async (req: Request, res) => {
 
     const document = docResult.rows[0];
     
-    // ✅ S3-FIRST APPROACH: Check for S3 storage key
+    // ✅ Azure-FIRST APPROACH: Check for Azure storage key
     if (document.storage_key) {
       try {
-        console.log(`🔗 [S3 DOWNLOAD] Generating pre-signed URL for: ${document.storage_key}`);
+        console.log(`🔗 [Azure DOWNLOAD] Generating pre-signed URL for: ${document.storage_key}`);
         
-        // Import and use the S3 pre-signed URL generator
+        // Import and use the Azure pre-signed URL generator
         const { generatePreSignedDownloadUrl } = await import('../utils/s3PreSignedUrls.js');
         const preSignedUrl = await generatePreSignedDownloadUrl(
           document.storage_key, 
@@ -543,29 +542,29 @@ router.get('/:id/download', async (req: Request, res) => {
           document.name
         );
         
-        console.log(`✅ [S3 DOWNLOAD] Generated pre-signed URL for ${document.name}`);
+        console.log(`✅ [Azure DOWNLOAD] Generated pre-signed URL for ${document.name}`);
         
         return res.json({
           success: true,
           url: preSignedUrl,
           fileName: document.name,
           fileType: document.file_type,
-          source: 'S3',
+          source: 'Azure',
           expiresIn: '1 hour'
         });
         
       } catch (s3Error: any) {
-        console.error(`❌ [S3 DOWNLOAD] Failed to generate pre-signed URL:`, s3Error.message);
+        console.error(`❌ [Azure DOWNLOAD] Failed to generate pre-signed URL:`, s3Error.message);
         
         return res.status(500).json({ 
-          error: `S3 access failed: ${s3Error.message}`,
+          error: `Azure access failed: ${s3Error.message}`,
           message: "Cloud storage access failed. Document may need to be re-uploaded."
         });
       }
     }
     
-    // Legacy local file fallback (only if no S3 storage key)
-    console.log(`⚠️ [DOWNLOAD] No S3 storage key found for document ${id}, checking local files...`);
+    // Legacy local file fallback (only if no Azure storage key)
+    console.log(`⚠️ [DOWNLOAD] No Azure storage key found for document ${id}, checking local files...`);
     
     const filePath = path.resolve(document.file_path);
     
@@ -573,14 +572,14 @@ router.get('/:id/download', async (req: Request, res) => {
     if (!fs.existsSync(filePath)) {
       console.log(`❌ [DOWNLOAD] Missing file on disk: ${filePath}`);
       
-      // Check if S3 storage key exists for fallback
+      // Check if Azure storage key exists for fallback
       if (document.storage_key) {
         try {
-          console.log(`🔄 [S3 Fallback] Attempting to stream from S3: ${document.storage_key}`);
+          console.log(`🔄 [Azure Fallback] Attempting to stream from Azure: ${document.storage_key}`);
           
-          // Get object from S3
+          // Get object from Azure
           const getObjectCommand = new GetObjectCommand({
-            Bucket: process.env.S3_BUCKET_NAME || 'boreal-documents',
+            Bucket: process.env.Azure_BUCKET_NAME || 'boreal-documents',
             Key: document.storage_key,
           });
           
@@ -593,7 +592,7 @@ router.get('/:id/download', async (req: Request, res) => {
             res.setHeader('X-Fallback-Source', 's3');
             res.setHeader('X-Bulletproof-Download', 's3-fallback');
             
-            console.log(`✅ [S3 Fallback Success] Streamed from S3 for document: ${id}`);
+            console.log(`✅ [Azure Fallback Success] Streamed from Azure for document: ${id}`);
             
             // Optional: Save back to local disk for lazy rehydration
             try {
@@ -604,25 +603,25 @@ router.get('/:id/download', async (req: Request, res) => {
               s3ReadableStream.pipe(localWriteStream);
               s3ReadableStream.pipe(res);
               
-              console.log(`💾 [S3 Fallback] File restored to local disk: ${filePath}`);
+              console.log(`💾 [Azure Fallback] File restored to local disk: ${filePath}`);
               
             } catch (rehydrationError) {
-              console.error(`⚠️ [S3 Fallback] Rehydration failed but streaming continues:`, rehydrationError);
+              console.error(`⚠️ [Azure Fallback] Rehydration failed but streaming continues:`, rehydrationError);
               // Still serve the file even if local save fails
               const s3ReadableStream = s3Response.Body as NodeJS.ReadableStream;
               s3ReadableStream.pipe(res);
             }
             
-            return; // Exit early after successful S3 fallback
+            return; // Exit early after successful Azure fallback
           }
           
         } catch (s3Error) {
-          console.error(`[S3 Fallback Failed] Could not fetch from S3:`, s3Error);
-          return res.status(500).json({ error: "S3 fallback failed. Contact support." });
+          console.error(`[Azure Fallback Failed] Could not fetch from Azure:`, s3Error);
+          return res.status(500).json({ error: "Azure fallback failed. Contact support." });
         }
       }
       
-      // No S3 storage key or S3 fallback failed
+      // No Azure storage key or Azure fallback failed
       console.log(`❌ [DOWNLOAD] Missing file on disk: ${filePath}`);
       return res.status(404).json({ error: "File not found and no cloud backup available." });
     }
@@ -1199,7 +1198,7 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
     const docsResult = await pool.query(docsQuery, [applicationId]);
     const documents = docsResult.rows;
     
-    console.log(`📦 [ZIP-DOWNLOAD] Found ${documents.length} accepted documents with S3 storage keys`);
+    console.log(`📦 [ZIP-DOWNLOAD] Found ${documents.length} accepted documents with Azure storage keys`);
     console.log(`📦 [ZIP-DOWNLOAD] Sample documents:`, documents.slice(0, 3).map(d => ({ 
       id: d.id, 
       name: d.name, 
@@ -1212,7 +1211,7 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
       return res.status(404).json({ 
         error: 'No accepted documents found for this application',
         applicationId: applicationId,
-        message: 'Only accepted documents with S3 storage are included in ZIP downloads'
+        message: 'Only accepted documents with Azure storage are included in ZIP downloads'
       });
     }
 
@@ -1258,7 +1257,7 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
 
     let successCount = 0;
     let errorCount = 0;
-    const bucketName = process.env.CORRECT_S3_BUCKET_NAME || process.env.S3_BUCKET_NAME || 'boreal-documents';
+    const bucketName = process.env.CORRECT_Azure_BUCKET_NAME || process.env.Azure_BUCKET_NAME || 'boreal-documents';
 
     // Add each document to ZIP
     for (const doc of documents) {
@@ -1302,7 +1301,7 @@ router.get('/:applicationId/download-all', async (req: Request, res) => {
       console.log(`❌ [ZIP-DOWNLOAD] No files successfully added to ZIP`);
       if (!res.headersSent) {
         return res.status(404).json({ 
-          error: 'No documents could be retrieved from S3',
+          error: 'No documents could be retrieved from Azure',
           applicationId: applicationId 
         });
       }

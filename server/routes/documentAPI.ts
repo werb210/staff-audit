@@ -14,7 +14,7 @@ router.get('/applications/:id/documents', bearerAuth, async (req: any, res: any)
       ORDER BY uploaded_at DESC
     `, [req.params.id]);
 
-    // For now, generate simple view URLs - in production this would be S3 presigned URLs
+    // For now, generate simple view URLs - in production this would be Azure presigned URLs
     const withUrls = rows.map(d => ({
       ...d,
       url: `/api/documents/${d.id}/view`,
@@ -51,7 +51,7 @@ router.post('/applications/:id/documents', bearerAuth, async (req: any, res: any
   }
 });
 
-// View document (would be S3 redirect in production)
+// View document (would be Azure redirect in production)
 router.get('/documents/:docId/view', bearerAuth, async (req: any, res: any) => {
   try {
     const { rows } = await pool.query(`
@@ -64,7 +64,7 @@ router.get('/documents/:docId/view', bearerAuth, async (req: any, res: any) => {
       return res.status(404).json({ ok: false, error: 'Document not found' });
     }
 
-    // In production, this would redirect to S3 presigned URL
+    // In production, this would redirect to Azure presigned URL
     res.json({ 
       ok: true, 
       message: 'Document view requested',

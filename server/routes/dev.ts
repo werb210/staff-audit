@@ -32,7 +32,7 @@ router.get("/env-dump", (req: any, res: any) => {
     TWILIO_API_KEY_SID: mask(process.env.TWILIO_API_KEY_SID),
     TWILIO_TWIML_APP_SID: mask(process.env.TWILIO_TWIML_APP_SID),
     TWILIO_VERIFY_SERVICE_SID: mask(process.env.TWILIO_VERIFY_SERVICE_SID),
-    S3_BUCKET: process.env.S3_BUCKET || "MISSING",
+    Azure_BUCKET: process.env.Azure_BUCKET || "MISSING",
   });
 });
 

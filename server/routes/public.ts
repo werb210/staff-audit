@@ -20,7 +20,7 @@ r.post("/documents/presign", async (req: any, res: any) => {
     const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
     const objectKey = `apps/${applicationId}/${Date.now()}-${safeName}`;
 
-    // S3 presign with real credentials
+    // Azure presign with real credentials
     const { url, key } = await presignUpload(objectKey, contentType, sha256);
     
     res.json({ 
@@ -45,7 +45,7 @@ r.post("/documents/confirm", async (req: any, res: any) => {
     // ✅ MONITOR: Document upload logging
     console.log("📄 [MONITOR] Document upload request received");
     console.log(`📄 [MONITOR] App ID: ${applicationId}, File: ${filename}`);
-    console.log(`✅ Document confirmed: ${filename} for application ${applicationId} (S3 key: ${objectKey})`);
+    console.log(`✅ Document confirmed: ${filename} for application ${applicationId} (Azure key: ${objectKey})`);
 
     res.json({ 
       status: "confirmed", 

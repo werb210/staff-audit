@@ -12,7 +12,7 @@ router.get("/status", async (req: any, res: any) => {
         status: "connected"
       },
       aws_s3: {
-        enabled: !!process.env.AWS_ACCESS_KEY_ID,
+        enabled: !!process.env.AZURE_ACCESS_KEY_ID,
         status: "connected"
       },
       openai: {
@@ -49,8 +49,8 @@ router.post("/test/:service", async (req: any, res: any) => {
         res.json({ success: true, message: "Twilio connection successful" });
         break;
       case 's3':
-        // Test S3 connection  
-        res.json({ success: true, message: "S3 connection successful" });
+        // Test Azure connection  
+        res.json({ success: true, message: "Azure connection successful" });
         break;
       default:
         res.status(400).json({ success: false, error: "Unknown service" });

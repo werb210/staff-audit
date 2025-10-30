@@ -1,5 +1,4 @@
-export const S3_CONFIG = {
-  region: process.env.AWS_REGION!,
-  bucket: process.env.S3_BUCKET!,
-  serverSideEncryption: "AES256" as const,
+export const AZURE_STORAGE_CONFIG = {
+  connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING!,
+  containerName: process.env.AZURE_STORAGE_CONTAINER!,
 };

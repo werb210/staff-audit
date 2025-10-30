@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { documents, retryUploadLogs } from '../../shared/schema';
-import { uploadToS3 } from '../utils/s3DirectStorage';
+import { uploadToAzure } from '../utils/s3DirectStorage';
 import { enqueueUploadRetry } from '../queues/retryQueue';
 import { v4 as uuidv4 } from 'uuid';
 import { eq, desc } from 'drizzle-orm';
@@ -18,7 +18,7 @@ interface UploadResult {
 
 /**
  * STRICT UPLOAD SERVICE - NO FALLBACK RESPONSES
- * Either succeeds with real S3 upload or fails with retry queue
+ * Either succeeds with real Azure upload or fails with retry queue
  */
 export async function processDocumentUpload(
   applicationId: string,
@@ -33,17 +33,17 @@ export async function processDocumentUpload(
   console.log(`📊 [UPLOAD-SERVICE] File size: ${buffer.length} bytes, Type: ${documentType}`);
 
   try {
-    // Attempt direct S3 upload
-    console.log(`☁️ [UPLOAD-SERVICE] Attempting S3 upload...`);
-    const s3Result = await uploadToS3(buffer, filename, applicationId);
+    // Attempt direct Azure upload
+    console.log(`☁️ [UPLOAD-SERVICE] Attempting Azure upload...`);
+    const s3Result = await uploadToAzure(buffer, filename, applicationId);
     
     if (!s3Result.success) {
-      throw new Error(s3Result.error || 'S3 upload failed');
+      throw new Error(s3Result.error || 'Azure upload failed');
     }
 
-    console.log(`✅ [UPLOAD-SERVICE] S3 upload successful: ${s3Result.storageKey}`);
+    console.log(`✅ [UPLOAD-SERVICE] Azure upload successful: ${s3Result.storageKey}`);
 
-    // Create document record with real S3 data
+    // Create document record with real Azure data
     const documentId = uuidv4();
     await db.insert(documents).values({
       id: documentId,
@@ -74,7 +74,7 @@ export async function processDocumentUpload(
     };
 
   } catch (error: any) {
-    console.error(`❌ [UPLOAD-SERVICE] S3 upload failed for ${filename}:`, error.message);
+    console.error(`❌ [UPLOAD-SERVICE] Azure upload failed for ${filename}:`, error.message);
 
     // NO FALLBACK - Enqueue for retry instead
     try {

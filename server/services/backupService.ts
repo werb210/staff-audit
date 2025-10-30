@@ -5,17 +5,17 @@ import archiver from 'archiver';
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { AzureClient, PutObjectCommand } from '@aws-sdk/client-s3';
 
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION || 'ca-central-1',
+const s3Client = new AzureClient({
+  region: process.env.AZURE_REGION || 'ca-central-1',
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AZURE_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AZURE_SECRET_ACCESS_KEY!,
   },
 });
 
-const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'boreal-documents';
+const BUCKET_NAME = process.env.Azure_BUCKET_NAME || 'boreal-documents';
 
 export class BackupService {
   // Create monthly snapshot for all applications
@@ -73,9 +73,9 @@ export class BackupService {
       // Create ZIP file
       const zipPath = await this.createZipFile(applicationId, docs);
       
-      // Upload to S3
+      // Upload to Azure
       const s3Key = `snapshots/${month}/${applicationId}.zip`;
-      const s3Url = await this.uploadToS3(zipPath, s3Key);
+      const s3Url = await this.uploadToAzure(zipPath, s3Key);
       
       // Calculate file size
       const stats = fs.statSync(zipPath);
@@ -182,8 +182,8 @@ export class BackupService {
     });
   }
 
-  // Upload ZIP file to S3
-  private async uploadToS3(filePath: string, s3Key: string): Promise<string> {
+  // Upload ZIP file to Azure
+  private async uploadToAzure(filePath: string, s3Key: string): Promise<string> {
     try {
       const fileContent = fs.readFileSync(filePath);
       
@@ -202,11 +202,11 @@ export class BackupService {
       await s3Client.send(command);
       
       const s3Url = `s3://${BUCKET_NAME}/${s3Key}`;
-      console.log(`[BACKUP] Uploaded to S3: ${s3Url}`);
+      console.log(`[BACKUP] Uploaded to Azure: ${s3Url}`);
       return s3Url;
       
     } catch (error) {
-      console.error(`[BACKUP] S3 upload failed for ${s3Key}:`, error);
+      console.error(`[BACKUP] Azure upload failed for ${s3Key}:`, error);
       throw error;
     }
   }

@@ -1,6 +1,5 @@
 /**
  * Dynamic Base URL Generation for Dev/Production Environments
- * Prevents hardcoded production URLs from breaking Replit preview
  */
 
 export function getBaseUrl(req?: any): string {
@@ -9,7 +8,6 @@ export function getBaseUrl(req?: any): string {
     return process.env.BASE_URL || 'https://boreal.financial';
   }
   
-  // In development, use the request hostname if available (for Replit preview)
   if (req?.hostname && /\.replit\.dev$/i.test(req.hostname)) {
     return `https://${req.hostname}`;
   }

@@ -119,9 +119,9 @@ router.get("/applications/:id/documents.zip", async (req: Request, res: Response
     // Pipe archive to response
     archive.pipe(res);
 
-    // Add placeholder content (in production, fetch from S3)
+    // Add placeholder content (in production, fetch from Azure)
     for (const doc of rows) {
-      const content = `Document: ${doc.name}\nType: ${doc.document_type}\nStorage: ${doc.storage_key}\n\n[File content would be fetched from S3 in production]`;
+      const content = `Document: ${doc.name}\nType: ${doc.document_type}\nStorage: ${doc.storage_key}\n\n[File content would be fetched from Azure in production]`;
       archive.append(content, { name: doc.name });
     }
 

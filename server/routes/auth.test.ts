@@ -23,7 +23,6 @@ r.post('/test-login', async (req: any, res: any) => {
     res.cookie("auth_token", token, {
       httpOnly: true,
       sameSite: "none",     // key for iframe compatibility
-      secure: true,         // Replit preview is HTTPS
       path: "/",
     });
 

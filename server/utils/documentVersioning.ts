@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import { S3_CONFIG } from "../config/s3Config";
+import { Azure_CONFIG } from "../config/s3Config";
 import { db } from "../db";
 import { documents } from "../../shared/schema";
 import { eq } from "drizzle-orm";
@@ -13,9 +13,9 @@ export function computeSHA256(buffer: Buffer): string {
 }
 
 /**
- * Store document to S3 with SHA256 versioning
+ * Store document to Azure with SHA256 versioning
  */
-export async function storeDocumentToS3WithVersioning(
+export async function storeDocumentToAzureWithVersioning(
   documentId: string,
   file: Express.Multer.File
 ): Promise<{ storageKey: string; hash: string; fileSize: number }> {
@@ -33,12 +33,12 @@ export async function storeDocumentToS3WithVersioning(
   console.log(`📂 [VERSIONING] Storage key: ${versionedKey}`);
   
   try {
-    // Import S3 client dynamically to avoid import issues
+    // Import Azure client dynamically to avoid import issues
     const { s3Client } = await import("../config/s3Config");
     
-    // Check if this exact version already exists in S3
+    // Check if this exact version already exists in Azure
     const headCommand = new GetObjectCommand({
-      Bucket: S3_CONFIG.bucket,
+      Bucket: Azure_CONFIG.bucket,
       Key: versionedKey
     });
     
@@ -47,10 +47,10 @@ export async function storeDocumentToS3WithVersioning(
       console.log(`♻️  [VERSIONING] File with hash ${hash.substring(0, 12)} already exists - skipping upload`);
     } catch (notFoundError) {
       // File doesn't exist, proceed with upload
-      console.log(`📤 [VERSIONING] Uploading new version to S3`);
+      console.log(`📤 [VERSIONING] Uploading new version to Azure`);
       
       const uploadCommand = new PutObjectCommand({
-        Bucket: S3_CONFIG.bucket,
+        Bucket: Azure_CONFIG.bucket,
         Key: versionedKey,
         Body: file.buffer,
         ContentType: file.mimetype,
@@ -65,7 +65,7 @@ export async function storeDocumentToS3WithVersioning(
       
       const { s3Client: s3ClientForUpload } = await import("../config/s3Config");
       await s3ClientForUpload.send(uploadCommand);
-      console.log(`✅ [VERSIONING] Successfully uploaded to S3: ${versionedKey}`);
+      console.log(`✅ [VERSIONING] Successfully uploaded to Azure: ${versionedKey}`);
     }
     
     return {
@@ -75,8 +75,8 @@ export async function storeDocumentToS3WithVersioning(
     };
     
   } catch (error: any) {
-    console.error(`❌ [VERSIONING] Error storing document to S3:`, error);
-    throw new Error(`S3 upload failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`❌ [VERSIONING] Error storing document to Azure:`, error);
+    throw new Error(`Azure upload failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -95,8 +95,8 @@ export async function storeDocumentWithVersioning(
     const { v4: uuidv4 } = await import('uuid');
     const documentId = uuidv4();
     
-    // Store to S3 with versioning
-    const { storageKey, hash, fileSize } = await storeDocumentToS3WithVersioning(documentId, file);
+    // Store to Azure with versioning
+    const { storageKey, hash, fileSize } = await storeDocumentToAzureWithVersioning(documentId, file);
     
     // Store in database with versioning metadata
     await db.insert(documents).values({
@@ -146,8 +146,8 @@ export async function reuploadDocumentWithVersioning(
       throw new Error(`Document not found: ${documentId}`);
     }
     
-    // Store new version to S3
-    const { storageKey, hash, fileSize } = await storeDocumentToS3WithVersioning(documentId, file);
+    // Store new version to Azure
+    const { storageKey, hash, fileSize } = await storeDocumentToAzureWithVersioning(documentId, file);
     
     // Update database record
     await db

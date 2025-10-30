@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db } from "../db/drizzle";
 import { sql } from "drizzle-orm";
 import IORedis from "ioredis";
-import { S3Client, HeadBucketCommand } from "@aws-sdk/client-s3";
+import { AzureClient, HeadBucketCommand } from "@aws-sdk/client-s3";
 import fetch from "node-fetch";
 import { getToken } from "../services/graph";
 const r = Router();
@@ -14,8 +14,8 @@ r.get("/ops/status", async (_req, res) => {
     TWILIO_ACCOUNT_SID: !!process.env.TWILIO_ACCOUNT_SID,
     TWILIO_AUTH_TOKEN: !!process.env.TWILIO_AUTH_TOKEN,
     TWILIO_MESSAGING_SERVICE_SID: !!process.env.TWILIO_MESSAGING_SERVICE_SID,
-    S3_BUCKET: !!process.env.S3_BUCKET,
-    S3_REGION: !!process.env.S3_REGION,
+    Azure_BUCKET: !!process.env.Azure_BUCKET,
+    Azure_REGION: !!process.env.Azure_REGION,
     DATABASE_URL: !!process.env.DATABASE_URL,
     REDIS_URL: !!process.env.REDIS_URL,
     O365_SERVICE_USER_ID: !!process.env.O365_SERVICE_USER_ID,
@@ -26,7 +26,7 @@ r.get("/ops/status", async (_req, res) => {
   out.checks.env = need;
   try { await db.execute(sql`select 1`); out.checks.database = { ok:true }; } catch (e:any){ out.checks.database={ ok:false, err:e?.message }; out.ok=false; }
   try { const r = new IORedis(process.env.REDIS_URL!); await r.ping(); await r.quit(); out.checks.redis={ ok:true }; } catch(e:any){ out.checks.redis={ ok:false, err:e?.message }; out.ok=false; }
-  try { const s3 = new S3Client({ region: process.env.S3_REGION }); await s3.send(new HeadBucketCommand({ Bucket: process.env.S3_BUCKET! })); out.checks.s3={ ok:true }; } catch(e:any){ out.checks.s3={ ok:false, err:e?.message }; out.ok=false; }
+  try { const s3 = new AzureClient({ region: process.env.Azure_REGION }); await s3.send(new HeadBucketCommand({ Bucket: process.env.Azure_BUCKET! })); out.checks.s3={ ok:true }; } catch(e:any){ out.checks.s3={ ok:false, err:e?.message }; out.ok=false; }
   try {
     // Twilio: lightweight auth check
     const sid = process.env.TWILIO_ACCOUNT_SID, tok = process.env.TWILIO_AUTH_TOKEN;

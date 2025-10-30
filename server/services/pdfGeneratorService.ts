@@ -7,7 +7,7 @@ import { PDFDocument, PDFForm, PDFTextField, PDFCheckBox, rgb } from 'pdf-lib';
 import { db } from '../db';
 import { applications, documents, contacts } from '../../shared/schema';
 import { eq } from 'drizzle-orm';
-import { uploadDocumentToS3 } from '../utils/s3Upload';
+import { uploadDocumentToAzure } from '../utils/s3Upload';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -222,20 +222,20 @@ export async function generateApplicationPDF(applicationId: string): Promise<Buf
 }
 
 /**
- * Save generated PDF as document to S3 and database
+ * Save generated PDF as document to Azure and database
  */
-export async function saveDocumentToS3AndDB(
+export async function saveDocumentToAzureAndDB(
   applicationId: string,
   fileBuffer: Buffer,
   filename: string,
   category: string = 'generated_application_summary',
   status: string = 'accepted'
 ): Promise<string> {
-  console.log(`📤 [PDF-GEN] Uploading PDF to S3: ${filename}`);
+  console.log(`📤 [PDF-GEN] Uploading PDF to Azure: ${filename}`);
 
   try {
-    // Upload to S3
-    const s3Result = await uploadDocumentToS3({
+    // Upload to Azure
+    const s3Result = await uploadDocumentToAzure({
       buffer: fileBuffer,
       originalName: filename,
       mimeType: 'application/pdf'
@@ -301,9 +301,9 @@ export async function generateAllApplicationPDFs(): Promise<{
         // Generate PDF
         const pdfBuffer = await generateApplicationPDF(app.id);
         
-        // Save to S3 and database
+        // Save to Azure and database
         const filename = `ApplicationSummary-${app.id}.pdf`;
-        await saveDocumentToS3AndDB(
+        await saveDocumentToAzureAndDB(
           app.id,
           pdfBuffer,
           filename,
@@ -365,9 +365,9 @@ export async function testPDFGeneration(applicationId?: string): Promise<{
     // Generate PDF
     const pdfBuffer = await generateApplicationPDF(applicationId);
     
-    // Save to S3 and database
+    // Save to Azure and database
     const filename = `Test-ApplicationSummary-${applicationId}.pdf`;
-    const documentId = await saveDocumentToS3AndDB(
+    const documentId = await saveDocumentToAzureAndDB(
       applicationId,
       pdfBuffer,
       filename,

@@ -1,6 +1,6 @@
 /**
  * BULLETPROOF DOCUMENT UPLOAD SERVICE
- * Local storage + S3 backup with atomic transactions
+ * Local storage + Azure backup with atomic transactions
  */
 
 import { promises as fs } from 'fs';
@@ -12,7 +12,7 @@ import mime from 'mime-types';
 import { db } from '../db';
 import { documents } from '../../shared/schema';
 import { eq } from 'drizzle-orm';
-import { s3, S3_CONFIG } from '../config/s3Config';
+import { s3, Azure_CONFIG } from '../config/s3Config';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'documents');
 
@@ -170,11 +170,11 @@ async function queueForBackup(documentId: string) {
 }
 
 /**
- * BACKGROUND: Perform actual S3 backup
+ * BACKGROUND: Perform actual Azure backup
  */
 async function performBackup(documentId: string) {
   if (!s3Client) {
-    console.warn(`⚠️ [BULLETPROOF] S3 not available, skipping backup for: ${documentId}`);
+    console.warn(`⚠️ [BULLETPROOF] Azure not available, skipping backup for: ${documentId}`);
     await updateBackupStatus(documentId, 'failed');
     return;
   }
@@ -196,12 +196,12 @@ async function performBackup(documentId: string) {
     const filePath = path.join(process.cwd(), document.filePath);
     const buffer = await fs.readFile(filePath);
     
-    // Create S3 object key
+    // Create Azure object key
     const objectKey = `${document.applicationId}/${documentId}${path.extname(document.fileName)}`;
     
-    console.log(`☁️ [BULLETPROOF] Uploading to S3: ${objectKey}`);
+    console.log(`☁️ [BULLETPROOF] Uploading to Azure: ${objectKey}`);
     
-    // Upload to S3
+    // Upload to Azure
     await s3Client.send(new PutObjectCommand({
       Bucket: s3Config.bucket,
       Key: objectKey,
@@ -215,7 +215,7 @@ async function performBackup(documentId: string) {
       },
     }));
     
-    console.log(`✅ [BULLETPROOF] S3 backup completed: ${objectKey}`);
+    console.log(`✅ [BULLETPROOF] Azure backup completed: ${objectKey}`);
     
     // Update database with success
     await updateBackupStatus(documentId, 'completed', objectKey);
@@ -293,12 +293,12 @@ export async function getDocumentFile(documentId: string): Promise<{
       };
       
     } catch (localError) {
-      console.log(`⚠️ [BULLETPROOF] Local file not found, trying S3 backup: ${documentId}`);
+      console.log(`⚠️ [BULLETPROOF] Local file not found, trying Azure backup: ${documentId}`);
       
-      // Try S3 backup
+      // Try Azure backup
       if (s3Client && document.objectStorageKey && document.backupStatus === 'completed') {
         try {
-          console.log(`☁️ [BULLETPROOF] Fetching from S3: ${document.objectStorageKey}`);
+          console.log(`☁️ [BULLETPROOF] Fetching from Azure: ${document.objectStorageKey}`);
           
           const response = await s3Client.send(new GetObjectCommand({
             Bucket: s3Config.bucket,
@@ -306,7 +306,7 @@ export async function getDocumentFile(documentId: string): Promise<{
           }));
           
           if (response.Body) {
-            console.log(`✅ [BULLETPROOF] Serving from S3: ${document.fileName}`);
+            console.log(`✅ [BULLETPROOF] Serving from Azure: ${document.fileName}`);
             
             return {
               stream: response.Body as NodeJS.ReadableStream,
@@ -317,7 +317,7 @@ export async function getDocumentFile(documentId: string): Promise<{
           }
           
         } catch (s3Error) {
-          console.error(`❌ [BULLETPROOF] S3 retrieval failed:`, s3Error);
+          console.error(`❌ [BULLETPROOF] Azure retrieval failed:`, s3Error);
         }
       }
       

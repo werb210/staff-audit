@@ -45,7 +45,7 @@ r.get("/applications/:id/documents.zip", async (req: Request, res: Response) => 
     manifest.push(`status=${d.status}`);
     if (d.sha256) manifest.push(`sha256=${d.sha256}`);
     manifest.push("");
-    zip.append(`s3://${process.env.S3_BUCKET}/${d.object_key}\n`, { name: `pointers/${d.id}_${d.filename}.txt` });
+    zip.append(`s3://${process.env.Azure_BUCKET}/${d.object_key}\n`, { name: `pointers/${d.id}_${d.filename}.txt` });
   }
   zip.append(manifest.join("\n") + "\n", { name: "manifest.txt" });
   await zip.finalize();

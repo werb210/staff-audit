@@ -3,7 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { db } from '../db';
 import { documents } from '../../shared/schema';
-import { uploadToS3, testS3Connection } from '../config/s3Config';
+import { uploadToAzure, testAzureConnection } from '../config/s3Config';
 
 interface DocumentUploadParams {
   documentId: string;
@@ -62,29 +62,29 @@ export async function saveDocumentToDiskAndDB(params: DocumentUploadParams) {
     }
     console.log(`✅ [BULLETPROOF DISK-ONLY] File verified: ${stats.size} bytes`);
 
-    // Step 3: S3 Primary Storage (enabled for all environments)
+    // Step 3: Azure Primary Storage (enabled for all environments)
     let storageKey = null;
     let backupStatus = 'none';
     
     try {
-      console.log(`☁️ [S3 PRIMARY] Uploading to S3 primary storage...`);
+      console.log(`☁️ [Azure PRIMARY] Uploading to Azure primary storage...`);
       storageKey = `${applicationId}/${fileName}`;
-      await uploadToS3({
+      await uploadToAzure({
         file: fileBuffer,
         fileName: fileName,
         contentType: mimeType,
         applicationId: applicationId
       });
       backupStatus = 'completed';
-      console.log(`✅ [S3 PRIMARY] File uploaded to S3: ${storageKey}`);
+      console.log(`✅ [Azure PRIMARY] File uploaded to Azure: ${storageKey}`);
     } catch (s3Error: any) {
-      console.error(`❌ [S3 PRIMARY] Failed to upload to S3:`, s3Error.message);
+      console.error(`❌ [Azure PRIMARY] Failed to upload to Azure:`, s3Error.message);
       backupStatus = 'failed';
       // Continue with disk storage as fallback
-      console.log(`🔄 [S3 PRIMARY] Continuing with disk fallback due to S3 error`);
+      console.log(`🔄 [Azure PRIMARY] Continuing with disk fallback due to Azure error`);
     }
 
-    // Step 4: Create database record AFTER disk verification and S3 backup
+    // Step 4: Create database record AFTER disk verification and Azure backup
     const dbResult = await db.insert(documents).values({
       id: documentId,
       applicationId: applicationId,
@@ -95,7 +95,7 @@ export async function saveDocumentToDiskAndDB(params: DocumentUploadParams) {
       file_type: mimeType,
       file_exists: true,
       checksum: checksum,
-      storage_key: storageKey, // S3 key if uploaded, null in dev mode
+      storage_key: storageKey, // Azure key if uploaded, null in dev mode
       backup_status: backupStatus, // Track backup status
       is_required: false,
       is_verified: false,

@@ -5,9 +5,9 @@ const router = express.Router();
 // Simple credential diagnostic endpoint
 router.get('/diagnose', async (req: any, res: any) => {
   try {
-    const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-    const region = process.env.AWS_DEFAULT_REGION || 'ca-central-1';
+    const accessKeyId = process.env.AZURE_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.AZURE_SECRET_ACCESS_KEY;
+    const region = process.env.AZURE_DEFAULT_REGION || 'ca-central-1';
 
     const diagnosis = {
       accessKeyId: {

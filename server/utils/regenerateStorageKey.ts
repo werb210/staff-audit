@@ -1,20 +1,20 @@
 /**
  * 🔧 STORAGE KEY REGENERATION UTILITY
  * 
- * Regenerates missing storage_key values for S3 integration
+ * Regenerates missing storage_key values for Azure integration
  * Created: July 24, 2025
  */
 
 import { pool } from '../db';
 
 /**
- * Regenerates storage_key for documents missing S3 integration
+ * Regenerates storage_key for documents missing Azure integration
  */
 export async function regenerateStorageKey(applicationId: string, fileName: string): Promise<boolean> {
   try {
     console.log(`🔧 [REGENERATE] Regenerating storage key for ${applicationId}/${fileName}`);
     
-    // Generate storage key in S3 format
+    // Generate storage key in Azure format
     const storageKey = `${applicationId}/${fileName}`;
     
     // Update document with storage key

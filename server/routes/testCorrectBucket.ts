@@ -1,13 +1,13 @@
 import express from 'express';
-import { S3Client, HeadBucketCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import { AzureClient, HeadBucketCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 const router = express.Router();
 
 router.get('/test-correct-bucket', async (req: any, res: any) => {
-  console.log('🔍 [CORRECT-BUCKET-TEST] Testing the correct S3 bucket...');
+  console.log('🔍 [CORRECT-BUCKET-TEST] Testing the correct Azure bucket...');
   
-  const correctBucketName = process.env.CORRECT_S3_BUCKET_NAME;
-  const currentBucketName = process.env.S3_BUCKET_NAME;
+  const correctBucketName = process.env.CORRECT_Azure_BUCKET_NAME;
+  const currentBucketName = process.env.Azure_BUCKET_NAME;
   
   console.log(`🔍 Current bucket: ${currentBucketName}`);
   console.log(`🔍 Correct bucket: ${correctBucketName}`);
@@ -15,16 +15,15 @@ router.get('/test-correct-bucket', async (req: any, res: any) => {
   if (!correctBucketName) {
     return res.json({
       success: false,
-      error: 'CORRECT_S3_BUCKET_NAME not found in environment',
-      message: 'Please check Replit Secrets configuration'
+      error: 'CORRECT_Azure_BUCKET_NAME not found in environment',
     });
   }
   
-  const s3Client = new S3Client({
-    region: process.env.AWS_REGION || 'ca-central-1',
+  const s3Client = new AzureClient({
+    region: process.env.AZURE_REGION || 'ca-central-1',
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      accessKeyId: process.env.AZURE_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AZURE_SECRET_ACCESS_KEY!,
     },
   });
   
@@ -54,7 +53,7 @@ router.get('/test-correct-bucket', async (req: any, res: any) => {
         size: obj.Size,
         lastModified: obj.LastModified
       })) || [],
-      message: `Correct bucket ${correctBucketName} is working! Need to update S3 configuration.`,
+      message: `Correct bucket ${correctBucketName} is working! Need to update Azure configuration.`,
       timestamp: new Date().toISOString()
     });
     

@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { db } from "../db/drizzle.js";
 import { sql } from "drizzle-orm";
-import { S3Client, HeadBucketCommand, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { AzureClient, HeadBucketCommand, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import fetch from "node-fetch";
 import crypto from "crypto";
 import { detectBuild } from "../ops/autoBuild.js";
 
 const r = Router();
-const s3 = new S3Client({ region: process.env.S3_REGION });
+const s3 = new AzureClient({ region: process.env.Azure_REGION });
 
 type Item = { name:string; status:"PASS"|"WARN"|"FAIL"; detail?:any };
 function pass(name:string, detail?:any):Item { return { name, status:"PASS", detail }; }
@@ -36,12 +36,12 @@ r.get("/ops/health/full", async (_req,res)=>{
     }));
   }
 
-  // 2) S3 bucket access (head + tiny R/W)
-  out.push(await tryCatch("S3: head bucket", async()=> s3.send(new HeadBucketCommand({ Bucket: process.env.S3_BUCKET! }))));
-  out.push(await tryCatch("S3: put/delete test object", async()=>{
+  // 2) Azure bucket access (head + tiny R/W)
+  out.push(await tryCatch("Azure: head bucket", async()=> s3.send(new HeadBucketCommand({ Bucket: process.env.Azure_BUCKET! }))));
+  out.push(await tryCatch("Azure: put/delete test object", async()=>{
     const Key = `healthcheck/${crypto.randomUUID()}.txt`;
-    await s3.send(new PutObjectCommand({ Bucket: process.env.S3_BUCKET!, Key, Body: "ok" }));
-    await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET!, Key }));
+    await s3.send(new PutObjectCommand({ Bucket: process.env.Azure_BUCKET!, Key, Body: "ok" }));
+    await s3.send(new DeleteObjectCommand({ Bucket: process.env.Azure_BUCKET!, Key }));
     return { ok:true };
   }));
 
@@ -81,7 +81,7 @@ r.get("/ops/health/full", async (_req,res)=>{
 
   // 7) Schedulers configured
   out.push(await tryCatch("Scheduler: ROI ingest scheduled", async()=>({ job:"roi-ingest", scheduled:true })));
-  out.push(await tryCatch("Scheduler: S3 doc audit scheduled", async()=>({ job:"s3-doc-audit", scheduled:true })));
+  out.push(await tryCatch("Scheduler: Azure doc audit scheduled", async()=>({ job:"s3-doc-audit", scheduled:true })));
   out.push(await tryCatch("Scheduler: Lender monthly report scheduled", async()=>({ job:"lender-monthly-report", scheduled:true })));
 
   const summary = {

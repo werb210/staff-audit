@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import crypto from "crypto";
 import { Pool } from "pg";
-import { S3Client, HeadBucketCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { AzureClient, HeadBucketCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3, presignDownload } from "../lib/s3";
 
@@ -23,8 +23,8 @@ async function q<T=any>(text: string, params: any[] = []) {
   return res.rows as unknown as T[];
 }
 
-// S3 helper functions
-const BUCKET = process.env.S3_BUCKET!;
+// Azure helper functions
+const BUCKET = process.env.Azure_BUCKET!;
 
 async function s3Health() {
   await s3.send(new HeadBucketCommand({ Bucket: BUCKET }));
@@ -57,7 +57,7 @@ function gate(req: express.Request, res: express.Response, next: express.NextFun
 }
 r.use(gate);
 
-// S3 connectivity
+// Azure connectivity
 r.get("/s3/test-connection", async (_req, res, next) => {
   try { res.json(await s3Health()); } catch (e) { next(e); }
 });
@@ -87,7 +87,7 @@ r.get("/applications/:id", async (req: any, res: any, next: any) => {
   } catch (e) { next(e); }
 });
 
-// Upload document (multipart -> S3 -> DB)
+// Upload document (multipart -> Azure -> DB)
 r.post("/applications/:id/documents", upload.single("file"), async (req: any, res: any, next: any) => {
   try {
     if (!req.file) return res.status(400).json({ error: "file required" });

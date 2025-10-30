@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db/drizzle";
 import { sql } from "drizzle-orm";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { AzureClient, GetObjectCommand } from "@aws-sdk/client-s3";
 // PDF parsing disabled for now - will work around issue with test file
 // import pdf from "pdf-parse";
 
@@ -23,18 +23,18 @@ r.get("/training/search", async (req: any, res: any) => {
   res.json({ ok: true, items: rows });
 });
 
-// Reindex top N recent S3 documents (PDF/text). Intended for admin use.
+// Reindex top N recent Azure documents (PDF/text). Intended for admin use.
 r.post("/training/reindex", async (req: any, res: any) => {
   const limit = Math.min(200, Number(req.body?.limit || 50));
   const { rows: docs } = await db.execute(sql`
     select id, name, s3_key, mime_type, contact_id
     from documents order by createdAt desc limit ${limit}
   `);
-  const s3 = new S3Client({ region: process.env.S3_REGION });
+  const s3 = new AzureClient({ region: process.env.Azure_REGION });
   let ok = 0, fail = 0;
   for (const d of docs) {
     try {
-      const obj: any = await s3.send(new GetObjectCommand({ Bucket: process.env.S3_BUCKET!, Key: d.s3_key }));
+      const obj: any = await s3.send(new GetObjectCommand({ Bucket: process.env.Azure_BUCKET!, Key: d.s3_key }));
       const buf = await obj.Body.transformToByteArray();
       let text = "";
       if ((d.mime_type || "").includes("pdf")) {
@@ -44,7 +44,7 @@ r.post("/training/reindex", async (req: any, res: any) => {
       }
       await db.execute(sql`
         insert into training_docs(title, body, tags, source_type, source_id, source_url, contact_id)
-        values(${d.name}, ${text.slice(0, 500000)}, '{}', 'document', ${d.id}, ${'s3://' + process.env.S3_BUCKET + '/' + d.s3_key}, ${d.contact_id})
+        values(${d.name}, ${text.slice(0, 500000)}, '{}', 'document', ${d.id}, ${'s3://' + process.env.Azure_BUCKET + '/' + d.s3_key}, ${d.contact_id})
         on conflict (id) do nothing
       `);
       ok++;

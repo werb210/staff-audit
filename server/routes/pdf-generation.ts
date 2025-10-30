@@ -8,7 +8,7 @@ import {
   generateApplicationPDF, 
   generateAllApplicationPDFs, 
   testPDFGeneration,
-  saveDocumentToS3AndDB 
+  saveDocumentToAzureAndDB 
 } from '../services/pdfGeneratorService';
 
 const router = Router();
@@ -63,9 +63,9 @@ router.post('/generate/:applicationId', async (req: any, res: any) => {
     // Generate PDF
     const pdfBuffer = await generateApplicationPDF(applicationId);
     
-    // Save to S3 and database
+    // Save to Azure and database
     const filename = `ApplicationSummary-${applicationId}.pdf`;
-    const documentId = await saveDocumentToS3AndDB(
+    const documentId = await saveDocumentToAzureAndDB(
       applicationId,
       pdfBuffer,
       filename,

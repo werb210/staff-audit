@@ -8,7 +8,7 @@ export const PresignSchema = z.object({
   applicationId: z.string().min(1),
   fileName: z.string().min(1),
   mime: z.string().min(1),
-  bytes: z.number().positive().max(Number(process.env.S3_MAX_BYTES || 10_485_760))
+  bytes: z.number().positive().max(Number(process.env.Azure_MAX_BYTES || 10_485_760))
 });
 
 export const EmailComposeSchema = z.object({

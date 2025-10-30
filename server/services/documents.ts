@@ -1,11 +1,11 @@
 import { db } from '../db';
 import { documents, applications } from '../../shared/schema';
 import { eq } from 'drizzle-orm';
-import { S3Storage } from '../utils/s3';
+import { AzureStorage } from '../utils/s3';
 import { ocrService } from './ocr';
 import { z } from 'zod';
 
-const s3Storage = new S3Storage();
+const s3Storage = new AzureStorage();
 
 // Document upload validation schema
 export const documentUploadSchema = z.object({
@@ -63,9 +63,9 @@ export class DocumentsService {
         throw new Error('Application not found');
       }
 
-      // Upload to S3
+      // Upload to Azure
       const storageKey = await s3Storage.set(fileBuffer, metadata.fileName, applicationId);
-      const s3Url = `https://${process.env.AWS_S3_BUCKET_NAME || 'boreal-documents'}.s3.${process.env.AWS_REGION || 'ca-central-1'}.amazonaws.com/${storageKey}`;
+      const s3Url = `https://${process.env.AZURE_Azure_BUCKET_NAME || 'boreal-documents'}.s3.${process.env.AZURE_REGION || 'ca-central-1'}.azureedge.net/${storageKey}`;
 
       // Save document metadata to database
       const [newDocument] = await db.insert(documents).values({

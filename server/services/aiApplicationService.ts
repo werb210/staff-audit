@@ -15,7 +15,7 @@ import {
   buildDocumentSummaryPrompt 
 } from '../utils/openai';
 import { buildCreditInput } from './_canonFields';
-import { uploadDocumentToS3 } from '../utils/s3Upload';
+import { uploadDocumentToAzure } from '../utils/s3Upload';
 import { PDFDocument, rgb } from 'pdf-lib';
 
 export interface AIApplicationData {
@@ -246,11 +246,11 @@ export async function submitSummaryWithLenderCustomization(
     // Generate PDF
     const pdfBuffer = await generateSummaryPDF(applicationId, customizedSummary);
     
-    // Upload to S3
+    // Upload to Azure
     const appData = await getApplicationData(applicationId);
     const filename = `${appData?.businessName || 'Application'} - Credit Summary.pdf`;
     
-    const s3Result = await uploadDocumentToS3({
+    const s3Result = await uploadDocumentToAzure({
       buffer: pdfBuffer,
       originalName: filename,
       mimeType: 'application/pdf'

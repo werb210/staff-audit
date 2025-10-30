@@ -5,10 +5,7 @@ import express from 'express';
 import applicationsCreateRouter from './applications/create';
 import applicationsSubmitRouter from './applications/submit';
 import applicationsUploadRouter from './applications/upload';
-// initiateSigning router removed - SignNow integration removed
 import applicationsCompleteRouter from './applications/complete';
-// signingStatus router removed - SignNow integration removed
-// signingUrl router removed - SignNow integration removed
 
 const router = Router();
 
@@ -38,7 +35,6 @@ router.use('/', applicationsSubmitRouter);
 // Mount upload route (note: this goes to /upload path, not /applications)
 router.use('/upload', applicationsUploadRouter);
 
-// initiate signing route removed - SignNow integration removed
 
 // Mount complete application route
 router.use('/', applicationsCompleteRouter);
@@ -47,9 +43,7 @@ router.use('/', applicationsCompleteRouter);
 import applicationsFinalizeRouter from './applications/finalize';
 router.use('/', applicationsFinalizeRouter);
 
-// signing status route removed - SignNow integration removed
 
-// signing URL route removed - SignNow integration removed
 
 // Debug endpoint for verification testing
 router.get('/debug/applications/:id', async (req: any, res: any) => {
@@ -170,6 +164,5 @@ router.get('/:id', async (req: any, res: any) => {
 
 // Signing status endpoint removed - document signing no longer required
 
-// SignNow diagnostics endpoint removed - document signing no longer required
 
 export default router;

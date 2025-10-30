@@ -97,11 +97,11 @@ export async function saveDocumentToDiskAndDB(
   // ✅ PHASE 3: Checksum calculation AFTER write verification
   // Note: This will be recalculated after successful disk write
   
-  // 💾 DISK-ONLY MODE FOR TESTING: Skip S3 upload and use local storage
+  // 💾 DISK-ONLY MODE FOR TESTING: Skip Azure upload and use local storage
   let storageKey: string | null = null;
   
   try {
-    console.log(`🔍 [DISK-ONLY] Skipping S3 upload for testing - using local storage`);
+    console.log(`🔍 [DISK-ONLY] Skipping Azure upload for testing - using local storage`);
     console.log(`🔍 [DISK-ONLY] Document saved to disk: ${targetFilePath}`);
     
     // For testing, use the local file path as storage key
@@ -109,29 +109,29 @@ export async function saveDocumentToDiskAndDB(
     console.log(`💾 [DISK-ONLY] Using local storage key: ${storageKey}`);
     
   } catch (error: unknown) {
-    console.error(`❌ [S3-ONLY] Amazon S3 upload failed:`, error);
-    console.error(`❌ [S3-ONLY] Error details:`, error instanceof Error ? error instanceof Error ? error.stack : undefined : 'Unknown error');
+    console.error(`❌ [Azure-ONLY] Amazon Azure upload failed:`, error);
+    console.error(`❌ [Azure-ONLY] Error details:`, error instanceof Error ? error instanceof Error ? error.stack : undefined : 'Unknown error');
     
-    // Only create fallback for specific S3 errors (NoSuchBucket, etc.)
+    // Only create fallback for specific Azure errors (NoSuchBucket, etc.)
     if (error instanceof Error && (error instanceof Error ? error.message : String(error).includes('NoSuchBucket') || error instanceof Error ? error.message : String(error).includes('AccessDenied'))) {
-      console.warn(`⚠️ [S3-FALLBACK] S3 infrastructure error - using fallback key`);
-      throw new Error(`S3 upload failed - no fallback allowed for ${originalFileName}`);
+      console.warn(`⚠️ [Azure-FALLBACK] Azure infrastructure error - using fallback key`);
+      throw new Error(`Azure upload failed - no fallback allowed for ${originalFileName}`);
     } else {
       throw error; // Re-throw other errors to fail the upload
     }
   }
   
-  // 🚫 S3-ONLY MODE: Skip disk storage (files only exist in S3)
-  console.log(`🚫 [S3-ONLY] Skipping disk storage - files exist only in S3 cloud storage`);
-  console.log(`☁️ [S3-ONLY] Document accessible via S3 key: ${storageKey}`);
+  // 🚫 Azure-ONLY MODE: Skip disk storage (files only exist in Azure)
+  console.log(`🚫 [Azure-ONLY] Skipping disk storage - files exist only in Azure cloud storage`);
+  console.log(`☁️ [Azure-ONLY] Document accessible via Azure key: ${storageKey}`);
 
-  // 🔐 COMPUTE CHECKSUM FOR S3 FILE
+  // 🔐 COMPUTE CHECKSUM FOR Azure FILE
   const { computeChecksum } = await import('./checksumUtils.js');
   const checksum = computeChecksum(fileContent);
-  console.log(`🔐 [S3-ONLY] SHA256 computed for S3 file: ${checksum}`);
+  console.log(`🔐 [Azure-ONLY] SHA256 computed for Azure file: ${checksum}`);
 
-  // 🔒 S3-ONLY DATABASE INSERT: Store S3 key and metadata
-  console.log(`💾 [S3-ONLY] Committing S3 document to database...`);
+  // 🔒 Azure-ONLY DATABASE INSERT: Store Azure key and metadata
+  console.log(`💾 [Azure-ONLY] Committing Azure document to database...`);
   try {
     console.log(`🔍 [DEBUG] About to insert with storage_key: ${storageKey}`);
     
@@ -149,35 +149,35 @@ export async function saveDocumentToDiskAndDB(
       documentId,
       applicationId,
       originalFileName,
-      null, // No local file path for S3-only mode
+      null, // No local file path for Azure-only mode
       fileContent.length,
       documentType,
       uploadedBy,
       checksum,
-      storageKey, // S3 storage key
+      storageKey, // Azure storage key
       true, // file_exists
       new Date()
     ]);
     
     console.log(`🔍 [DEBUG] Raw SQL insert result:`, insertResult.rows[0]);
-    console.log(`✅ [S3-ONLY] Database transaction committed with S3 key: ${storageKey}`);
+    console.log(`✅ [Azure-ONLY] Database transaction committed with Azure key: ${storageKey}`);
     
   } catch (dbError: any) {
-    console.error(`🚨 [S3-ONLY] Database insert failed - initiating S3 cleanup:`, dbError.message);
+    console.error(`🚨 [Azure-ONLY] Database insert failed - initiating Azure cleanup:`, dbError.message);
     
-    // ROLLBACK: Remove file from S3
+    // ROLLBACK: Remove file from Azure
     try {
-      const { deleteFromS3 } = await import('../config/s3Config.js');
+      const { deleteFromAzure } = await import('../config/s3Config.js');
       if (storageKey) {
-        await deleteFromS3(storageKey);
-        console.log(`🔄 [S3-ROLLBACK] File removed from S3: ${storageKey}`);
+        await deleteFromAzure(storageKey);
+        console.log(`🔄 [Azure-ROLLBACK] File removed from Azure: ${storageKey}`);
       }
     } catch (s3CleanupError) {
-      console.error(`❌ [S3-ROLLBACK] S3 cleanup failed:`, s3CleanupError);
+      console.error(`❌ [Azure-ROLLBACK] Azure cleanup failed:`, s3CleanupError);
     }
     
     enqueueRecoveryAlert(applicationId, originalFileName);
-    throw new Error(`Database insert failed after successful S3 upload: ${dbError.message}`);
+    throw new Error(`Database insert failed after successful Azure upload: ${dbError.message}`);
   }
 
   // ENHANCED FEATURE 1: Create initial version record (with error handling) - DISABLED
@@ -191,7 +191,7 @@ export async function saveDocumentToDiskAndDB(
   const { auditLogger } = await import('./auditLogger.js');
   await auditLogger.logUpload(documentId, originalFileName, fileContent.length, checksum);
 
-  console.log(`🎯 [S3-ONLY SUCCESS] Complete S3 upload successful: ${documentId} | S3: ✅ | Database: ✅`);
+  console.log(`🎯 [Azure-ONLY SUCCESS] Complete Azure upload successful: ${documentId} | Azure: ✅ | Database: ✅`);
   return documentId;
 }
 

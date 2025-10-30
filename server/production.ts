@@ -1,5 +1,4 @@
 // Production Server Entry Point
-// This file is optimized for Replit production deployment
 
 import express from 'express';
 import path from 'path';

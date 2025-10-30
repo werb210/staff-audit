@@ -62,7 +62,6 @@ export function validateEnvironment(): ValidationResult {
     } else {
       configured.push(variable.name);
       
-      // Check for insecure values (skip admin credentials from Replit Secrets)
       if (variable.name !== 'ADMIN_PASSWORD' && variable.name !== 'ADMIN_EMAIL' && isInsecureValue(value)) {
         errors.push(`SECURITY: ${variable.name} contains insecure value (${variable.description})`);
       }

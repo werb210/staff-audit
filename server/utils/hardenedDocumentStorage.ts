@@ -2,7 +2,7 @@
  * 🛡️ HARDENED DOCUMENT STORAGE SYSTEM
  * 
  * Implements bulletproof document storage with comprehensive audit logging,
- * mandatory checksum verification, and guaranteed S3 backup fallback.
+ * mandatory checksum verification, and guaranteed Azure backup fallback.
  * 
  * Created: July 21, 2025
  * Purpose: Resolve critical document disappearance issue
@@ -93,25 +93,25 @@ async function logUploadAudit(auditData: UploadAuditLog): Promise<void> {
 }
 
 /**
- * Attempts S3 backup with retry logic using proper S3 integration
+ * Attempts Azure backup with retry logic using proper Azure integration
  */
-async function attemptS3Backup(content: Buffer, fileName: string, documentId: string, applicationId: string): Promise<{success: boolean, storageKey?: string, error?: string}> {
+async function attemptAzureBackup(content: Buffer, fileName: string, documentId: string, applicationId: string): Promise<{success: boolean, storageKey?: string, error?: string}> {
   try {
-    console.log(`☁️ [S3-HARDENED] Starting S3 upload for: ${fileName} (${documentId})`);
+    console.log(`☁️ [Azure-HARDENED] Starting Azure upload for: ${fileName} (${documentId})`);
 
-    // Use proper S3 system instead of old object storage fallback
-    const { S3Storage } = await import('./s3.js');
-    const s3Storage = new S3Storage();
+    // Use proper Azure system instead of old object storage fallback
+    const { AzureStorage } = await import('./s3.js');
+    const s3Storage = new AzureStorage();
     
-    // Upload directly to S3 with proper storage key format
+    // Upload directly to Azure with proper storage key format
     const storageKey = await s3Storage.set(content, fileName, applicationId);
     
-    console.log(`✅ [S3-HARDENED] S3 upload successful: ${storageKey}`);
+    console.log(`✅ [Azure-HARDENED] Azure upload successful: ${storageKey}`);
     return { success: true, storageKey };
     
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown S3 error';
-    console.error(`❌ [S3-HARDENED] S3 upload failed for ${documentId}:`, errorMessage);
+    const errorMessage = error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown Azure error';
+    console.error(`❌ [Azure-HARDENED] Azure upload failed for ${documentId}:`, errorMessage);
     return { success: false, error: errorMessage };
   }
 }
@@ -180,19 +180,19 @@ export async function hardenedSaveDocument(
     auditLog.checksumVerified = true;
     console.log(`✅ [HARDENED] Disk write verified successfully`);
     
-    // Step 5: DIRECTLY use S3 system - NO FALLBACK ALLOWED
-    const { S3Storage } = await import('./s3.js');
-    const s3Storage = new S3Storage();
+    // Step 5: DIRECTLY use Azure system - NO FALLBACK ALLOWED
+    const { AzureStorage } = await import('./s3.js');
+    const s3Storage = new AzureStorage();
     const storageKey = await s3Storage.set(fileContent, originalFileName, applicationId);
     
-    // Verify S3 upload succeeded
+    // Verify Azure upload succeeded
     if (!storageKey) {
-      throw new Error('S3 upload failed - no storage key returned');
+      throw new Error('Azure upload failed - no storage key returned');
     }
     
     auditLog.s3BackupSuccessful = true;
     
-    console.log(`✅ [HARDENED] S3 upload confirmed: ${storageKey}`);
+    console.log(`✅ [HARDENED] Azure upload confirmed: ${storageKey}`);
     
     // Step 6: Create database record ONLY after successful disk write
     await db.insert(documents).values({

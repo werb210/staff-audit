@@ -44,7 +44,7 @@ router.post('/role', (req: any, res: any) => {
     d.conference({ ...baseOpts, startConferenceOnEnter: true, recordingStatusCallback: '/api/conference/recording-status', recordingStatusCallbackMethod: 'POST' }, CONF_ROOM_NAME);
   } else if (digits === CONF_GUEST_PIN) {
     const d = vr.dial();
-    d.conference({ ...baseOpts, startConferenceOnEnter: false, waitUrl: 'http://com.twilio.music.classical.s3.amazonaws.com/BusyStrings.mp3' }, CONF_ROOM_NAME);
+    d.conference({ ...baseOpts, startConferenceOnEnter: false, waitUrl: 'http://com.twilio.music.classical.s3.azureedge.net/BusyStrings.mp3' }, CONF_ROOM_NAME);
   } else {
     vr.say('Invalid pin. Please try again.');
     vr.redirect('/api/conference/enter');

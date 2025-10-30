@@ -8,7 +8,7 @@ import { db } from '../db';
 import { applications, contacts, documents } from '../../shared/schema';
 import { creditSummaries, creditSummaryTraining, creditSummaryTemplates } from '../../shared/ai-summary-schema';
 import { eq, and, desc } from 'drizzle-orm';
-import { uploadDocumentToS3 } from '../utils/s3Upload';
+import { uploadDocumentToAzure } from '../utils/s3Upload';
 import * as diff from 'diff';
 
 // Initialize OpenAI if API key is available
@@ -163,9 +163,9 @@ export async function submitFinalSummary(
     // Generate PDF from final content
     const pdfBuffer = await generatePDFFromSummary(finalContent, existingSummary);
     
-    // Upload PDF to S3
+    // Upload PDF to Azure
     const filename = `CreditSummary-${existingSummary.applicationId}.pdf`;
-    const s3Result = await uploadDocumentToS3({
+    const s3Result = await uploadDocumentToAzure({
       buffer: pdfBuffer,
       originalName: filename,
       mimeType: 'application/pdf'
@@ -179,8 +179,8 @@ export async function submitFinalSummary(
         isDraft: false,
         isLocked: true,
         pdfExported: true,
-        pdfS3Key: s3Result.key,
-        pdfS3Bucket: s3Result.bucket,
+        pdfAzureKey: s3Result.key,
+        pdfAzureBucket: s3Result.bucket,
         pdfFilename: filename,
         lockedBy: userId || null,
         lockedAt: new Date(),

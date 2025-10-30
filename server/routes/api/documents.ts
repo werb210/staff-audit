@@ -44,7 +44,7 @@ router.get('/', async (req: any, res: any) => {
           description: 'Annual tax return documentation',
           tags: ['tax', 'annual', 'required'],
           sha256: 'abc123def456',
-          existsOnS3: true
+          existsOnAzure: true
         },
         { 
           id: '2', 
@@ -56,7 +56,7 @@ router.get('/', async (req: any, res: any) => {
           description: 'Recent bank statement for verification',
           tags: ['banking', 'statement'],
           sha256: 'def456ghi789',
-          existsOnS3: true
+          existsOnAzure: true
         },
         { 
           id: '3', 
@@ -68,7 +68,7 @@ router.get('/', async (req: any, res: any) => {
           description: 'Valid business operating license',
           tags: ['license', 'legal', 'approved'],
           sha256: 'ghi789jkl012',
-          existsOnS3: true
+          existsOnAzure: true
         }
       ]
     });
@@ -93,23 +93,23 @@ router.get('/:id/view', async (req: any, res: any) => {
     const doc = documents[docId as keyof typeof documents];
     
     if (!doc || !doc.s3Key) {
-      return res.status(404).json({ error: 'Document not found or missing S3 key' });
+      return res.status(404).json({ error: 'Document not found or missing Azure key' });
     }
 
     // For demo purposes, return a sample PDF URL
-    // In production, this would generate a real S3 signed URL
+    // In production, this would generate a real Azure signed URL
     const mockPdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
     
-    if (process.env.AWS_ACCESS_KEY_ID && process.env.S3_BUCKET) {
+    if (process.env.AZURE_ACCESS_KEY_ID && process.env.Azure_BUCKET) {
       try {
         const url = s3.getSignedUrl('getObject', {
-          Bucket: process.env.S3_BUCKET,
+          Bucket: process.env.Azure_BUCKET,
           Key: doc.s3Key,
           Expires: 300 // 5 minutes
         });
         res.json({ url });
       } catch (s3Error) {
-        console.error('S3 signing failed:', s3Error);
+        console.error('Azure signing failed:', s3Error);
         // Fallback to mock URL
         res.json({ url: mockPdfUrl });
       }
@@ -266,7 +266,7 @@ router.post('/:id/rebind', upload.single('file'), async (req: any, res: any) => 
       return res.status(400).json({ error: 'No file provided' });
     }
     
-    // In production: calculate SHA256, upload to S3, update database
+    // In production: calculate SHA256, upload to Azure, update database
     console.log(`Document ${docId} rebound with new file: ${req.file.originalname}`);
     res.json({ success: true, message: 'Document file rebound successfully' });
   } catch (error: unknown) {
@@ -301,7 +301,7 @@ router.post('/upload-base64', async (req: any, res: any) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     
-    // In production: decode base64, calculate SHA256, upload to S3
+    // In production: decode base64, calculate SHA256, upload to Azure
     const documentId = `doc-${Date.now()}`;
     console.log(`Base64 document uploaded: ${fileName} for application ${applicationId}`);
     
