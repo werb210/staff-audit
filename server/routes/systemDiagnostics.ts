@@ -2,42 +2,42 @@
  * 🔧 SYSTEM DIAGNOSTICS ROUTES
  * 
  * Comprehensive diagnostic testing for all system components
- * Including S3, database, authentication, and core functionality
+ * Including Azure, database, authentication, and core functionality
  * 
  * Created: July 25, 2025
  */
 
 import { Router, Request, Response } from 'express';
 import { 
-  testS3BucketAccess, 
-  testS3Upload, 
-  testS3PreSignedUrl, 
-  runComprehensiveS3Diagnostic 
+  testAzureBucketAccess, 
+  testAzureUpload, 
+  testAzurePreSignedUrl, 
+  runComprehensiveAzureDiagnostic 
 } from '../utils/s3Diagnostic';
 
 const router = Router();
 
 /**
  * GET /api/system/test-s3-basic
- * Basic S3 bucket access test
+ * Basic Azure bucket access test
  */
 router.get('/test-s3-basic', async (req: Request, res: Response) => {
   try {
-    const bucket = process.env.AWS_S3_BUCKET_NAME || 'boreal-documents';
-    console.log(`🧪 [SYSTEM DIAGNOSTIC] Testing S3 basic access for bucket: ${bucket}`);
+    const bucket = process.env.AZURE_Azure_BUCKET_NAME || 'boreal-documents';
+    console.log(`🧪 [SYSTEM DIAGNOSTIC] Testing Azure basic access for bucket: ${bucket}`);
     
-    const result = await testS3BucketAccess(bucket);
+    const result = await testAzureBucketAccess(bucket);
     
     res.json({
       ...result,
       configuration: {
         bucket,
-        region: process.env.AWS_REGION || 'ca-central-1',
-        hasCredentials: !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY)
+        region: process.env.AZURE_REGION || 'ca-central-1',
+        hasCredentials: !!(process.env.AZURE_ACCESS_KEY_ID && process.env.AZURE_SECRET_ACCESS_KEY)
       }
     });
   } catch (error: any) {
-    console.error('❌ [SYSTEM DIAGNOSTIC] S3 basic test error:', error);
+    console.error('❌ [SYSTEM DIAGNOSTIC] Azure basic test error:', error);
     res.status(500).json({
       success: false,
       test: 'bucket-access',
@@ -49,25 +49,25 @@ router.get('/test-s3-basic', async (req: Request, res: Response) => {
 
 /**
  * GET /api/system/test-s3-upload
- * S3 upload functionality test
+ * Azure upload functionality test
  */
 router.get('/test-s3-upload', async (req: Request, res: Response) => {
   try {
-    const bucket = process.env.AWS_S3_BUCKET_NAME || 'boreal-documents';
-    console.log(`🧪 [SYSTEM DIAGNOSTIC] Testing S3 upload for bucket: ${bucket}`);
+    const bucket = process.env.AZURE_Azure_BUCKET_NAME || 'boreal-documents';
+    console.log(`🧪 [SYSTEM DIAGNOSTIC] Testing Azure upload for bucket: ${bucket}`);
     
-    const result = await testS3Upload(bucket);
+    const result = await testAzureUpload(bucket);
     
     res.json({
       ...result,
       configuration: {
         bucket,
-        region: process.env.AWS_REGION || 'ca-central-1',
+        region: process.env.AZURE_REGION || 'ca-central-1',
         encryption: 'AES256'
       }
     });
   } catch (error: any) {
-    console.error('❌ [SYSTEM DIAGNOSTIC] S3 upload test error:', error);
+    console.error('❌ [SYSTEM DIAGNOSTIC] Azure upload test error:', error);
     res.status(500).json({
       success: false,
       test: 'upload',
@@ -79,27 +79,27 @@ router.get('/test-s3-upload', async (req: Request, res: Response) => {
 
 /**
  * GET /api/system/test-s3-presigned
- * S3 pre-signed URL generation test
+ * Azure pre-signed URL generation test
  */
 router.get('/test-s3-presigned', async (req: Request, res: Response) => {
   try {
-    const bucket = process.env.AWS_S3_BUCKET_NAME || 'boreal-documents';
+    const bucket = process.env.AZURE_Azure_BUCKET_NAME || 'boreal-documents';
     const key = req.query.key as string;
     
-    console.log(`🧪 [SYSTEM DIAGNOSTIC] Testing S3 pre-signed URL for bucket: ${bucket}`);
+    console.log(`🧪 [SYSTEM DIAGNOSTIC] Testing Azure pre-signed URL for bucket: ${bucket}`);
     
-    const result = await testS3PreSignedUrl(bucket, key);
+    const result = await testAzurePreSignedUrl(bucket, key);
     
     res.json({
       ...result,
       configuration: {
         bucket,
-        region: process.env.AWS_REGION || 'ca-central-1',
+        region: process.env.AZURE_REGION || 'ca-central-1',
         defaultExpiration: '1 hour'
       }
     });
   } catch (error: any) {
-    console.error('❌ [SYSTEM DIAGNOSTIC] S3 pre-signed URL test error:', error);
+    console.error('❌ [SYSTEM DIAGNOSTIC] Azure pre-signed URL test error:', error);
     res.status(500).json({
       success: false,
       test: 'presigned-url',
@@ -111,35 +111,35 @@ router.get('/test-s3-presigned', async (req: Request, res: Response) => {
 
 /**
  * GET /api/system/test-s3-comprehensive
- * Complete S3 diagnostic suite
+ * Complete Azure diagnostic suite
  */
 router.get('/test-s3-comprehensive', async (req: Request, res: Response) => {
   try {
-    const bucket = process.env.AWS_S3_BUCKET_NAME || 'boreal-documents';
-    console.log(`🔍 [SYSTEM DIAGNOSTIC] Running comprehensive S3 diagnostic for bucket: ${bucket}`);
+    const bucket = process.env.AZURE_Azure_BUCKET_NAME || 'boreal-documents';
+    console.log(`🔍 [SYSTEM DIAGNOSTIC] Running comprehensive Azure diagnostic for bucket: ${bucket}`);
     
-    const diagnosticResult = await runComprehensiveS3Diagnostic(bucket);
+    const diagnosticResult = await runComprehensiveAzureDiagnostic(bucket);
     
     res.json({
       ...diagnosticResult,
       configuration: {
         bucket,
-        region: process.env.AWS_REGION || 'ca-central-1',
-        hasCredentials: !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY),
+        region: process.env.AZURE_REGION || 'ca-central-1',
+        hasCredentials: !!(process.env.AZURE_ACCESS_KEY_ID && process.env.AZURE_SECRET_ACCESS_KEY),
         encryption: 'AES256'
       },
       recommendations: diagnosticResult.overall ? [
-        "✅ S3 integration is fully operational",
+        "✅ Azure integration is fully operational",
         "✅ All upload and access functions working",
         "✅ System ready for production document management"
       ] : [
-        "⚠️ S3 configuration issues detected",
+        "⚠️ Azure configuration issues detected",
         "🔧 Check AWS credentials and bucket permissions",
         "📋 Review failed tests in results array"
       ]
     });
   } catch (error: any) {
-    console.error('❌ [SYSTEM DIAGNOSTIC] Comprehensive S3 test error:', error);
+    console.error('❌ [SYSTEM DIAGNOSTIC] Comprehensive Azure test error:', error);
     res.status(500).json({
       overall: false,
       results: [],
@@ -167,12 +167,12 @@ router.get('/environment-info', async (req: Request, res: Response) => {
       node_version: process.version,
       environment: process.env.NODE_ENV || 'development',
       s3_configuration: {
-        region: process.env.AWS_REGION || 'ca-central-1',
-        bucket: process.env.AWS_S3_BUCKET_NAME || 'boreal-documents',
-        has_access_key: !!process.env.AWS_ACCESS_KEY_ID,
-        has_secret_key: !!process.env.AWS_SECRET_ACCESS_KEY,
-        access_key_preview: process.env.AWS_ACCESS_KEY_ID ? 
-          `${process.env.AWS_ACCESS_KEY_ID.substring(0, 4)}...${process.env.AWS_ACCESS_KEY_ID.slice(-4)}` : 
+        region: process.env.AZURE_REGION || 'ca-central-1',
+        bucket: process.env.AZURE_Azure_BUCKET_NAME || 'boreal-documents',
+        has_access_key: !!process.env.AZURE_ACCESS_KEY_ID,
+        has_secret_key: !!process.env.AZURE_SECRET_ACCESS_KEY,
+        access_key_preview: process.env.AZURE_ACCESS_KEY_ID ? 
+          `${process.env.AZURE_ACCESS_KEY_ID.substring(0, 4)}...${process.env.AZURE_ACCESS_KEY_ID.slice(-4)}` : 
           'Not configured'
       },
       database_configuration: {

@@ -94,9 +94,9 @@ export async function runDocumentStartupAudit() {
       const key = `backup/${doc.id}-${Date.now()}`;
       
       try {
-        // Upload to S3 first, then store the key
-        const { uploadToS3 } = await import('../utils/s3');
-        const s3Storage = new (await import('../utils/s3')).S3Storage();
+        // Upload to Azure first, then store the key
+        const { uploadToAzure } = await import('../utils/s3');
+        const s3Storage = new (await import('../utils/s3')).AzureStorage();
         const storageKey = await s3Storage.set(buffer, doc.name, doc.applicationId);
         
         await sql`
@@ -105,11 +105,11 @@ export async function runDocumentStartupAudit() {
           WHERE id = ${doc.id}
         `;
         
-        console.log(`☁️ [STARTUP AUDIT] S3 storage key added for ${doc.name}: ${storageKey}`);
+        console.log(`☁️ [STARTUP AUDIT] Azure storage key added for ${doc.name}: ${storageKey}`);
         storageKeysAdded++;
       } catch (err) {
-        console.error(`❌ [STARTUP AUDIT] S3 upload failed for ${doc.id}:`, err);
-        console.error("[UPLOAD FAILURE] S3 upload failed:", err);
+        console.error(`❌ [STARTUP AUDIT] Azure upload failed for ${doc.id}:`, err);
+        console.error("[UPLOAD FAILURE] Azure upload failed:", err);
         throw err;
       }
     }

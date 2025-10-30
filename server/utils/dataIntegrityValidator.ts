@@ -87,8 +87,8 @@ export async function validateApplicationSubmission(applicationId: string): Prom
   }
 }
 
-// STEP 2: S3 Verification - Confirm storage_key validity
-export async function validateS3Storage(documentId: string): Promise<{ isValid: boolean; errors: string[] }> {
+// STEP 2: Azure Verification - Confirm storage_key validity
+export async function validateAzureStorage(documentId: string): Promise<{ isValid: boolean; errors: string[] }> {
   try {
     const [document] = await db.select().from(documents).where(eq(documents.id, documentId));
     
@@ -99,28 +99,28 @@ export async function validateS3Storage(documentId: string): Promise<{ isValid: 
     const s3Key = (document as any).storageKey || document.storageKey || document.objectStorageKey;
     
     if (!s3Key) {
-      return { isValid: false, errors: [`Document ${documentId} has no S3 storage key`] };
+      return { isValid: false, errors: [`Document ${documentId} has no Azure storage key`] };
     }
 
-    // Test S3 access by generating pre-signed URL
+    // Test Azure access by generating pre-signed URL
     try {
       const { generatePreSignedDownloadUrl } = await import('./s3PreSignedUrls');
       await generatePreSignedDownloadUrl(s3Key, 300, document.fileName); // 5-minute test URL
       
-      console.log(`✅ [S3 VALIDATION] Document ${documentId} S3 storage verified: ${s3Key}`);
+      console.log(`✅ [Azure VALIDATION] Document ${documentId} Azure storage verified: ${s3Key}`);
       return { isValid: true, errors: [] };
       
     } catch (s3Error) {
       return { 
         isValid: false, 
-        errors: [`S3 access failed for ${documentId}: ${s3Error instanceof Error ? s3Error.message : 'Unknown S3 error'}`] 
+        errors: [`Azure access failed for ${documentId}: ${s3Error instanceof Error ? s3Error.message : 'Unknown Azure error'}`] 
       };
     }
 
   } catch (error: unknown) {
     return { 
       isValid: false, 
-      errors: [`S3 validation error: ${error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'}`] 
+      errors: [`Azure validation error: ${error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'}`] 
     };
   }
 }

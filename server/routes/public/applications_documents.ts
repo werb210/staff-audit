@@ -2,7 +2,7 @@
  * 🔗 PUBLIC APPLICATIONS DOCUMENT UPLOAD ROUTE
  * 
  * Implements the missing /api/public/applications/:id/documents endpoint
- * with proper S3 integration and database persistence
+ * with proper Azure integration and database persistence
  */
 
 import { Router } from 'express';
@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const router = Router();
 
-// Configure multer for S3 upload (memory storage)
+// Configure multer for Azure upload (memory storage)
 const uploadMiddleware = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -47,7 +47,7 @@ const uploadMiddleware = multer({
   }
 }).single('document');
 
-// POST /api/public/applications/:id/documents - Document Upload with S3
+// POST /api/public/applications/:id/documents - Document Upload with Azure
 router.post('/:id/documents', uploadMiddleware, async (req: any, res: any) => {
   const { id: applicationId } = req.params;
   const { documentType } = req.body;
@@ -116,18 +116,18 @@ router.post('/:id/documents', uploadMiddleware, async (req: any, res: any) => {
     
     console.log(`[UPLOAD] Generated storage key: ${storageKey}`);
     
-    // Upload to S3
-    const { uploadToS3 } = await import('../../config/s3Config.js');
+    // Upload to Azure
+    const { uploadToAzure } = await import('../../config/s3Config.js');
     
     try {
-      const s3StorageKey = await uploadToS3(
+      const s3StorageKey = await uploadToAzure(
         file.buffer,
         file.originalname,
         file.mimetype,
         applicationId
       );
       
-      console.log(`[UPLOAD] S3 upload successful: ${s3StorageKey}`);
+      console.log(`[UPLOAD] Azure upload successful: ${s3StorageKey}`);
       
       // Calculate checksum
       const crypto = await import('crypto');
@@ -166,7 +166,7 @@ router.post('/:id/documents', uploadMiddleware, async (req: any, res: any) => {
         - File: ${file.originalname}
         - Type: ${documentType}
         - Size: ${file.size} bytes
-        - S3 Key: ${s3StorageKey}
+        - Azure Key: ${s3StorageKey}
         - Checksum: ${checksum}`);
 
       // 🚀 PIPELINE AUTOMATION: Check if all required documents are now uploaded
@@ -228,12 +228,12 @@ router.post('/:id/documents', uploadMiddleware, async (req: any, res: any) => {
       });
       
     } catch (s3Error: any) {
-      console.error(`❌ [UPLOAD] S3 upload failed:`, s3Error);
+      console.error(`❌ [UPLOAD] Azure upload failed:`, s3Error);
       res.status(500).json({
         success: false,
-        error: 'S3 upload failed',
+        error: 'Azure upload failed',
         details: s3Error.message,
-        code: 'S3_UPLOAD_ERROR'
+        code: 'Azure_UPLOAD_ERROR'
       });
     }
     

@@ -53,7 +53,6 @@ export const SECURITY_CONFIG = {
   
   // IP Security
   IP_SECURITY: {
-    // Trust proxy headers (for Replit deployment)
     TRUST_PROXY: true,
     
     // Rate limit cleanup interval (10 minutes)

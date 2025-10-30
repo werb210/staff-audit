@@ -3,7 +3,7 @@ export type LenderReport = {
   lenderId: string;
   name: string;             // e.g., "Monthly Funding Summary"
   type: "link"|"iframe"|"pdf"|"csv"; // render hint
-  url?: string;             // external URL or CDN/S3 path
+  url?: string;             // external URL or CDN/Azure path
   embedUrl?: string;        // for iframe dashboards if different
   createdAt: string;
 };

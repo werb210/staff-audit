@@ -192,7 +192,7 @@ r.get("/docs/scan", async (req: Request, res: Response) => {
       else if (t.includes("financial") || t.includes("pl") || t.includes("balance")) key = "Financials (YTD + last FY)";
       if (key) present.add(key);
 
-      // quality heuristics (improve with S3 metadata/OCR results)
+      // quality heuristics (improve with Azure metadata/OCR results)
       const dpi = d.dpi ?? 110;
       const pages = d.pages ?? 1;
       const q = { id: d.id, file: d.name, dpi, pages, ok: dpi >= 150 && pages > 0 };

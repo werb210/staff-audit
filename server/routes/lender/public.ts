@@ -22,7 +22,7 @@ router.post("/upload", async (req:any, res)=>{
   const { filename, contentType="application/octet-stream", category } = req.body || {};
   const key = `lender/${req.lender.applicationId}/${Date.now()}_${String(filename||'file').replace(/\s+/g,'_')}`;
   
-  // For now, return a mock presigned URL - in production this would use AWS S3
+  // For now, return a mock presigned URL - in production this would use AWS Azure
   const mockUrl = `/api/lender/mock-upload?key=${encodeURIComponent(key)}`;
   
   await db.execute(sql`
@@ -40,7 +40,7 @@ router.post("/download", async (req:any, res)=>{
   const doc = (await db.execute(sql`SELECT id, filename, s3_key FROM documents WHERE id=${documentId} AND applicationId=${req.lender.applicationId} LIMIT 1`)).rows?.[0];
   if (!doc?.s3_key) return res.status(404).json({ error: "not found" });
   
-  // For now, return a mock download URL - in production this would use AWS S3
+  // For now, return a mock download URL - in production this would use AWS Azure
   const mockUrl = `/api/lender/mock-download?key=${encodeURIComponent(doc.s3_key)}`;
   
   await lenderAudit(req, "doc_download", { documentId, filename: doc.filename });

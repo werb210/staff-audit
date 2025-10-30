@@ -5,11 +5,11 @@ import { db } from '../db/index';
 import { documents, applications } from '../../shared/schema.js';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
-import { S3Storage } from '../utils/s3.js';
+import { AzureStorage } from '../utils/s3.js';
 
 const router = express.Router();
 
-// Multer configuration for memory storage (S3 upload)
+// Multer configuration for memory storage (Azure upload)
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { 
@@ -38,7 +38,7 @@ const upload = multer({
 
 /**
  * POST /api/public/applications/:applicationId/documents
- * Upload document for application with S3 storage
+ * Upload document for application with Azure storage
  */
 router.post('/public/applications/:applicationId/documents', upload.single('document'), async (req: any, res: any) => {
   try {
@@ -86,12 +86,12 @@ router.post('/public/applications/:applicationId/documents', upload.single('docu
     const sha256 = crypto.createHash('sha256').update(file.buffer).digest('hex');
     console.log(`🔐 [DOCUMENT UPLOAD] Generated SHA256: ${sha256.substring(0, 8)}...`);
 
-    // Upload to S3
-    console.log(`☁️ [DOCUMENT UPLOAD] Uploading to S3...`);
-    const s3Storage = new S3Storage();
+    // Upload to Azure
+    console.log(`☁️ [DOCUMENT UPLOAD] Uploading to Azure...`);
+    const s3Storage = new AzureStorage();
     const storageKey = await s3Storage.set(file.buffer, file.originalname, applicationId);
 
-    console.log(`✅ [DOCUMENT UPLOAD] S3 upload successful: ${storageKey}`);
+    console.log(`✅ [DOCUMENT UPLOAD] Azure upload successful: ${storageKey}`);
 
     // Create database record
     const documentId = uuidv4();

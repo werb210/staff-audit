@@ -97,7 +97,7 @@ router.post('/:id/reupload', upload.single('document'), async (req: Request, res
       });
     }
     
-    if (error instanceof Error ? error.message : String(error).includes('S3 upload failed')) {
+    if (error instanceof Error ? error.message : String(error).includes('Azure upload failed')) {
       return res.status(500).json({
         success: false,
         error: 'Upload failed',

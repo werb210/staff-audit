@@ -499,8 +499,8 @@ export async function getOcrResultsByApplication(applicationId: string) {
   return result.rows;
 }
 
-// S3-compatible OCR processing function
-export async function processS3DocumentOCR(
+// Azure-compatible OCR processing function
+export async function processAzureDocumentOCR(
   documentId: string,
   applicationId: string,
   storageKey: string,
@@ -509,24 +509,24 @@ export async function processS3DocumentOCR(
   const startTime = Date.now();
   
   try {
-    console.log(`🌐 [S3-OCR] Starting S3 OCR processing for document ${documentId}, storage key: ${storageKey}`);
+    console.log(`🌐 [Azure-OCR] Starting Azure OCR processing for document ${documentId}, storage key: ${storageKey}`);
     
-    // Import S3 utilities
-    const { S3Client, GetObjectCommand } = await import('@aws-sdk/client-s3');
+    // Import Azure utilities
+    const { AzureClient, GetObjectCommand } = await import('@aws-sdk/client-s3');
     
-    // Configure S3 client
-    const s3Client = new S3Client({
-      region: process.env.AWS_REGION || 'ca-central-1',
+    // Configure Azure client
+    const s3Client = new AzureClient({
+      region: process.env.AZURE_REGION || 'ca-central-1',
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+        accessKeyId: process.env.AZURE_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AZURE_SECRET_ACCESS_KEY!,
       },
     });
     
-    const bucketName = process.env.CORRECT_S3_BUCKET_NAME || process.env.S3_BUCKET_NAME || 'boreal-documents';
+    const bucketName = process.env.CORRECT_Azure_BUCKET_NAME || process.env.Azure_BUCKET_NAME || 'boreal-documents';
     
-    // Get document from S3
-    console.log(`📥 [S3-OCR] Downloading document from S3: ${bucketName}/${storageKey}`);
+    // Get document from Azure
+    console.log(`📥 [Azure-OCR] Downloading document from Azure: ${bucketName}/${storageKey}`);
     const getObjectCommand = new GetObjectCommand({
       Bucket: bucketName,
       Key: storageKey,
@@ -536,10 +536,10 @@ export async function processS3DocumentOCR(
     const documentBody = await s3Response.Body?.transformToByteArray();
     
     if (!documentBody) {
-      throw new Error('Failed to download document from S3');
+      throw new Error('Failed to download document from Azure');
     }
     
-    console.log(`✅ [S3-OCR] Downloaded ${documentBody.length} bytes from S3`);
+    console.log(`✅ [Azure-OCR] Downloaded ${documentBody.length} bytes from Azure`);
     
     // Create a prompt for OCR processing based on document type
     let ocrPrompt = '';
@@ -577,14 +577,14 @@ export async function processS3DocumentOCR(
     // Check if it's a PDF and handle accordingly
     if (storageKey.toLowerCase().endsWith('.pdf')) {
       // For PDFs, convert to image and use Vision API for better extraction
-      console.log(`📄 [S3-OCR] PDF detected, converting to image for Vision API processing...`);
+      console.log(`📄 [Azure-OCR] PDF detected, converting to image for Vision API processing...`);
       
       let pdfData: any;
       try {
         // Try pdf2pic conversion for better OCR
         const pdf2pic = await import('pdf2pic');
         const pdfBuffer = Buffer.from(documentBody);
-        console.log(`📄 [S3-OCR] Converting PDF buffer of ${pdfBuffer.length} bytes to image...`);
+        console.log(`📄 [Azure-OCR] Converting PDF buffer of ${pdfBuffer.length} bytes to image...`);
         
         // Convert first page of PDF to base64 image
         const convert = pdf2pic.fromBuffer(pdfBuffer, {
@@ -599,7 +599,7 @@ export async function processS3DocumentOCR(
         const result = await convert(1, { responseType: "base64" }); // Convert page 1
         const base64Image = result.base64;
         
-        console.log(`✅ [S3-OCR] PDF successfully converted to PNG image (${base64Image?.length || 0} chars)`);
+        console.log(`✅ [Azure-OCR] PDF successfully converted to PNG image (${base64Image?.length || 0} chars)`);
         
         // Now process with Vision API for better text extraction
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -637,7 +637,7 @@ Format as detailed text extraction for banking analysis.`
         });
 
         const extractedText = response.choices[0]?.message?.content || "";
-        console.log(`✅ [S3-OCR] Vision API extracted ${extractedText.length} characters from PDF`);
+        console.log(`✅ [Azure-OCR] Vision API extracted ${extractedText.length} characters from PDF`);
         
         pdfData = {
           text: extractedText,
@@ -646,13 +646,13 @@ Format as detailed text extraction for banking analysis.`
         };
         
       } catch (pdfError: any) {
-        console.error(`❌ [S3-OCR] PDF conversion/Vision API failed: ${pdfError.message}`);
+        console.error(`❌ [Azure-OCR] PDF conversion/Vision API failed: ${pdfError.message}`);
         
         // Enhanced fallback: Try pdf-parse as backup
         try {
           const pdfParse = await import('pdf-parse');
           const pdfBuffer = Buffer.from(documentBody);
-          console.log(`🔄 [S3-OCR] Trying pdf-parse as fallback...`);
+          console.log(`🔄 [Azure-OCR] Trying pdf-parse as fallback...`);
           
           if (typeof pdfParse.default === 'function') {
             pdfData = await pdfParse.default(pdfBuffer);
@@ -661,9 +661,9 @@ Format as detailed text extraction for banking analysis.`
           } else {
             throw new Error('pdf-parse function not found');
           }
-          console.log(`✅ [S3-OCR] pdf-parse fallback succeeded with ${pdfData.text?.length || 0} characters`);
+          console.log(`✅ [Azure-OCR] pdf-parse fallback succeeded with ${pdfData.text?.length || 0} characters`);
         } catch (fallbackError: any) {
-          console.error(`❌ [S3-OCR] All PDF extraction methods failed: ${fallbackError.message}`);
+          console.error(`❌ [Azure-OCR] All PDF extraction methods failed: ${fallbackError.message}`);
           
           // Final fallback: Create a basic response indicating extraction failed
           pdfData = {
@@ -687,7 +687,7 @@ Format as detailed text extraction for banking analysis.`
       const overallConfidence = 90;
       
       // Store OCR results in database using raw SQL
-      console.log('✅ [S3-OCR] Inserting PDF text extraction results into database...');
+      console.log('✅ [Azure-OCR] Inserting PDF text extraction results into database...');
       const insertQuery = `
         INSERT INTO ocr_results (
           document_id, applicationId, extracted_data, confidence, 
@@ -717,13 +717,13 @@ Format as detailed text extraction for banking analysis.`
       
       const [insertedResult] = insertResult.rows;
       
-      console.log(`✅ [S3-OCR] PDF text extraction completed for document ${documentId} in ${processingTime}ms with confidence ${overallConfidence}%`);
+      console.log(`✅ [Azure-OCR] PDF text extraction completed for document ${documentId} in ${processingTime}ms with confidence ${overallConfidence}%`);
       
       return insertedResult.id;
     }
     
     // For images, process with OpenAI Vision API
-    console.log(`🤖 [S3-OCR] Processing image with OpenAI Vision API...`);
+    console.log(`🤖 [Azure-OCR] Processing image with OpenAI Vision API...`);
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     
     // Determine correct MIME type for images
@@ -782,7 +782,7 @@ Format as detailed text extraction for banking analysis.`
     const overallConfidence = extractedData.confidence || 85;
     
     // Store OCR results in database using raw SQL
-    console.log('✅ [S3-OCR] Inserting OCR results into database...');
+    console.log('✅ [Azure-OCR] Inserting OCR results into database...');
     const insertQuery = `
       INSERT INTO ocr_results (
         document_id, applicationId, extracted_data, confidence, 
@@ -812,16 +812,16 @@ Format as detailed text extraction for banking analysis.`
     
     const [insertedResult] = insertResult.rows;
     
-    console.log(`✅ [S3-OCR] OCR processing completed for document ${documentId} in ${processingTime}ms with confidence ${overallConfidence}%`);
+    console.log(`✅ [Azure-OCR] OCR processing completed for document ${documentId} in ${processingTime}ms with confidence ${overallConfidence}%`);
     
     return insertedResult.id;
     
   } catch (error: any) {
-    console.error(`❌ [S3-OCR] Failed to process S3 document ${documentId}:`, error.message);
+    console.error(`❌ [Azure-OCR] Failed to process Azure document ${documentId}:`, error.message);
     
     // Store failed result using raw SQL
     const processingTime = Date.now() - startTime;
-    console.log('❌ [S3-OCR] Storing failed OCR result in database...');
+    console.log('❌ [Azure-OCR] Storing failed OCR result in database...');
     
     const failedQuery = `
       INSERT INTO ocr_results (

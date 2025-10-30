@@ -1,5 +1,5 @@
 import Queue from 'bull';
-import { uploadToS3 } from '../utils/s3DirectStorage';
+import { uploadToAzure } from '../utils/s3DirectStorage';
 import { db } from '../db';
 import { documents, retryUploadLogs } from '../../shared/schema';
 import { logRetryFailure, logRetrySuccess } from '../services/uploadService';
@@ -58,16 +58,16 @@ retryQueue.process('upload-retry', async (job) => {
   console.log(`🔄 [RETRY-WORKER] Processing retry attempt ${attempt} for ${fileName}`);
 
   try {
-    // Attempt S3 upload again
-    const s3Result = await uploadToS3(fileBuffer, fileName, applicationId);
+    // Attempt Azure upload again
+    const s3Result = await uploadToAzure(fileBuffer, fileName, applicationId);
     
     if (!s3Result.success) {
-      throw new Error(s3Result.error || 'S3 upload failed during retry');
+      throw new Error(s3Result.error || 'Azure upload failed during retry');
     }
 
-    console.log(`☁️ [RETRY-WORKER] S3 upload successful: ${s3Result.storageKey}`);
+    console.log(`☁️ [RETRY-WORKER] Azure upload successful: ${s3Result.storageKey}`);
 
-    // Create document record with real S3 data
+    // Create document record with real Azure data
     const documentId = uuidv4();
     await db.insert(documents).values({
       id: documentId,

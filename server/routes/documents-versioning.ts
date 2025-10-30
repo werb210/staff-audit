@@ -2,17 +2,17 @@ import { Router } from "express";
 import { db } from "../db/drizzle";
 import { sql, eq, desc } from "drizzle-orm";
 import { requireAuth } from "../auth/verifyOnly";
-import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { AzureClient, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 
 const r = Router();
 r.use(requireAuth);
 
-// Initialize S3 client
-const s3 = new S3Client({
-  region: process.env.AWS_REGION || 'ca-central-1',
+// Initialize Azure client
+const s3 = new AzureClient({
+  region: process.env.AZURE_REGION || 'ca-central-1',
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+    accessKeyId: process.env.AZURE_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AZURE_SECRET_ACCESS_KEY!
   }
 });
 

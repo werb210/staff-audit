@@ -6,10 +6,6 @@ console.log("🧪 Boreal Staff App — Environment Sanity Check\n");
 const keys = [
   "PORT",
   "NODE_ENV",
-  "AWS_REGION",
-  "AWS_ACCESS_KEY_ID",
-  "AWS_SECRET_ACCESS_KEY",
-  "S3_BUCKET",
   "TWILIO_ACCOUNT_SID",
   "TWILIO_AUTH_TOKEN",
   "TWILIO_PHONE_NUMBER",

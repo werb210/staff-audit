@@ -1,12 +1,12 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { AzureClient, PutObjectCommand, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const REGION = process.env.AWS_REGION!;
-const PUB = process.env.S3_BUCKET_PUBLIC || process.env.AWS_S3_BUCKET_NAME!;
-const PRI = process.env.S3_BUCKET_PRIVATE || process.env.AWS_S3_BUCKET_NAME!;
-const ENDPOINT = process.env.S3_ENDPOINT; // optional
+const REGION = process.env.AZURE_REGION!;
+const PUB = process.env.Azure_BUCKET_PUBLIC || process.env.AZURE_Azure_BUCKET_NAME!;
+const PRI = process.env.Azure_BUCKET_PRIVATE || process.env.AZURE_Azure_BUCKET_NAME!;
+const ENDPOINT = process.env.Azure_ENDPOINT; // optional
 
-export const s3 = new S3Client({ region: REGION, ...(ENDPOINT ? { endpoint: ENDPOINT, forcePathStyle: true } : {}) });
+export const s3 = new AzureClient({ region: REGION, ...(ENDPOINT ? { endpoint: ENDPOINT, forcePathStyle: true } : {}) });
 
 export async function signPut(scope: "public"|"private", key: string, type?: string) {
   const Bucket = scope === "public" ? PUB : PRI;

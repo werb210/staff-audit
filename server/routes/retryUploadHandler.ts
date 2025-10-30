@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { uploadToS3 } from "../utils/s3Upload";
+import { uploadToAzure } from "../utils/s3Upload";
 import { db } from "../db";
 import { documents } from "../../shared/schema";
 import { v4 as uuidv4 } from "uuid";
@@ -18,13 +18,13 @@ router.post("/upload/:applicationId", upload.single("document"), async (req: any
   }
 
   try {
-    console.log("🔄 [RETRY UPLOAD] S3 upload starting...");
-    const s3Result = await uploadToS3(applicationId, file); // must throw if S3 fails
-    console.log("✅ [RETRY UPLOAD] S3 upload successful:", s3Result);
+    console.log("🔄 [RETRY UPLOAD] Azure upload starting...");
+    const s3Result = await uploadToAzure(applicationId, file); // must throw if Azure fails
+    console.log("✅ [RETRY UPLOAD] Azure upload successful:", s3Result);
 
-    // Validate S3 result completeness
+    // Validate Azure result completeness
     if (!s3Result || !s3Result.storageKey || !s3Result.checksum) {
-      throw new Error("❌ S3 upload failed — result is incomplete or fallback still triggered");
+      throw new Error("❌ Azure upload failed — result is incomplete or fallback still triggered");
     }
 
     // Save document metadata to database 
@@ -45,7 +45,7 @@ router.post("/upload/:applicationId", upload.single("document"), async (req: any
       updatedAt: new Date()
     });
 
-    console.log("✅ [S3 UPLOAD SUCCESS] Document uploaded and saved:", documentId);
+    console.log("✅ [Azure UPLOAD SUCCESS] Document uploaded and saved:", documentId);
     
     return res.json({
       success: true,
@@ -58,12 +58,12 @@ router.post("/upload/:applicationId", upload.single("document"), async (req: any
       status: "success",
     });
   } catch (err) {
-    console.error("❌ [S3 UPLOAD FAILED] - Error:", (err as Error).message);
+    console.error("❌ [Azure UPLOAD FAILED] - Error:", (err as Error).message);
     // NO FALLBACK - fail completely
     return res.status(500).json({ 
       success: false, 
       fallback: false, // NEVER return fallback: true
-      message: "S3 upload failed — aborting with no fallback",
+      message: "Azure upload failed — aborting with no fallback",
       error: (err as Error).message
     });
   }

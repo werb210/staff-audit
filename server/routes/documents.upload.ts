@@ -31,12 +31,12 @@ r.post("/api/applications/:id/documents/upload", requireStaff, upload.single("fi
 
     // 🔐 optional: ensure user/session is authorized to upload to this application
 
-    // 👉 Server-side persistence (S3 or local). Replace with your existing S3 client.
+    // 👉 Server-side persistence (Azure or local). Replace with your existing Azure client.
     // Example using AWS SDK v3 (already configured elsewhere in your app):
     // const key = `applications/${appId}/${Date.now()}-${slug(f.originalname)}`;
-    // await s3Client.send(new PutObjectCommand({ Bucket: process.env.S3_BUCKET!, Key: key, Body: f.buffer, ContentType: f.mimetype }));
+    // await s3Client.send(new PutObjectCommand({ Bucket: process.env.Azure_BUCKET!, Key: key, Body: f.buffer, ContentType: f.mimetype }));
 
-    // If you don't want to wire S3 yet, write to disk and set file_key to the path.
+    // If you don't want to wire Azure yet, write to disk and set file_key to the path.
     const key = `applications/${appId}/${Date.now()}-${slug(f.originalname)}`;
     // await fs.promises.mkdir(`/data/${appId}`, { recursive: true });
     // await fs.promises.writeFile(`/data/${key}`, f.buffer);

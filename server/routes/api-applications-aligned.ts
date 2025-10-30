@@ -8,7 +8,7 @@ import { Router, Request, Response } from "express";
 import { Client } from "pg";
 import crypto from "crypto";
 import multer from "multer";
-import { S3Storage } from "../utils/s3.js";
+import { AzureStorage } from "../utils/s3.js";
 
 const router = Router();
 
@@ -351,15 +351,15 @@ router.post("/applications/:id/documents/upload", upload.single("file"), async (
 
     console.log(`✅ [API-ALIGNED] Application ${applicationId} validated`);
 
-    // Upload to S3 (if S3Storage is available)
+    // Upload to Azure (if AzureStorage is available)
     let s3Url = null;
     try {
-      const s3Storage = new S3Storage();
+      const s3Storage = new AzureStorage();
       const storageKey = await s3Storage.set(file.buffer, file.originalname, applicationId);
       s3Url = `s3://${storageKey}`;
-      console.log(`✅ [API-ALIGNED] S3 upload successful: ${storageKey}`);
+      console.log(`✅ [API-ALIGNED] Azure upload successful: ${storageKey}`);
     } catch (s3Error) {
-      console.warn(`⚠️ [API-ALIGNED] S3 upload failed, proceeding without S3: ${s3Error.message}`);
+      console.warn(`⚠️ [API-ALIGNED] Azure upload failed, proceeding without Azure: ${s3Error.message}`);
     }
 
     // Create document record

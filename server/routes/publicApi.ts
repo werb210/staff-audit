@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 import { db } from '../db';
 import { documents, applications, businesses, expectedDocuments } from '../../shared/schema';
 import { eq, and } from 'drizzle-orm';
-// import { s3Upload, saveDocumentToS3AndDB, validateS3Configuration } from '../utils/s3DirectStorage.js';
+// import { s3Upload, saveDocumentToAzureAndDB, validateAzureConfiguration } from '../utils/s3DirectStorage.js';
 import { v4 as uuidv4 } from 'uuid';
 import { storage } from '../storage';
 import path from 'path';
@@ -94,14 +94,14 @@ async function resolveUUIDFromAppKey(appId: string): Promise<string | null> {
 // CRITICAL FIX: NO authentication middleware applied to ANY routes in this file
 // All routes in publicApi.ts are explicitly public and require no authentication
 
-// 🚀 S3 DIRECT STREAMING CONFIGURATION
-// Validate S3 configuration on startup
-const s3Config = validateS3Configuration();
+// 🚀 Azure DIRECT STREAMING CONFIGURATION
+// Validate Azure configuration on startup
+const s3Config = validateAzureConfiguration();
 if (!s3Config.isValid) {
-  console.warn(`⚠️ [S3-CONFIG] Missing S3 variables: ${s3Config.missingVars.join(', ')}`);
-  console.warn(`⚠️ [S3-CONFIG] S3 direct streaming may not function properly`);
+  console.warn(`⚠️ [Azure-CONFIG] Missing Azure variables: ${s3Config.missingVars.join(', ')}`);
+  console.warn(`⚠️ [Azure-CONFIG] Azure direct streaming may not function properly`);
 } else {
-  console.log(`✅ [S3-CONFIG] S3 direct streaming configured successfully`);
+  console.log(`✅ [Azure-CONFIG] Azure direct streaming configured successfully`);
 }
 
 /**
@@ -126,8 +126,8 @@ router.get('/upload-test', (req: any, res: any) => {
   res.json({ status: 'Upload endpoint accessible', timestamp: new Date().toISOString() });
 });
 
-// 🚀 S3 UPLOAD WITH WORKING ROUTE PATTERN
-// Using memory storage + manual S3 streaming approach
+// 🚀 Azure UPLOAD WITH WORKING ROUTE PATTERN
+// Using memory storage + manual Azure streaming approach
 
 // PRODUCTION FIX: Enhanced multer configuration for better field handling
 const testUpload = multer({ 
@@ -149,7 +149,7 @@ const testUpload = multer({
   }
 });
 
-// DISABLED: Legacy disk storage - S3-only mode active
+// DISABLED: Legacy disk storage - Azure-only mode active
 // const legacyUpload = multer({ 
 //   storage: multer.diskStorage({
 //     destination: 'uploads/documents/',
@@ -172,7 +172,7 @@ const universalUpload = multer({
   }
 });
 
-// 🚀 PURE S3 UPLOAD ENDPOINT - NO DISK STORAGE FALLBACK
+// 🚀 PURE Azure UPLOAD ENDPOINT - NO DISK STORAGE FALLBACK
 router.post('/s3-upload/:applicationId', 
   normalizeDocumentType,
   validateDocumentType,
@@ -182,8 +182,8 @@ router.post('/s3-upload/:applicationId',
   const file = req.files?.[0] || req.file;
   const documentType = req.body.documentType || 'other';
   
-  console.log(`[S3] Upload request for application ${applicationId}`);
-  console.log(`[S3] File: ${file?.originalname}, Size: ${file?.size} bytes, Type: ${file?.mimetype}`);
+  console.log(`[Azure] Upload request for application ${applicationId}`);
+  console.log(`[Azure] File: ${file?.originalname}, Size: ${file?.size} bytes, Type: ${file?.mimetype}`);
 
   if (!file) {
     return res.status(400).json({
@@ -204,7 +204,7 @@ router.post('/s3-upload/:applicationId',
     // Verify application exists
     const [application] = await db.select().from(applications).where(eq(applications.id, applicationId));
     if (!application) {
-      console.log(`❌ [S3-UPLOAD] Application ${applicationId} not found in database`);
+      console.log(`❌ [Azure-UPLOAD] Application ${applicationId} not found in database`);
       return res.status(404).json({
         status: 'error',
         error: 'Application not found',
@@ -216,10 +216,10 @@ router.post('/s3-upload/:applicationId',
       });
     }
 
-    // Import and use pure S3 upload utility
-    const { uploadDocumentToS3 } = await import('../utils/pureS3Upload');
+    // Import and use pure Azure upload utility
+    const { uploadDocumentToAzure } = await import('../utils/pureAzureUpload');
     
-    const result = await uploadDocumentToS3({
+    const result = await uploadDocumentToAzure({
       applicationId,
       fileBuffer: file.buffer,
       fileName: file.originalname,
@@ -252,22 +252,22 @@ router.post('/s3-upload/:applicationId',
       status: 'success',
       documentId: result.documentId,
       storageKey: result.storageKey,
-      message: `Document ${file.originalname} uploaded successfully to S3`,
+      message: `Document ${file.originalname} uploaded successfully to Azure`,
       category: documentType,
       fileSize: file.size
     });
 
   } catch (error: unknown) {
-    console.error(`[S3] Upload failed:`, error);
+    console.error(`[Azure] Upload failed:`, error);
     res.status(500).json({
       status: 'error',
-      error: 'S3 upload failed',
+      error: 'Azure upload failed',
       details: error instanceof Error ? error instanceof Error ? error.message : String(error) : 'Unknown error'
     });
   }
 });
 
-// Test successful S3 upload and generate pre-signed URL
+// Test successful Azure upload and generate pre-signed URL
 router.get('/s3-test/:documentId', async (req: any, res: any) => {
   const { documentId } = req.params;
   
@@ -278,9 +278,9 @@ router.get('/s3-test/:documentId', async (req: any, res: any) => {
       return res.status(404).json({ error: 'Document not found' });
     }
     
-    // Check if document has S3 key
+    // Check if document has Azure key
     if (!document.objectStorageKey) {
-      return res.status(400).json({ error: 'Document has no S3 key' });
+      return res.status(400).json({ error: 'Document has no Azure key' });
     }
     
     // Generate pre-signed URL
@@ -297,14 +297,14 @@ router.get('/s3-test/:documentId', async (req: any, res: any) => {
     });
     
   } catch (error: unknown) {
-    console.error('S3 test error:', error);
+    console.error('Azure test error:', error);
     res.status(500).json({ error: 'Failed to generate pre-signed URL' });
   }
 });
 
-// REMOVED: Duplicate upload route - using S3 direct upload instead
+// REMOVED: Duplicate upload route - using Azure direct upload instead
 
-// DISABLED: Legacy disk upload - S3-only mode active
+// DISABLED: Legacy disk upload - Azure-only mode active
 // router.post('/upload/:id', legacyUpload.single('document'), async (req: any, res) => {
 //   // 🚫 DO NOT ADD ABORT-BASED CLEANUP HERE
 //   // This upload system has been hardened against false positives.
@@ -345,7 +345,7 @@ router.get('/s3-test/:documentId', async (req: any, res: any) => {
 //     // HARDENED SAVE: Use bulletproof storage with verification
 //     console.log(`🛡️ [HARDENED] Using bulletproof save with comprehensive verification`);
 //     
-//     const hardenedResult = await saveDocumentToS3AndDB(
+//     const hardenedResult = await saveDocumentToAzureAndDB(
 //       id,
 //       file.path,
 //       file.originalname,
@@ -428,14 +428,14 @@ router.get('/s3-test/:documentId', async (req: any, res: any) => {
 //   }
 // });
 
-// REMOVED: Second duplicate upload route - using S3 direct upload instead
+// REMOVED: Second duplicate upload route - using Azure direct upload instead
 
 // 2. Application Final Submission Endpoint - MOVED TO publicApplications.ts router
 // This endpoint is now handled by server/routes/applications/submit.ts via publicApplications router
 
 // 🛡️ PERMANENT UPLOAD ENDPOINT - HARDENED AGAINST ALL INSTABILITY
 // 🚫 DO NOT ADD ABORT-BASED CLEANUP HERE - SYSTEM HARDENED AGAINST FALSE POSITIVES
-// Create disk-based multer for temporary storage before S3 upload
+// Create disk-based multer for temporary storage before Azure upload
 const diskUpload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
@@ -576,7 +576,6 @@ router.post('/documents/:id', diskUpload.any(), async (req: any, res) => {
   }
 });
 
-// SignNow initiation endpoint removed - document signing no longer required
 
 // 3. Finalization Endpoint - REMOVED - Use centralized finalize endpoint instead
 
@@ -674,13 +673,8 @@ router.get('/loan-products/required-documents/:category', async (req: any, res: 
 // ============================================
 
 // Import signing status functionality
-// signingStatusRouter removed - SignNow integration removed
-// overrideSigningRouter removed - SignNow integration removed
 // applicationsCreateRouter removed - integrated inline for simplicity
-// SignNow signing status routes removed
-// overrideSigningRouter mount removed - SignNow integration removed
 
-// SignNow status endpoint removed - document signing no longer required
 
 // CRITICAL: Add the exact endpoint the client expects
 // POST /api/public/applications/:id/documents
@@ -762,7 +756,7 @@ router.post('/applications/:id/documents', s3Upload.single('document'), async (r
     console.log(`📂 [STRICT] File size from multer: ${file.size} bytes`);
 
     // Use unified document storage with actual file path
-    const documentId = await saveDocumentToS3AndDB(
+    const documentId = await saveDocumentToAzureAndDB(
       actualId,
       file.path,
       file.originalname,
@@ -801,7 +795,7 @@ router.post('/applications/:id/documents', s3Upload.single('document'), async (r
 });
 
 // GET /api/public/applications/:id/documents
-// Returns S3-mapped documents for both UUID and app_ format application IDs
+// Returns Azure-mapped documents for both UUID and app_ format application IDs
 router.get('/applications/:id/documents', async (req: any, res: any) => {
   try {
     const rawApplicationId = req.params.id;
@@ -897,7 +891,7 @@ router.get('/applications/:id/documents', async (req: any, res: any) => {
     const result = await pool.query(documentsQuery, [dbId]);
     const s3Documents = result.rows;
     
-    console.log(`✅ [DUAL-FORMAT] Found ${s3Documents.length} S3-mapped documents for ${actualId}`);
+    console.log(`✅ [DUAL-FORMAT] Found ${s3Documents.length} Azure-mapped documents for ${actualId}`);
     
     // Return enhanced response format
     res.json({

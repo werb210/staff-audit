@@ -29,7 +29,6 @@ const PUBLIC_ENDPOINTS = [
   ] : []),
   
   // Webhook endpoints (external services)
-  // SignNow removed
   
   // Health and monitoring endpoints
   { method: 'GET', path: /^\/$/ },

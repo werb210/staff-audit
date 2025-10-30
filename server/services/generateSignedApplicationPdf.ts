@@ -1,5 +1,5 @@
 import { PDFDocument, PDFForm, PDFTextField } from 'pdf-lib';
-import { uploadDocumentToS3 } from '../utils/s3Upload';
+import { uploadDocumentToAzure } from '../utils/s3Upload';
 import { db } from '../db';
 import { v4 as uuidv4 } from 'uuid';
 import { buildPdfData } from './_canonFields';
@@ -190,14 +190,14 @@ export async function generateSignedApplicationPdf(applicationId: string) {
 
     console.log(`✅ [PDF] PDF document generated (${buffer.length} bytes)`);
 
-    // 4. Upload to S3
-    const storageKey = await uploadDocumentToS3(applicationId, buffer, {
+    // 4. Upload to Azure
+    const storageKey = await uploadDocumentToAzure(applicationId, buffer, {
       documentType: "signed_application",
       fileName: "Signed_Application.pdf",
     });
 
     console.log(`✅ [MONITOR] Final PDF uploaded - signed_application`);
-    console.log(`✅ [MONITOR] S3 Key: ${storageKey}`);
+    console.log(`✅ [MONITOR] Azure Key: ${storageKey}`);
 
     // 5. Save to database
     const documentId = uuidv4();

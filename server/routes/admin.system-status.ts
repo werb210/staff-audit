@@ -29,8 +29,8 @@ r.get("/admin/system-status", async (req: any, res) => {
       'DATABASE_URL',
       'TWILIO_ACCOUNT_SID', 
       'TWILIO_AUTH_TOKEN',
-      'S3_BUCKET',
-      'S3_REGION',
+      'Azure_BUCKET',
+      'Azure_REGION',
       'JWT_SECRET'
     ];
     
@@ -60,7 +60,7 @@ r.get("/admin/system-status", async (req: any, res) => {
     // Check external services (basic ping)
     const services = {
       'Twilio': !!process.env.TWILIO_ACCOUNT_SID,
-      'S3': !!process.env.S3_BUCKET,
+      'Azure': !!process.env.Azure_BUCKET,
       'Microsoft Graph': !!process.env.O365_SERVICE_USER_ID,
       'LinkedIn': !!process.env.LINKEDIN_CLIENT_ID,
       'Redis': !!process.env.REDIS_URL
@@ -74,11 +74,11 @@ r.get("/admin/system-status", async (req: any, res) => {
       status: services
     };
 
-    // Check S3 accessibility
+    // Check Azure accessibility
     try {
-      // Basic S3 configuration check
-      const hasS3Config = process.env.S3_BUCKET && process.env.S3_REGION;
-      status.storage = { accessible: hasS3Config };
+      // Basic Azure configuration check
+      const hasAzureConfig = process.env.Azure_BUCKET && process.env.Azure_REGION;
+      status.storage = { accessible: hasAzureConfig };
     } catch (error: unknown) {
       status.storage = { accessible: false, error: error instanceof Error ? error.message : String(error) };
     }

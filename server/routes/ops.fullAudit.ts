@@ -112,7 +112,7 @@ r.get("/full-audit", async (req: any, res: any) => {
       features: [
         { key:"/documents page renders SPA", check: ui("/documents") },
         { key:"/api/documents list", check: apiOK("/api/documents","items") },
-        { key:"S3 env present", check: need(["AWS_ACCESS_KEY_ID","AWS_SECRET_ACCESS_KEY","S3_BUCKET"], "S3") }
+        { key:"Azure env present", check: need(["AZURE_ACCESS_KEY_ID","AZURE_SECRET_ACCESS_KEY","Azure_BUCKET"], "Azure") }
       ]
     },
     {
@@ -150,7 +150,7 @@ r.get("/full-audit", async (req: any, res: any) => {
       features: [
         { key:"/api/ops/schema-check", check: apiOK("/api/ops/schema-check") },
         { key:"Webhook secrets present", check: need(["TWILIO_WEBHOOK_SECRET"], "Webhook") },
-        { key:"S3 AV flag present (if used)", check: need(["AV_SCAN_ENABLED"], "AV") }
+        { key:"Azure AV flag present (if used)", check: need(["AV_SCAN_ENABLED"], "AV") }
       ]
     },
     {

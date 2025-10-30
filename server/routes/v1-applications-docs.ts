@@ -1,19 +1,19 @@
 // V1 API for application document uploads - AUTHORITATIVE ENDPOINT (PUBLIC ACCESS)
 import { Router, Request, Response } from "express";
 import multer from "multer";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { AzureClient, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// S3 Configuration - Best Practices
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION || 'ca-central-1',
+// Azure Configuration - Best Practices
+const s3Client = new AzureClient({
+  region: process.env.AZURE_REGION || 'ca-central-1',
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+    accessKeyId: process.env.AZURE_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AZURE_SECRET_ACCESS_KEY!
   },
   // Best practice: Force path style for compatibility
   forcePathStyle: false,
@@ -21,8 +21,8 @@ const s3Client = new S3Client({
   maxAttempts: 3
 });
 
-// S3 Bucket - Following established environment variable hierarchy
-const BUCKET_NAME = process.env.CORRECT_S3_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME || 'boreal-documents';
+// Azure Bucket - Following established environment variable hierarchy
+const BUCKET_NAME = process.env.CORRECT_Azure_BUCKET_NAME || process.env.AZURE_Azure_BUCKET_NAME || 'boreal-documents';
 
 // AUTHORITATIVE ENDPOINT: POST /api/v1/applications/:id/docs
 router.post("/api/v1/applications/:id/docs", upload.single("file"), async (req: Request, res: Response) => {
@@ -54,12 +54,12 @@ router.post("/api/v1/applications/:id/docs", upload.single("file"), async (req: 
       });
     }
     
-    // Generate unique S3 key
+    // Generate unique Azure key
     const documentId = crypto.randomUUID();
     const timestamp = new Date().toISOString().slice(0, 10);
     const s3Key = `applications/${applicationId}/documents/${timestamp}/${documentId}-${file.originalname}`;
     
-    // Upload to S3 - Best Practices
+    // Upload to Azure - Best Practices
     const uploadParams = {
       Bucket: BUCKET_NAME,
       Key: s3Key,
@@ -95,7 +95,7 @@ router.post("/api/v1/applications/:id/docs", upload.single("file"), async (req: 
       s3Key, file.size, file.mimetype
     ]);
     
-    console.log(`✅ [V1-DOCS] Document ${documentId} uploaded successfully to S3: ${s3Key}`);
+    console.log(`✅ [V1-DOCS] Document ${documentId} uploaded successfully to Azure: ${s3Key}`);
     
     res.status(201).json({
       success: true,

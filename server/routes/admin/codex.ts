@@ -85,9 +85,9 @@ function collectIssueTrends(): { duplicateRouteScan: IssueTrendEntry[]; s3Health
       : content.includes("✅ Duplicate route scan")
       ? "pass"
       : "unknown";
-    const s3Status: IssueStatus = content.includes("❌ S3 health check")
+    const s3Status: IssueStatus = content.includes("❌ Azure health check")
       ? "fail"
-      : content.includes("✅ S3 health check")
+      : content.includes("✅ Azure health check")
       ? "pass"
       : "unknown";
 

@@ -6,7 +6,6 @@
 import { Client } from '@replit/object-storage';
 import { Readable } from 'stream';
 
-// Replit Object Storage client - initialized on first use
 let client: Client | null = null;
 let clientInitialized = false;
 
@@ -24,7 +23,6 @@ function getClient(): Client | null {
   }
   
   try {
-    // Initialize Replit Object Storage client for production
     client = new Client();
     
     console.log('✅ [OBJECT STORAGE] Client initialized successfully');
@@ -42,7 +40,6 @@ function getClient(): Client | null {
 }
 
 /**
- * Upload file buffer to Replit Object Storage
  * @param buffer File buffer data
  * @param originalName Original filename for reference
  * @returns Storage key for retrieval
@@ -52,8 +49,8 @@ export async function uploadToStorage(buffer: Buffer, originalName: string): Pro
   if (!client) {
     console.error(`❌ [OBJECT STORAGE] Client not available - no fallback allowed`);
     
-    // FALLBACK DISABLED: S3 must be used
-    throw new Error("❌ Fallback upload disabled: S3 must be used");
+    // FALLBACK DISABLED: Azure must be used
+    throw new Error("❌ Fallback upload disabled: Azure must be used");
   }
   
   try {
@@ -64,7 +61,6 @@ export async function uploadToStorage(buffer: Buffer, originalName: string): Pro
     console.log(`☁️ [OBJECT STORAGE] Uploading to storage: ${storageKey}`);
     console.log(`☁️ [OBJECT STORAGE] Buffer size: ${buffer.length} bytes`);
     
-    // Upload to Replit Object Storage using the key as both identifier and path
     await client.uploadFromBytes(storageKey, buffer);
     
     console.log(`✅ [OBJECT STORAGE] Successfully uploaded: ${storageKey}`);
@@ -75,14 +71,13 @@ export async function uploadToStorage(buffer: Buffer, originalName: string): Pro
     console.error(`❌ [OBJECT STORAGE] Upload failed for ${originalName}:`, error);
     console.error(`❌ [OBJECT STORAGE] Error message:`, error instanceof Error ? error instanceof Error ? error.message : String(error) : error);
     
-    // NO FALLBACK - throw error to force proper S3 integration
+    // NO FALLBACK - throw error to force proper Azure integration
     console.error(`❌ [OBJECT STORAGE] Upload failed - no fallback allowed`);
     throw new Error(`Object Storage upload failed for ${originalName}: ${error instanceof Error ? error instanceof Error ? error.message : String(error) : error}`);
   }
 }
 
 /**
- * Get file stream from Replit Object Storage
  * @param storageKey Storage key from upload
  * @returns Readable stream or null if not found
  */
@@ -108,7 +103,6 @@ export async function getStorageStream(storageKey: string): Promise<Readable | n
 }
 
 /**
- * Delete file from Replit Object Storage
  * @param storageKey Storage key to delete
  * @returns Success boolean
  */

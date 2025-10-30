@@ -1,7 +1,7 @@
 import { graphForUser, logGraph } from "./graphClient";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { AzureClient, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const s3 = new S3Client({ region: process.env.S3_REGION });
+const s3 = new AzureClient({ region: process.env.Azure_REGION });
 
 export interface EmailMessage {
   to: string[];
@@ -114,9 +114,9 @@ async function processEmailAttachments(client: any, basePath: string, messageId:
       if (attachment["@odata.type"] === "#microsoft.graph.fileAttachment") {
         const s3Key = `emails/${messageId}/${attachment.name}`;
         
-        // Upload to S3
+        // Upload to Azure
         await s3.send(new PutObjectCommand({
-          Bucket: process.env.S3_BUCKET!,
+          Bucket: process.env.Azure_BUCKET!,
           Key: s3Key,
           Body: Buffer.from(attachment.contentBytes, "base64"),
           ContentType: attachment.contentType || "application/octet-stream",
@@ -131,7 +131,7 @@ async function processEmailAttachments(client: any, basePath: string, messageId:
           s3Key
         });
         
-        console.log(`[O365-EMAIL] Attachment ${attachment.name} saved to S3: ${s3Key}`);
+        console.log(`[O365-EMAIL] Attachment ${attachment.name} saved to Azure: ${s3Key}`);
       }
     }
   } catch (error) {

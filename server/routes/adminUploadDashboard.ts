@@ -115,23 +115,23 @@ router.get('/health', async (req: any, res: any) => {
     const dbTest = await db.execute(sql`SELECT COUNT(*) as count FROM documents LIMIT 1`);
     const dbConnected = !!dbTest.rows[0];
 
-    // Check S3 connectivity (basic)
+    // Check Azure connectivity (basic)
     let s3Connected = false;
     try {
-      const { S3Client, HeadBucketCommand } = await import('@aws-sdk/client-s3');
-      const s3Client = new S3Client({
-        region: process.env.AWS_REGION || 'ca-central-1',
+      const { AzureClient, HeadBucketCommand } = await import('@aws-sdk/client-s3');
+      const s3Client = new AzureClient({
+        region: process.env.AZURE_REGION || 'ca-central-1',
         credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+          accessKeyId: process.env.AZURE_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.AZURE_SECRET_ACCESS_KEY!,
         },
       });
       
-      const bucketName = process.env.AWS_S3_BUCKET_NAME || 'boreal-production-uploads';
+      const bucketName = process.env.AZURE_Azure_BUCKET_NAME || 'boreal-production-uploads';
       await s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
       s3Connected = true;
     } catch (s3Error) {
-      console.warn('⚠️ [ADMIN] S3 health check failed:', (s3Error as any).message);
+      console.warn('⚠️ [ADMIN] Azure health check failed:', (s3Error as any).message);
     }
 
     // Check recent upload activity
@@ -208,7 +208,7 @@ router.post('/retry-upload/:documentId', async (req: any, res: any) => {
     if (result.success) {
       res.json({
         success: true,
-        message: 'Document successfully uploaded to S3',
+        message: 'Document successfully uploaded to Azure',
         documentId,
         newStorageKey: result.newStorageKey,
       });

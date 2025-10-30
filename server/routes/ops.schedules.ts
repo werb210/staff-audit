@@ -5,7 +5,7 @@ import { sql } from "drizzle-orm";
 
 const r = Router();
 
-// Create/ensure repeatable jobs (daily S3 audit, daily budget alerts, monthly lender reports)
+// Create/ensure repeatable jobs (daily Azure audit, daily budget alerts, monthly lender reports)
 r.post("/ops/schedules/ensure", async (_req, res) => {
   // Simplified without Redis - just acknowledge the endpoint exists
   res.json({ ok: true, message: "Schedule endpoints ready" });
@@ -14,7 +14,7 @@ r.post("/ops/schedules/ensure", async (_req, res) => {
 r.get("/ops/schedules", async (_req, res) => {
   // Return mock scheduled jobs for now
   const jobs = [
-    { name: "s3-audit", pattern: "0 3 * * *", description: "Daily S3 audit at 03:00" },
+    { name: "s3-audit", pattern: "0 3 * * *", description: "Daily Azure audit at 03:00" },
     { name: "budget-alerts", pattern: "0 8 * * *", description: "Daily budget alerts at 08:00" },
     { name: "lender-monthly", pattern: "0 9 1 * *", description: "Monthly lender reports on 1st at 09:00" },
     { name: "db-backup", pattern: "0 2 * * *", description: "Daily database backup at 02:00" },
@@ -24,7 +24,7 @@ r.get("/ops/schedules", async (_req, res) => {
   res.json({ ok: true, jobs });
 });
 
-// Manual S3 audit trigger for testing
+// Manual Azure audit trigger for testing
 r.post("/ops/s3-audit/run", async (_req, res) => {
   try {
     const s = await listAndSummarizeBucket();
@@ -32,7 +32,7 @@ r.post("/ops/s3-audit/run", async (_req, res) => {
       values(${s.total}, ${s.bytes}, ${s.sample}, ${JSON.stringify(s.mismatches || [])}::jsonb)`);
     res.json({ ok: true, audit: s });
   } catch (error: unknown) {
-    res.status(500).json({ ok: false, error: "S3 audit failed" });
+    res.status(500).json({ ok: false, error: "Azure audit failed" });
   }
 });
 

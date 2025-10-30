@@ -10,11 +10,11 @@ export async function startupAuditSafe() {
 
   for (const doc of docs) {
     if (!doc.s3Key) {
-      console.log(`❌ [STARTUP-AUDIT] MISSING S3 KEY: ${doc.name} (${doc.id})`);
+      console.log(`❌ [STARTUP-AUDIT] MISSING Azure KEY: ${doc.name} (${doc.id})`);
       results.push({
         documentId: doc.id,
         documentName: doc.name || "Unknown",
-        error: `Missing S3 key in record`,
+        error: `Missing Azure key in record`,
       });
       continue;
     }

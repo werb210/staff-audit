@@ -89,19 +89,19 @@ router.get('/health', async (req: any, res: any) => {
       healthStatus.status = 'degraded';
     }
 
-    // 3. Storage system validation (S3 integration check)
+    // 3. Storage system validation (Azure integration check)
     try {
-      // Check if S3 configuration is available
-      const hasS3Config = process.env.AWS_ACCESS_KEY_ID && 
-                         process.env.AWS_SECRET_ACCESS_KEY && 
-                         process.env.AWS_REGION;
+      // Check if Azure configuration is available
+      const hasAzureConfig = process.env.AZURE_ACCESS_KEY_ID && 
+                         process.env.AZURE_SECRET_ACCESS_KEY && 
+                         process.env.AZURE_REGION;
       
-      if (hasS3Config) {
+      if (hasAzureConfig) {
         healthStatus.checks.storageSystem = 'operational';
-        console.log('✅ [HEALTH] Storage system: S3 configuration available');
+        console.log('✅ [HEALTH] Storage system: Azure configuration available');
       } else {
         healthStatus.checks.storageSystem = 'local_only';
-        console.log('⚠️ [HEALTH] Storage system: Local storage only (S3 not configured)');
+        console.log('⚠️ [HEALTH] Storage system: Local storage only (Azure not configured)');
       }
     } catch (storageError) {
       console.error('❌ [HEALTH] Storage system check failed:', storageError);

@@ -6,9 +6,9 @@ import { db } from "../db.js";
 import { sql } from "drizzle-orm";
 
 // Optional AWS (prod)
-let S3Client, PutObjectCommand, getSignedUrl;
+let AzureClient, PutObjectCommand, getSignedUrl;
 try {
-  ({ S3Client } = await import("@aws-sdk/client-s3"));
+  ({ AzureClient } = await import("@aws-sdk/client-s3"));
   ({ PutObjectCommand } = await import("@aws-sdk/client-s3"));
   ({ getSignedUrl } = await import("@aws-sdk/s3-request-presigner"));
 } catch (_) { /* dev mode without AWS */ }
@@ -29,7 +29,7 @@ const CompleteBody = z.object({
 });
 
 const isProd = process.env.NODE_ENV === "production";
-const USE_AWS = !!(process.env.S3_BUCKET && process.env.AWS_REGION);
+const USE_AWS = !!(process.env.Azure_BUCKET && process.env.AZURE_REGION);
 const DOCS_JWT_SECRET = process.env.JWT_SECRET || process.env.DOCS_JWT_SECRET || "dev-docs-secret";
 
 type MountTarget = Express | ExpressRouter;
@@ -77,8 +77,8 @@ export function mountDocumentRoutes(app: MountTarget, basePath = "/api") {
 
     if (isProd && USE_AWS) {
       try {
-        const s3 = new S3Client({ region: process.env.AWS_REGION });
-        const bucket = process.env.S3_BUCKET!;
+        const s3 = new AzureClient({ region: process.env.AZURE_REGION });
+        const bucket = process.env.Azure_BUCKET!;
         const cmd = new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType });
         const url = await getSignedUrl(s3, cmd, { expiresIn: 60 * 5 }); // 5 min
 
@@ -93,7 +93,7 @@ export function mountDocumentRoutes(app: MountTarget, basePath = "/api") {
           confirmToken
         });
       } catch (e: any) {
-        return res.status(500).json({ ok: false, error: "S3_SIGN_ERROR", message: e?.message });
+        return res.status(500).json({ ok: false, error: "Azure_SIGN_ERROR", message: e?.message });
       }
     }
 
@@ -181,15 +181,15 @@ export function mountDocumentRoutes(app: MountTarget, basePath = "/api") {
 
     if (isProd && USE_AWS) {
       try {
-        const s3 = new S3Client({ region: process.env.AWS_REGION });
-        const bucket = process.env.S3_BUCKET!;
+        const s3 = new AzureClient({ region: process.env.AZURE_REGION });
+        const bucket = process.env.Azure_BUCKET!;
         // Light-weight prefix listing; you can swap to ListObjectsV2Command if you prefer
         const { ListObjectsV2Command } = await import("@aws-sdk/client-s3");
         const out = await s3.send(new ListObjectsV2Command({ Bucket: bucket, Prefix: `apps/${applicationId}/uploads/` }));
         const items = (out.Contents || []).map(o => ({ key: o.Key, size: o.Size, lastModified: o.LastModified }));
         return res.json({ ok: true, storage: "s3", items });
       } catch (e: any) {
-        return res.status(500).json({ ok: false, error: "S3_LIST_ERROR", message: e?.message });
+        return res.status(500).json({ ok: false, error: "Azure_LIST_ERROR", message: e?.message });
       }
     }
 

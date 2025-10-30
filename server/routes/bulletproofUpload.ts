@@ -1,6 +1,6 @@
 /**
  * BULLETPROOF DOCUMENT UPLOAD API
- * Implements bulletproof upload with local + S3 backup
+ * Implements bulletproof upload with local + Azure backup
  */
 
 import express from 'express';

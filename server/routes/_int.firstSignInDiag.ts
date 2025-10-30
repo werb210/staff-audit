@@ -106,7 +106,6 @@ r.get("/api/_int/auth/first-signin/diag", async (req: any, res: any) => {
 `First-time sign-in & verification ${
   ok ? "is READY" : "is NOT READY"
 }.
-What Replit checked:
 • Database: users, invites, user_lenders tables present; required columns ${
   hardFails.includes(true) ? "have gaps" : "are OK"
 }.

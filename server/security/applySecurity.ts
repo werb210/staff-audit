@@ -84,7 +84,6 @@ export const corsAllowlist: (string|RegExp)[] = [
   "http://localhost:5173",
   "http://127.0.0.1:5000",
   
-  // Replit domains
   /^https:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]?\.replit\.app$/,
   /^https:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]?\.replit\.dev$/,
   /^https:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]?\.janeway\.replit\.dev$/,

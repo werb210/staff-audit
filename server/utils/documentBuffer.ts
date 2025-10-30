@@ -1,7 +1,6 @@
 import { Client } from '@replit/object-storage';
 import crypto from 'crypto';
 
-// Replit Object Storage client - initialized on first use
 let storageClient: Client | null = null;
 let clientInitialized = false;
 
@@ -23,7 +22,6 @@ function getStorageClient(): Client | null {
 }
 
 /**
- * Upload document buffer directly to Replit Object Storage with MIME preservation
  */
 export async function uploadDocumentBuffer(documentId: string, buffer: Buffer, contentType: string = 'application/pdf'): Promise<string> {
   const key = `documents/${documentId}.pdf`;
@@ -46,7 +44,6 @@ export async function uploadDocumentBuffer(documentId: string, buffer: Buffer, c
 }
 
 /**
- * Download document buffer from Replit Object Storage
  */
 export async function downloadDocumentBuffer(storageKey: string): Promise<Buffer | null> {
   const storageClient = getStorageClient();
