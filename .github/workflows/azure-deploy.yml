@@ -10,7 +10,6 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,13 +19,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install root dependencies
+      - name: Install root deps
         run: npm ci
 
       - name: Build server (TypeScript → JS)
         run: npm run build:server
 
-      - name: Install client dependencies
+      - name: Install client deps
         run: npm ci
         working-directory: client
 
@@ -34,12 +33,12 @@ jobs:
         run: npm run build
         working-directory: client
 
-      - name: Confirm dist files exist
+      - name: Verify artifacts
         run: |
-          echo "Checking dist/server..."
-          ls -la dist/server || (echo "❌ Server build missing" && exit 1)
-          echo "Checking client/dist..."
-          ls -la client/dist || (echo "❌ Client build missing" && exit 1)
+          echo "Checking server build..."
+          ls -la dist/server || (echo "❌ dist/server missing" && exit 1)
+          echo "Checking client build..."
+          ls -la client/dist || (echo "❌ client/dist missing" && exit 1)
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
