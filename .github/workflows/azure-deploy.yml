@@ -10,6 +10,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,10 +20,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install root deps
+      - name: Install root dependencies
         run: npm ci
 
-      - name: Install client deps
+      - name: Build server (TypeScript → JS)
+        run: npm run build:server
+
+      - name: Install client dependencies
         run: npm ci
         working-directory: client
 
@@ -30,12 +34,16 @@ jobs:
         run: npm run build
         working-directory: client
 
-      # Type-check server only (exclude client/tests/scripts)
-      - name: Server type check only
-        run: npx tsc -p tsconfig.ci.json --noEmit || true
+      - name: Confirm dist files exist
+        run: |
+          echo "Checking dist/server..."
+          ls -la dist/server || (echo "❌ Server build missing" && exit 1)
+          echo "Checking client/dist..."
+          ls -la client/dist || (echo "❌ Client build missing" && exit 1)
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: boreal-staff
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: .
