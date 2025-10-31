@@ -37,17 +37,22 @@ jobs:
       - name: Verify build artifacts
         run: |
           echo "--- SERVER BUILD ---"
-          ls -la dist/server || (echo "❌ dist/server missing" && exit 1)
+          ls -la dist || (echo "❌ dist missing" && exit 1)
           echo "--- CLIENT BUILD ---"
           ls -la client/dist || (echo "❌ client/dist missing" && exit 1)
 
       - name: Prepare deploy package
         run: |
           mkdir -p deploy
-          cp -r dist deploy/
-          cp -r client/dist deploy/client
+          # flatten server build into deploy root
+          cp -r dist/* deploy/
+          # include client build
+          mkdir -p deploy/client
+          cp -r client/dist/* deploy/client/
+          # include manifest and configs
           cp package.json package-lock.json deploy/
-          echo "✅ Ready for Azure deploy"
+          echo "✅ Deploy folder structure:"
+          ls -R deploy | head -60
         shell: bash
 
       - name: Deploy to Azure Web App
