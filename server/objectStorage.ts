@@ -1,3 +1,4 @@
+// server/objectStorage.ts
 import { Storage, File } from "@google-cloud/storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
@@ -275,21 +276,18 @@ async function signObjectURL({
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
+
   const response = await fetch(
     `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     }
   );
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to sign object URL, error code: ${response.status}`
-    );
+    throw new Error(`Failed to sign object URL, error code: ${response.status}`);
   }
 
   const { signed_url: signedURL } = await response.json();
