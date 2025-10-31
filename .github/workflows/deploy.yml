@@ -1,4 +1,4 @@
-name: Deploy Staff App to AWS
+name: Build and deploy Node.js app to Azure Web App — boreal-staff
 
 on:
   push:
@@ -18,45 +18,43 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      # Critical: do NOT run root postinstall scripts; they invoke tsc on the client
-      - name: Install root deps (no scripts)
-        run: npm ci --ignore-scripts
-
-      # Server-only type build; tsconfig.ci.json must include only server sources
-      - name: Build server (TypeScript → JS)
-        run: npx tsc -p tsconfig.ci.json
-
-      - name: Install client deps
+      - name: Install root dependencies
         run: npm ci
-        working-directory: client
 
-      # Vite does not type-check by default; builds even if the client has TS errors
-      - name: Build client (Vite)
-        run: npm run build
-        working-directory: client
+      - name: Build server (TypeScript → JS only)
+        run: npm run build:server
 
-      - name: Verify build artifacts
+      - name: Verify server build
         run: |
-          echo "--- SERVER BUILD ---"
+          echo "---- DIST CONTENTS ----"
           ls -la dist || (echo "❌ dist missing" && exit 1)
-          echo "--- CLIENT BUILD ---"
-          ls -la client/dist || (echo "❌ client/dist missing" && exit 1)
+          # Accept either flattened dist/index.js or dist/server/index.js
+          if [ -f dist/index.js ]; then
+            echo "✅ Found dist/index.js"
+          elif [ -f dist/server/index.js ]; then
+            echo "✅ Found dist/server/index.js"
+          else
+            echo "❌ Server entry not found in dist/"
+            exit 1
+          fi
 
-      - name: Prepare deploy package
+      - name: Prepare deploy package (server only)
         run: |
           rm -rf deploy
-          mkdir -p deploy/client
-          cp -r dist/* deploy/
-          cp -r client/dist/* deploy/client/
+          mkdir -p deploy
+          if [ -f dist/index.js ]; then
+            cp -r dist/* deploy/
+          else
+            cp -r dist/server/* deploy/
+          fi
           cp package.json package-lock.json deploy/
-          echo "✅ Ready for deploy"
         shell: bash
 
-      # keep your existing AWS deploy step here if you have one; example artifact upload:
-      - name: Upload deploy artifact
-        uses: actions/upload-artifact@v4
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
         with:
-          name: staff-deploy
-          path: deploy
+          app-name: boreal-staff
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./deploy
