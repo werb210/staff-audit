@@ -20,13 +20,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
+      - name: Install root deps
         run: npm ci
 
       - name: Build server (TypeScript → JS)
         run: npm run build:server
 
-      - name: Install client dependencies
+      - name: Install client deps
         run: npm ci
         working-directory: client
 
@@ -34,16 +34,27 @@ jobs:
         run: npm run build
         working-directory: client
 
-      - name: Confirm artifacts exist
+      - name: Verify dist before deploy
         run: |
-          echo "Listing dist/server..."
-          ls -la dist/server || (echo "❌ Missing server build" && exit 1)
-          echo "Listing client/dist..."
-          ls -la client/dist || (echo "❌ Missing client build" && exit 1)
+          echo "Check dist/server"
+          ls -la dist/server || (echo "❌ dist/server missing" && exit 1)
+          echo "Check client/dist"
+          ls -la client/dist || (echo "❌ client/dist missing" && exit 1)
+
+      - name: Package dist only
+        run: |
+          mkdir -p deploy
+          cp -r dist deploy/
+          cp -r client/dist deploy/client
+          cp package.json deploy/
+          cp package-lock.json deploy/
+          cp -r server deploy/server || true
+          echo "✅ Prepared deploy package"
+        shell: bash
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'boreal-staff'
+          app-name: boreal-staff
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .
+          package: ./deploy
